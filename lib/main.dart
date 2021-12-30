@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'sensor_page.dart';
 import 'widgets.dart';
 import 'package:flutter_blue/flutter_blue.dart';
-
+import 'chart_view.dart';
 void main() {
   runApp(FlutterBlueApp());
 }
@@ -132,7 +132,7 @@ class FindDevicesScreen extends StatelessWidget {
           ),
         ),
       ),
-      floatingActionButton: StreamBuilder<bool>(
+      /*floatingActionButton: StreamBuilder<bool>(
         stream: FlutterBlue.instance.isScanning,
         initialData: false,
         builder: (c, snapshot) {
@@ -149,6 +149,11 @@ class FindDevicesScreen extends StatelessWidget {
                     .startScan(timeout: const Duration(seconds: 4)));
           }
         },
+      ),*/
+      floatingActionButton: FloatingActionButton(
+      onPressed: () => Navigator.of(context).push(
+      MaterialPageRoute(
+          builder: (context) => Chart()))
       ),
     );
   }
