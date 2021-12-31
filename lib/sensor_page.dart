@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:oscilloscope/oscilloscope.dart';
 
+
 class SensorPage extends StatefulWidget {
   const SensorPage({Key? key, required this.device}) : super(key: key);
   final BluetoothDevice device;
@@ -14,11 +15,11 @@ class SensorPage extends StatefulWidget {
 }
 
 class _SensorPageState extends State<SensorPage> {
-  final String SERVICE_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
-  final String CHARACTERISTIC_UUID = "6e400003-b5a3-f393-e0a9-e50e24dcca9e";
+  final String CHARACTERISTIC_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
+  final String SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
   late bool isReady;
   late Stream<List<int>> stream;
-  List<double> traceDust = [];
+  List<double> liveData = [];
 
   @override
   void initState() {
@@ -59,6 +60,7 @@ class _SensorPageState extends State<SensorPage> {
       return;
     }
 
+    /// Reads the UART services and characteristics for the Micro:Bit
     List<BluetoothService> services = await widget.device.discoverServices();
     for (var service in services) {
       if (service.uuid.toString() == SERVICE_UUID) {
@@ -66,7 +68,6 @@ class _SensorPageState extends State<SensorPage> {
           if (characteristic.uuid.toString() == CHARACTERISTIC_UUID) {
             characteristic.setNotifyValue(!characteristic.isNotifying);
             stream = characteristic.value;
-
             setState(() {
               isReady = true;
             });
@@ -112,6 +113,8 @@ class _SensorPageState extends State<SensorPage> {
 
   @override
   Widget build(BuildContext context) {
+
+    // Change this with chart dependency
     Oscilloscope oscilloscope = Oscilloscope(
       showYAxis: true,
       //TODO deprecated padding change to margin
@@ -120,8 +123,10 @@ class _SensorPageState extends State<SensorPage> {
       traceColor: Colors.white,
       yAxisMax: 3000.0,
       yAxisMin: 0.0,
-      dataSet: traceDust,
+      dataSet: liveData,
     );
+
+
 
     return WillPopScope(
       onWillPop: _onWillPop,
@@ -146,7 +151,7 @@ class _SensorPageState extends State<SensorPage> {
                     if (snapshot.connectionState ==
                         ConnectionState.active) {
                       var currentValue = _dataParser(snapshot.data!);
-                      traceDust.add(double.tryParse(currentValue) ?? 0);
+                      liveData.add(double.tryParse(currentValue) ?? 0);
 
                       return Center(
                           child: Column(
