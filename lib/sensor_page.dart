@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-
 class SensorPage extends StatefulWidget {
   const SensorPage({Key? key, required this.device}) : super(key: key);
   final BluetoothDevice device;
@@ -14,6 +13,7 @@ class SensorPage extends StatefulWidget {
 }
 
 class _SensorPageState extends State<SensorPage> {
+
   final String SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
   final String CHARACTERISTIC_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
   late bool isReady;
@@ -23,6 +23,7 @@ class _SensorPageState extends State<SensorPage> {
   late ChartSeriesController _chartSeriesController;
   late ZoomPanBehavior _zoomPanBehavior;
   late Timer timer;
+
 
   @override
   void initState() {
@@ -70,6 +71,7 @@ class _SensorPageState extends State<SensorPage> {
       return;
     }
 
+    /// Reads the UART services and characteristics for the Micro:Bit
     List<BluetoothService> services = await widget.device.discoverServices();
     for (var service in services) {
       if (service.uuid.toString() == SERVICE_UUID) {
@@ -77,7 +79,6 @@ class _SensorPageState extends State<SensorPage> {
           if (characteristic.uuid.toString() == CHARACTERISTIC_UUID) {
             characteristic.setNotifyValue(!characteristic.isNotifying);
             stream = characteristic.value;
-
             setState(() {
               isReady = true;
             });
@@ -89,7 +90,6 @@ class _SensorPageState extends State<SensorPage> {
     if (!isReady) {
       _Pop();
     }
-
   }
 
   Future<bool> _onWillPop() {
@@ -144,7 +144,6 @@ class _SensorPageState extends State<SensorPage> {
                   builder: (BuildContext context,
                       AsyncSnapshot<List<int>> snapshot) {
                     if (snapshot.hasError) return Text('Error: ${snapshot.error}');
-
                     if (snapshot.connectionState == ConnectionState.active) {
                        var currentValue = _dataParser(snapshot.data!);
                        traceDust.add(double.tryParse(currentValue) ?? 0);
@@ -180,6 +179,7 @@ class _SensorPageState extends State<SensorPage> {
                             ),
                           )
                       );
+
 
                     } else {
                       return const Text('Check the stream');
