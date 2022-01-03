@@ -1,10 +1,7 @@
 import 'dart:async';
 import 'dart:convert' show utf8;
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
-import 'package:oscilloscope/oscilloscope.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 
@@ -36,7 +33,7 @@ class _SensorPageState extends State<SensorPage> {
       zoomMode: ZoomMode.xy,
       enablePanning: true,
     );
-    Timer.periodic(const Duration(milliseconds: 5), updateDataSource);
+    Timer.periodic(const Duration(milliseconds: 500), updateDataSource);
 
     isReady = false;
     connectToDevice();
@@ -64,7 +61,6 @@ class _SensorPageState extends State<SensorPage> {
       _Pop();
       return;
     }
-
     widget.device.disconnect();
   }
 
@@ -93,6 +89,7 @@ class _SensorPageState extends State<SensorPage> {
     if (!isReady) {
       _Pop();
     }
+
   }
 
   Future<bool> _onWillPop() {
@@ -127,17 +124,6 @@ class _SensorPageState extends State<SensorPage> {
 
   @override
   Widget build(BuildContext context) {
-    /*Oscilloscope oscilloscope = Oscilloscope(
-      showYAxis: true,
-      //TODO deprecated padding change to margin
-      padding: 0.0,
-      backgroundColor: Colors.black,
-      traceColor: Colors.white,
-      yAxisMax: 3000.0,
-      yAxisMin: 0.0,
-      dataSet: traceDust,
-    );*/
-
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
@@ -145,6 +131,7 @@ class _SensorPageState extends State<SensorPage> {
           title: const Text('Sensor'),
         ),
         body: Container(
+          height: 400,
             child: !isReady
                 ? const Center(
               child: Text(
@@ -158,11 +145,9 @@ class _SensorPageState extends State<SensorPage> {
                       AsyncSnapshot<List<int>> snapshot) {
                     if (snapshot.hasError) return Text('Error: ${snapshot.error}');
 
-                    /*if (snapshot.connectionState ==
-                        ConnectionState.active) {*/
-                      var currentValue = _dataParser(snapshot.data!);
-                      print("CURRENT VALUE $currentValue");
-                      traceDust.add(double.tryParse(currentValue) ?? 0);
+                    if (snapshot.connectionState == ConnectionState.active) {
+                       var currentValue = _dataParser(snapshot.data!);
+                       traceDust.add(double.tryParse(currentValue) ?? 0);
 
                       return SafeArea(
                           child: Scaffold(
@@ -174,7 +159,7 @@ class _SensorPageState extends State<SensorPage> {
                                 SplineSeries<LiveData, int>(
                                   dataSource: chartData,
                                   //chartData lateInitializationError
-                                  name: 'sensor',
+                                  name: 'Right foot',
                                   //Legend name
                                   onRendererCreated: (ChartSeriesController controller) {
                                     _chartSeriesController = controller; //Updates the chart live
@@ -196,36 +181,11 @@ class _SensorPageState extends State<SensorPage> {
                           )
                       );
 
-                      /*
-                      return Center(
-
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Expanded(
-                                flex: 1,
-                                child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      const Text('Current value from Sensor',
-                                          style: TextStyle(fontSize: 14)),
-                                      Text('${currentValue}',
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 24))
-                                    ]),
-                              ),
-                              Expanded(
-                                flex: 1,
-                                child: oscilloscope,
-                              )
-                            ],
-                          )
-                      );
-                      */
-                    /*} else {
+                    } else {
                       return const Text('Check the stream');
-                    }*/
+                    }
+
+
                   },
                 )),
       ),
@@ -237,37 +197,36 @@ class _SensorPageState extends State<SensorPage> {
     /*if (time == 100) {
       timer.cancel();
     }*/
-    //print("TRACEDUST ${traceDust}");
-    chartData.add(LiveData(time++, traceDust.last));
-    //chartData.removeAt(0);
-    _chartSeriesController.updateDataSource(
-        addedDataIndex: chartData.length - 1);
-    //print(chartData.length);
-  }
 
-  /*List<LiveData> getChartData() {
-    return <LiveData>[
-      LiveData(0, 42),
-      LiveData(1, 47),
-      LiveData(2, 43),
-      LiveData(3, 49),
-      LiveData(4, 54),
-      LiveData(5, 41),
-      LiveData(6, 58),
-      LiveData(7, 51),
-      LiveData(8, 98),
-      LiveData(9, 41),
-      LiveData(10, 53),
-      LiveData(11, 72),
-      LiveData(12, 86),
-      LiveData(13, 52),
-      LiveData(14, 94),
-      LiveData(15, 92),
-      LiveData(16, 86),
-      LiveData(17, 72),
-      LiveData(18, 94)
-    ];
-  }*/
+    //print("TRACEDUST $traceDust");
+    chartData.add(LiveData(time++, traceDust.last));
+    //traceDust.removeLast();
+
+    if (chartData.length == 15) {
+      chartData.removeAt(0);
+      _chartSeriesController.updateDataSource(
+        addedDataIndexes: <int>[chartData.length - 1],
+        removedDataIndexes: <int>[0],
+      );
+    } else {
+      _chartSeriesController.updateDataSource(
+        addedDataIndexes: <int>[chartData.length - 1],
+      );
+    }
+      // Removes the last index data of data source.
+    // chartData.removeAt(0);
+      // Here calling updateDataSource method with addedDataIndexes to add data in last index and removedDataIndexes to remove data from the last.
+      // _chartSeriesController.updateDataSource(addedDataIndexes: <int>[chartData.length - 1],
+      //     removedDataIndexes: <int>[0]);
+
+      //print("CHARTDATA ${chartData.length}");
+
+    /*_chartSeriesController.updateDataSource(
+        addedDataIndex: chartData.length - 1);*/
+
+    //print(chartData.length);
+    //chartData.removeAt(0);
+  }
 
 }
 
