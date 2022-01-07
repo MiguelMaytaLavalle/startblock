@@ -1,8 +1,13 @@
 import 'dart:async';
 import 'dart:convert' show utf8;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:startblock/model/livedata.dart';
+import 'package:startblock/view_model/sensor_page_view_model.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+
+import '../contants/contants.dart';
 
 class SensorPage extends StatefulWidget {
   const SensorPage({Key? key, required this.device}) : super(key: key);
@@ -13,22 +18,20 @@ class SensorPage extends StatefulWidget {
 }
 
 class _SensorPageState extends State<SensorPage> {
-
-  final String SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
-  final String CHARACTERISTIC_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
-  late bool isReady;
+  var sensorPageViewModel = SensorPageViewModel();
+  //late bool isReady;
   late Stream<List<int>> stream;
-  List<double> traceDust = [];
-  late List<LiveData> chartData;
+  //List<double> traceDust = [];
+  //late List<LiveData> chartData;
   late ChartSeriesController _chartSeriesController;
   late ZoomPanBehavior _zoomPanBehavior;
-  late Timer timer;
+  //late Timer timer;
 
 
   @override
   void initState() {
     super.initState();
-    chartData = <LiveData>[];//getChartData();
+    //chartData = <LiveData>[];//getChartData();
     _zoomPanBehavior = ZoomPanBehavior(
       enablePinching: true,
       zoomMode: ZoomMode.xy,
@@ -36,7 +39,7 @@ class _SensorPageState extends State<SensorPage> {
     );
     Timer.periodic(const Duration(milliseconds: 500), updateDataSource);
 
-    isReady = false;
+    //isReady = false;
     connectToDevice();
   }
 
@@ -47,7 +50,8 @@ class _SensorPageState extends State<SensorPage> {
     }
 
     Timer(const Duration(seconds: 15), () {
-      if (!isReady) {
+      //if (!isReady) {
+      if(!sensorPageViewModel.getIsReady()){
         disconnectFromDevice();
         _Pop();
       }
@@ -74,20 +78,21 @@ class _SensorPageState extends State<SensorPage> {
     /// Reads the UART services and characteristics for the Micro:Bit
     List<BluetoothService> services = await widget.device.discoverServices();
     for (var service in services) {
-      if (service.uuid.toString() == SERVICE_UUID) {
+      if (service.uuid.toString() == Contants.SERVICE_UUID) {
         for (var characteristic in service.characteristics) {
-          if (characteristic.uuid.toString() == CHARACTERISTIC_UUID) {
+          if (characteristic.uuid.toString() == Contants.CHARACTERISTIC_UUID) {
             characteristic.setNotifyValue(!characteristic.isNotifying);
             stream = characteristic.value;
             setState(() {
-              isReady = true;
+              sensorPageViewModel.setIsReady(true);
             });
           }
         }
       }
     }
 
-    if (!isReady) {
+    //if (!isReady) {
+    if (!sensorPageViewModel.getIsReady()){
       _Pop();
     }
   }
@@ -131,8 +136,8 @@ class _SensorPageState extends State<SensorPage> {
           title: const Text('Sensor'),
         ),
         body: Container(
-          height: 400,
-            child: !isReady
+          //height: 400,
+            child: !sensorPageViewModel.getIsReady()
                 ? const Center(
               child: Text(
                 "Waiting...",
@@ -144,11 +149,14 @@ class _SensorPageState extends State<SensorPage> {
                   builder: (BuildContext context,
                       AsyncSnapshot<List<int>> snapshot) {
                     if (snapshot.hasError) return Text('Error: ${snapshot.error}');
+
                     if (snapshot.connectionState == ConnectionState.active) {
                        var currentValue = _dataParser(snapshot.data!);
-                       traceDust.add(double.tryParse(currentValue) ?? 0);
+                       //traceDust.add(double.tryParse(currentValue) ?? 0);
+                       sensorPageViewModel.getTraceDust().add(int.tryParse(currentValue) ?? 0);
 
                       return SafeArea(
+
                           child: Scaffold(
                             body: SfCartesianChart(
                               title: ChartTitle(text: "Micro:Bit"),
@@ -156,7 +164,8 @@ class _SensorPageState extends State<SensorPage> {
                               zoomPanBehavior: _zoomPanBehavior,
                               series: <ChartSeries>[
                                 SplineSeries<LiveData, int>(
-                                  dataSource: chartData,
+                                  //dataSource: chartData,
+                                  dataSource: sensorPageViewModel.getChartData(),
                                   //chartData lateInitializationError
                                   name: 'Right foot',
                                   //Legend name
@@ -177,61 +186,42 @@ class _SensorPageState extends State<SensorPage> {
                                   majorTickLines: const MajorTickLines(size: 0),
                                   title: AxisTitle(text: 'Value (Analog)')),
                             ),
-                          )
+                        ),
+
                       );
-
-
                     } else {
                       return const Text('Check the stream');
                     }
-
-
                   },
                 )),
+
       ),
     );
   }
 
-  int time = 0;
   void updateDataSource(Timer timer) {
-    /*if (time == 100) {
+    /*if (sensorPageViewModel.getTime() == 15) {
       timer.cancel();
     }*/
+    //chartData.add(LiveData(time++, traceDust.last));
 
-    //print("TRACEDUST $traceDust");
-    chartData.add(LiveData(time++, traceDust.last));
-    //traceDust.removeLast();
+    sensorPageViewModel.getChartData().add(LiveData(sensorPageViewModel.getTime(), sensorPageViewModel.getTraceDust().last));
 
-    if (chartData.length == 15) {
-      chartData.removeAt(0);
+    //if (chartData.length == 15) {
+    if(sensorPageViewModel.getChartData().length == 15){
+      //chartData.removeAt(0);
+      sensorPageViewModel.getChartData().removeAt(0);
       _chartSeriesController.updateDataSource(
-        addedDataIndexes: <int>[chartData.length - 1],
+        //addedDataIndexes: <int>[chartData.length - 1],
+        addedDataIndexes: <int>[sensorPageViewModel.getChartData().length - 1],
         removedDataIndexes: <int>[0],
       );
     } else {
       _chartSeriesController.updateDataSource(
-        addedDataIndexes: <int>[chartData.length - 1],
+        //addedDataIndexes: <int>[chartData.length - 1],
+        addedDataIndexes: <int>[sensorPageViewModel.getChartData().length - 1],
       );
     }
-      // Removes the last index data of data source.
-    // chartData.removeAt(0);
-      // Here calling updateDataSource method with addedDataIndexes to add data in last index and removedDataIndexes to remove data from the last.
-      // _chartSeriesController.updateDataSource(addedDataIndexes: <int>[chartData.length - 1],
-      //     removedDataIndexes: <int>[0]);
-
-      //print("CHARTDATA ${chartData.length}");
-
-    /*_chartSeriesController.updateDataSource(
-        addedDataIndex: chartData.length - 1);*/
-
-    //print(chartData.length);
-    //chartData.removeAt(0);
+    sensorPageViewModel.incrementTime();
   }
-
-}
-
-class LiveData {
-  LiveData(this.time, this.speed); //Constructor
-  final int time;
-  final num speed;
 }
