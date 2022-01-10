@@ -19,15 +19,27 @@ class SensorPageViewModel{
     sensorPageModel.isReady = set;
   }
 
-  getChartData() {
-    return sensorPageModel.chartData;
-  }
-
   getTraceDust(){
     return sensorPageModel.traceDust;
   }
 
+  getRightFootArray(){
+    return sensorPageModel.rightFootArray;
+  }
+
+  getLeftFootArray(){
+    return sensorPageModel.leftFootArray;
+  }
+
   void incrementTime() {
     sensorPageModel.time++;
+  }
+
+  getLeftChartData() {
+    return sensorPageModel.leftChartData;
+  }
+
+  getRightChartData() {
+    return sensorPageModel.rightChartData;
   }
 }

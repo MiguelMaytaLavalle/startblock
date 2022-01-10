@@ -1,13 +1,15 @@
 import 'dart:async';
 import 'dart:convert' show utf8;
+import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:startblock/model/livedata.dart';
 import 'package:startblock/view_model/sensor_page_view_model.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-
-import '../contants/contants.dart';
+import 'package:startblock/constant/constants.dart';
+import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 
 class SensorPage extends StatefulWidget {
   const SensorPage({Key? key, required this.device}) : super(key: key);
@@ -19,27 +21,23 @@ class SensorPage extends StatefulWidget {
 
 class _SensorPageState extends State<SensorPage> {
   var sensorPageViewModel = SensorPageViewModel();
-  //late bool isReady;
   late Stream<List<int>> stream;
-  //List<double> traceDust = [];
-  //late List<LiveData> chartData;
   late ChartSeriesController _chartSeriesController;
   late ZoomPanBehavior _zoomPanBehavior;
+  late CrosshairBehavior _crosshairBehavior;
   //late Timer timer;
 
 
   @override
   void initState() {
     super.initState();
-    //chartData = <LiveData>[];//getChartData();
     _zoomPanBehavior = ZoomPanBehavior(
       enablePinching: true,
       zoomMode: ZoomMode.xy,
       enablePanning: true,
     );
+    _crosshairBehavior = CrosshairBehavior(enable: true);
     Timer.periodic(const Duration(milliseconds: 500), updateDataSource);
-
-    //isReady = false;
     connectToDevice();
   }
 
@@ -75,9 +73,12 @@ class _SensorPageState extends State<SensorPage> {
       return;
     }
 
-    /// Reads the UART services and characteristics for the Micro:Bit
+   // connectServicesAndCharacteristics(Contants.SERVICE_UUID, Contants.CHARACTERISTIC_UUID);
+
+   /// Reads the UART services and characteristics for the Micro:Bit
     List<BluetoothService> services = await widget.device.discoverServices();
     for (var service in services) {
+      print("Servfound ${service.uuid.toString()}");
       if (service.uuid.toString() == Contants.SERVICE_UUID) {
         for (var characteristic in service.characteristics) {
           if (characteristic.uuid.toString() == Contants.CHARACTERISTIC_UUID) {
@@ -129,99 +130,249 @@ class _SensorPageState extends State<SensorPage> {
 
   @override
   Widget build(BuildContext context) {
+    final ButtonStyle style =
+      ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 20));
+
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Sensor'),
+          title: const Text('Startblock'),
         ),
-        body: Container(
-          //height: 400,
+        body: SizedBox(
+          height: 500,
             child: !sensorPageViewModel.getIsReady()
                 ? const Center(
               child: Text(
-                "Waiting...",
-                style: TextStyle(fontSize: 24, color: Colors.red),
+                "Connecting...",
+                style: TextStyle(fontSize: 24, color: Colors.blue),
               ),
             )
                 : StreamBuilder<List<int>>(
                   stream: stream,
-                  builder: (BuildContext context,
-                      AsyncSnapshot<List<int>> snapshot) {
+                  builder: (BuildContext context, AsyncSnapshot<List<int>> snapshot) {
                     if (snapshot.hasError) return Text('Error: ${snapshot.error}');
-
                     if (snapshot.connectionState == ConnectionState.active) {
-                       var currentValue = _dataParser(snapshot.data!);
-                       //traceDust.add(double.tryParse(currentValue) ?? 0);
-                       sensorPageViewModel.getTraceDust().add(int.tryParse(currentValue) ?? 0);
-
+                      readData(snapshot);
                       return SafeArea(
-
                           child: Scaffold(
                             body: SfCartesianChart(
-                              title: ChartTitle(text: "Micro:Bit"),
+                              //title: ChartTitle(text: "Startblock"),
+                              crosshairBehavior: _crosshairBehavior,
                               legend: Legend(isVisible: true),
                               zoomPanBehavior: _zoomPanBehavior,
-                              series: <ChartSeries>[
-                                SplineSeries<LiveData, int>(
-                                  //dataSource: chartData,
-                                  dataSource: sensorPageViewModel.getChartData(),
-                                  //chartData lateInitializationError
-                                  name: 'Right foot',
-                                  //Legend name
-                                  onRendererCreated: (ChartSeriesController controller) {
-                                    _chartSeriesController = controller; //Updates the chart live
-                                  },
-                                  xValueMapper: (LiveData livedata, _) => livedata.time,
-                                  yValueMapper: (LiveData livedata, _) => livedata.speed,
-                                )
-                              ],
+                              series: _getLiveUpdateSeries(),
                               primaryXAxis: NumericAxis(
+                                  interactiveTooltip: const InteractiveTooltip(
+                                    enable: true,
+                                ),
                                   majorGridLines: const MajorGridLines(width: 0),
                                   edgeLabelPlacement: EdgeLabelPlacement.shift,
                                   interval: 3,
-                                  title: AxisTitle(text: 'Time(seconds)')),
+                                  title: AxisTitle(text: 'Time [S]')
+                              ),
                               primaryYAxis: NumericAxis(
+                                minimum: 0,
+                                  maximum: 800,
+                                  interactiveTooltip: const InteractiveTooltip(
+                                    enable: true,
+                                  ),
                                   axisLine: const AxisLine(width: 0),
                                   majorTickLines: const MajorTickLines(size: 0),
-                                  title: AxisTitle(text: 'Value (Analog)')),
+                                  title: AxisTitle(text: 'Force [N]')
+                              ),
+
                             ),
+
                         ),
-
                       );
-                    } else {
-                      return const Text('Check the stream');
-                    }
+                    } else { return const Text('Check the stream'); }
                   },
-                )),
-
+                )
+        ),
+        floatingActionButton:Wrap(
+          direction: Axis.horizontal,
+          children: <Widget>[
+            Container(
+                margin:const EdgeInsets.all(10),
+                child: ElevatedButton(
+                  onPressed: () => _createExcel,
+                  child: const Icon(Icons.save_alt),
+                )
+            ),
+            Container(
+                margin:const EdgeInsets.all(10),
+                child: ElevatedButton(
+                  onPressed: () => initGo(),
+                  child: const Text('START'),
+                )
+            ),
+          ],
+        ),
       ),
     );
   }
 
+  Future<void> _createExcel() async {
+// Create a new Excel Document.
+    final Workbook workbook = Workbook();
+
+// Accessing worksheet via index.
+    final Worksheet sheet = workbook.worksheets[0];
+
+// Set the text value.
+    sheet.getRangeByName('A1').setText('Hello World!');
+
+// Save and dispose the document.
+    final List<int> bytes = workbook.saveAsStream();
+    workbook.dispose();
+
+// Save the Excel file in the local machine.
+    File('Output.xlsx').writeAsBytes(bytes);
+
+  }
+
+
+  /**
+   * Updates the data sources for right and left foot
+   */
   void updateDataSource(Timer timer) {
-    /*if (sensorPageViewModel.getTime() == 15) {
-      timer.cancel();
-    }*/
+    //if (sensorPageViewModel.getTime() == 15) {
+      //timer.cancel();
+    //}
+
     //chartData.add(LiveData(time++, traceDust.last));
 
-    sensorPageViewModel.getChartData().add(LiveData(sensorPageViewModel.getTime(), sensorPageViewModel.getTraceDust().last));
+      sensorPageViewModel.getRightChartData().add(LiveData(
+          sensorPageViewModel.getTime(),
+          sensorPageViewModel.getRightFootArray().last));
+    sensorPageViewModel.getLeftChartData().add(LiveData(
+        sensorPageViewModel.getTime(),
+        sensorPageViewModel.getLeftFootArray().last));
 
-    //if (chartData.length == 15) {
-    if(sensorPageViewModel.getChartData().length == 15){
-      //chartData.removeAt(0);
-      sensorPageViewModel.getChartData().removeAt(0);
+        _chartSeriesController.updateDataSource(
+          addedDataIndexes: <int>[sensorPageViewModel.getRightChartData().length - 1],
+        );
+        _chartSeriesController.updateDataSource(
+          addedDataIndexes: <int>[sensorPageViewModel.getLeftChartData().length - 1],
+        );
+
+/*    if(sensorPageViewModel.getRightChartData().length == 15){
+      sensorPageViewModel.getRightChartData().removeAt(0);
+      sensorPageViewModel.getLeftChartData().removeAt(0);
+
       _chartSeriesController.updateDataSource(
-        //addedDataIndexes: <int>[chartData.length - 1],
-        addedDataIndexes: <int>[sensorPageViewModel.getChartData().length - 1],
+        addedDataIndexes: <int>[sensorPageViewModel.getRightChartData().length - 1],
+        removedDataIndexes: <int>[0],
+      );
+      _chartSeriesController.updateDataSource(
+        addedDataIndexes: <int>[sensorPageViewModel.getLeftChartData().length - 1],
         removedDataIndexes: <int>[0],
       );
     } else {
       _chartSeriesController.updateDataSource(
-        //addedDataIndexes: <int>[chartData.length - 1],
-        addedDataIndexes: <int>[sensorPageViewModel.getChartData().length - 1],
+        addedDataIndexes: <int>[sensorPageViewModel.getRightChartData().length - 1],
+      );
+      _chartSeriesController.updateDataSource(
+        addedDataIndexes: <int>[sensorPageViewModel.getLeftChartData().length - 1],
+
+      );
+    }*/
+      sensorPageViewModel.incrementTime();
+
+    /*sensorPageViewModel.getRightChartData().add(LiveData(sensorPageViewModel.getTime(), sensorPageViewModel.getRightFootArray().last));
+    sensorPageViewModel.getLeftChartData().add(LiveData(sensorPageViewModel.getTime(), sensorPageViewModel.getLeftFootArray().last));
+
+    if(sensorPageViewModel.getRightChartData().length == 15){
+      sensorPageViewModel.getRightChartData().removeAt(0);
+      _chartSeriesController.updateDataSource(
+        addedDataIndexes: <int>[sensorPageViewModel.getRightChartData().length - 1],
+        removedDataIndexes: <int>[0],
+      );
+    } else {
+      _chartSeriesController.updateDataSource(
+        addedDataIndexes: <int>[sensorPageViewModel.getRightChartData().length - 1],
       );
     }
-    sensorPageViewModel.incrementTime();
+    sensorPageViewModel.incrementTime();*/
+  }
+
+  void readData(AsyncSnapshot<List<int>> snapshot) {
+    var currentValue = _dataParser(snapshot.data!);
+    var tag = currentValue.split(':');
+    switch(tag[0]){
+      case 'RF': {
+        sensorPageViewModel.getRightFootArray().add(int.tryParse(tag[1]) ?? 0);
+      }
+      break;
+      case 'LF': {
+        sensorPageViewModel.getLeftFootArray().add(int.tryParse(tag[1]) ?? 0);
+      }
+      break;
+      default:{
+        print('No data to read');
+      }
+      break;
+    }
+  }
+
+  /// Updates the chart
+  List<SplineSeries<LiveData, int>> _getLiveUpdateSeries() {
+    return <SplineSeries<LiveData, int>>[
+      SplineSeries<LiveData, int>(
+        dataSource: sensorPageViewModel.getLeftChartData()!,
+        width: 2,
+        name: 'Left foot',
+        onRendererCreated: (ChartSeriesController controller) {
+          _chartSeriesController = controller; //Updates the chart live
+        },
+        xValueMapper: (LiveData livedata, _) => livedata.time,
+        yValueMapper: (LiveData livedata, _) => livedata.speed,
+      ),
+      SplineSeries<LiveData, int>(
+        dataSource: sensorPageViewModel.getRightChartData()!,
+        width: 2,
+        name: 'Right foot',
+        onRendererCreated: (ChartSeriesController controller) {
+          _chartSeriesController = controller; //Updates the chart live
+        },
+        xValueMapper: (LiveData livedata, _) => livedata.time,
+        yValueMapper: (LiveData livedata, _) => livedata.speed,
+      ),
+    ];
+  }
+
+  initGo() async {
+    /// Reads the services and characteristics UUID for the Micro:Bit
+    /// Send a GO signal to the Micro:Bit
+    List<BluetoothService> services = await widget.device.discoverServices();
+    for (var service in services) {
+      if (service.uuid.toString() == Contants.LEDSERVICE_SERVICE_UUID) {
+        for (var c in service.characteristics) {
+          if (c.uuid.toString() == Contants.LEDTEXT_CHARACTERISTIC_UUID) {
+            //characteristic.setNotifyValue(!characteristic.isNotifying);
+            String test = ',1';
+            List<int> bytes = utf8.encode(test);
+
+            await c.write(bytes);
+          }
+        }
+      }
+    }
+  }
+
+}
+
+class MyStatelessWidget extends StatelessWidget {
+  const MyStatelessWidget({Key? key}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton(
+      onPressed: () {
+        debugPrint('Received click');
+      },
+      child: const Text('Click Me'),
+    );
   }
 }
+
