@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:startblock/view/sensor_page.dart';
@@ -88,32 +89,32 @@ class FindDevicesScreen extends StatelessWidget {
         ),
       ),
 
-      floatingActionButton: StreamBuilder<bool>(
-        stream: FlutterBlue.instance.isScanning,
-        initialData: false,
-        builder: (c, snapshot) {
-          if (snapshot.data!) {
-            return FloatingActionButton(
-              child: const Icon(Icons.stop),
-              onPressed: () => FlutterBlue.instance.stopScan(),
-              backgroundColor: Colors.red,
-            );
-          } else {
-            return FloatingActionButton(
-                child: const Icon(Icons.search),
-                onPressed: () => FlutterBlue.instance
-                    .startScan(timeout: const Duration(seconds: 4)));
-          }
-        },
-      ),
+      floatingActionButton:
+          Wrap(
+            direction: Axis.horizontal,
+            children: <Widget>[
+              StreamBuilder<bool>(
+                stream: FlutterBlue.instance.isScanning,
+                initialData: false,
+                builder: (c, snapshot) {
+                  if (snapshot.data!) {
+                    return FloatingActionButton(
+                      child: const Icon(Icons.stop),
+                      onPressed: () => FlutterBlue.instance.stopScan(),
+                      backgroundColor: Colors.red,
+                    );
+                  } else {
+                    return FloatingActionButton(
+                        child: const Icon(Icons.search),
+                        onPressed: () => FlutterBlue.instance
+                            .startScan(timeout: const Duration(seconds: 4)));
+                  }
+                },
+              ),
 
-      /*
-      floatingActionButton: FloatingActionButton(
-      onPressed: () => Navigator.of(context).push(
-      MaterialPageRoute(
-          builder: (context) => Chart()))
-      ),
-      */
+            ],
+          )
+
     );
   }
 }

@@ -37,6 +37,7 @@ dependencies:
   flutter_blue: ^0.8.0
   oscilloscope: ^0.2.0+1
   syncfusion_flutter_charts: ^19.4.40
+  syncfusion_flutter_xlsio: ^19.4.41-beta
 
 dev_dependencies:
   flutter_test:
