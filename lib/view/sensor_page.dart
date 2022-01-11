@@ -173,7 +173,7 @@ class _SensorPageState extends State<SensorPage> {
                               ),
                               primaryYAxis: NumericAxis(
                                 minimum: 0,
-                                  maximum: 800,
+                                  //maximum: 800,
                                   interactiveTooltip: const InteractiveTooltip(
                                     enable: true,
                                   ),
@@ -190,6 +190,7 @@ class _SensorPageState extends State<SensorPage> {
                   },
                 )
         ),
+
         floatingActionButton:Wrap(
           direction: Axis.horizontal,
           children: <Widget>[
@@ -209,6 +210,7 @@ class _SensorPageState extends State<SensorPage> {
             ),
           ],
         ),
+
       ),
     );
   }
@@ -353,7 +355,6 @@ class _SensorPageState extends State<SensorPage> {
             //characteristic.setNotifyValue(!characteristic.isNotifying);
             String test = ',1';
             List<int> bytes = utf8.encode(test);
-
             await c.write(bytes);
           }
         }

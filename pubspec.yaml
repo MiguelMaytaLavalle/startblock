@@ -38,6 +38,7 @@ dependencies:
   oscilloscope: ^0.2.0+1
   syncfusion_flutter_charts: ^19.4.40
   syncfusion_flutter_xlsio: ^19.4.41-beta
+  sqflite: ^2.0.1
 
 dev_dependencies:
   flutter_test:
