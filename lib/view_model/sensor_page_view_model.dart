@@ -42,4 +42,11 @@ class SensorPageViewModel{
   getRightChartData() {
     return sensorPageModel.rightChartData;
   }
+
+  /// Remove the very first index from the arrays that represents the chart
+  /// to keep the chart live without stacking up
+  void removeDataAtIndexZero() {
+    sensorPageModel.rightChartData.removeAt(0);
+    //sensorPageModel.leftChartData.removeAt(0);
+  }
 }

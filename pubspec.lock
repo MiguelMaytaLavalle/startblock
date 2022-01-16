@@ -115,7 +115,7 @@ packages:
       name: image
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.1.0"
+    version: "3.1.1"
   intl:
     dependency: transitive
     description:
@@ -218,28 +218,28 @@ packages:
       name: syncfusion_flutter_charts
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "19.4.40"
+    version: "19.4.42"
   syncfusion_flutter_core:
     dependency: transitive
     description:
       name: syncfusion_flutter_core
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "19.4.41"
+    version: "19.4.42"
   syncfusion_flutter_xlsio:
     dependency: "direct main"
     description:
       name: syncfusion_flutter_xlsio
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "19.4.41-beta"
+    version: "19.4.42-beta"
   syncfusion_officecore:
     dependency: transitive
     description:
       name: syncfusion_officecore
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "19.4.41-beta"
+    version: "19.4.42-beta"
   term_glyph:
     dependency: transitive
     description:

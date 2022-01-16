@@ -160,7 +160,7 @@ class _SensorPageState extends State<SensorPage> {
                               //title: ChartTitle(text: "Startblock"),
                               crosshairBehavior: _crosshairBehavior,
                               legend: Legend(isVisible: true),
-                              zoomPanBehavior: _zoomPanBehavior,
+                              //zoomPanBehavior: _zoomPanBehavior,
                               series: _getLiveUpdateSeries(),
                               primaryXAxis: NumericAxis(
                                   interactiveTooltip: const InteractiveTooltip(
@@ -173,7 +173,7 @@ class _SensorPageState extends State<SensorPage> {
                               ),
                               primaryYAxis: NumericAxis(
                                 minimum: 0,
-                                  maximum: 800,
+                                  //maximum: 800,
                                   interactiveTooltip: const InteractiveTooltip(
                                     enable: true,
                                   ),
@@ -249,14 +249,26 @@ class _SensorPageState extends State<SensorPage> {
     sensorPageViewModel.getLeftChartData().add(LiveData(
         sensorPageViewModel.getTime(),
         sensorPageViewModel.getLeftFootArray().last));
-
+    if(sensorPageViewModel.getRightChartData().length == 20 && sensorPageViewModel.getLeftChartData().length == 20)
+      {
+        sensorPageViewModel.getRightChartData().removeAt(0);
         _chartSeriesController.updateDataSource(
+            addedDataIndexes: <int>[sensorPageViewModel.getRightChartData().length - 1],removedDataIndex: 0
+        );
+        sensorPageViewModel.getLeftChartData().removeAt(0);
+        _chartSeriesController.updateDataSource(
+            addedDataIndexes: <int>[sensorPageViewModel.getLeftChartData().length - 1],removedDataIndex: 0
+        );
+      }
+    else
+    {
+      _chartSeriesController.updateDataSource(
           addedDataIndexes: <int>[sensorPageViewModel.getRightChartData().length - 1],
-        );
-        _chartSeriesController.updateDataSource(
-          addedDataIndexes: <int>[sensorPageViewModel.getLeftChartData().length - 1],
-        );
-
+      );
+      _chartSeriesController.updateDataSource(
+          addedDataIndexes: <int>[sensorPageViewModel.getLeftChartData().length - 1],removedDataIndex: 0
+      );
+    }
 /*    if(sensorPageViewModel.getRightChartData().length == 15){
       sensorPageViewModel.getRightChartData().removeAt(0);
       sensorPageViewModel.getLeftChartData().removeAt(0);
