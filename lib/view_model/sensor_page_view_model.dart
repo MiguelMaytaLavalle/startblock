@@ -1,4 +1,4 @@
-import 'package:startblock/model/sensor_page_model.dart';
+import 'package:startblock/model/sensor.dart';
 
 class SensorPageViewModel{
   var sensorPageModel = SensorPageModel();

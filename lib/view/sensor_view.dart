@@ -191,7 +191,7 @@ class _SensorPageState extends State<SensorPage> {
                 )
         ),
 
-        floatingActionButton:Wrap(
+ /*       floatingActionButton:Wrap(
           direction: Axis.horizontal,
           children: <Widget>[
             Container(
@@ -209,7 +209,7 @@ class _SensorPageState extends State<SensorPage> {
                 )
             ),
           ],
-        ),
+        ),*/
 
       ),
     );
@@ -246,18 +246,22 @@ class _SensorPageState extends State<SensorPage> {
     //chartData.add(LiveData(time++, traceDust.last));
 
       sensorPageViewModel.getRightChartData().add(LiveData(
-          sensorPageViewModel.getTime(),
-          sensorPageViewModel.getRightFootArray().last));
+          time: sensorPageViewModel.getTime(),
+          speed: sensorPageViewModel.getRightFootArray().last));
+/*
+
     sensorPageViewModel.getLeftChartData().add(LiveData(
-        sensorPageViewModel.getTime(),
-        sensorPageViewModel.getLeftFootArray().last));
+        time: sensorPageViewModel.getTime(),
+        speed: sensorPageViewModel.getLeftFootArray().last));
+*/
 
         _chartSeriesController.updateDataSource(
           addedDataIndexes: <int>[sensorPageViewModel.getRightChartData().length - 1],
         );
-        _chartSeriesController.updateDataSource(
+
+/*        _chartSeriesController.updateDataSource(
           addedDataIndexes: <int>[sensorPageViewModel.getLeftChartData().length - 1],
-        );
+        );*/
 
 /*    if(sensorPageViewModel.getRightChartData().length == 15){
       sensorPageViewModel.getRightChartData().removeAt(0);
@@ -301,6 +305,7 @@ class _SensorPageState extends State<SensorPage> {
 
   void readData(AsyncSnapshot<List<int>> snapshot) {
     var currentValue = _dataParser(snapshot.data!);
+    print("Hey");
     var tag = currentValue.split(':');
     switch(tag[0]){
       case 'RF': {
@@ -321,7 +326,7 @@ class _SensorPageState extends State<SensorPage> {
   /// Updates the chart
   List<SplineSeries<LiveData, int>> _getLiveUpdateSeries() {
     return <SplineSeries<LiveData, int>>[
-      SplineSeries<LiveData, int>(
+/*      SplineSeries<LiveData, int>(
         dataSource: sensorPageViewModel.getLeftChartData()!,
         width: 2,
         name: 'Left foot',
@@ -330,7 +335,7 @@ class _SensorPageState extends State<SensorPage> {
         },
         xValueMapper: (LiveData livedata, _) => livedata.time,
         yValueMapper: (LiveData livedata, _) => livedata.speed,
-      ),
+      ),*/
       SplineSeries<LiveData, int>(
         dataSource: sensorPageViewModel.getRightChartData()!,
         width: 2,

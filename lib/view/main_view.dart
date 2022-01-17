@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:startblock/view/history_list_view.dart';
-import 'package:startblock/view/sensor_page.dart';
+import 'package:startblock/view/sensor_view.dart';
 import 'package:startblock/view/tmp_view.dart';
 import 'package:startblock/view_model/home_view_model.dart';
 import 'dart:async';
@@ -113,7 +113,7 @@ class FindDevicesScreen extends StatelessWidget {
                   }
                 },
               ),
-              Container(
+/*              Container(
                   margin:const EdgeInsets.all(10),
                   child: ElevatedButton(
                     onPressed: () {
@@ -122,9 +122,21 @@ class FindDevicesScreen extends StatelessWidget {
                         MaterialPageRoute(builder: (context) => HistoryPage()),
                       );
                     },
-                    child: const Text('Open Route'),
+                    child: const Text('History'),
                   )
-              ),
+              ),*/
+/*              Container(
+                  margin:const EdgeInsets.all(10),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const Test()),
+                      );
+                    },
+                    child: const Text('test'),
+                  )
+              ),*/
             ],
           )
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:startblock/db/history_database.dart';
+import 'package:startblock/db/database_helper.dart';
 import 'package:startblock/model/history.dart';
 
 class HistoryCard extends StatefulWidget {
@@ -28,9 +28,7 @@ class _HistoryCardState extends State<HistoryCard> {
 
   Future refreshHistory() async {
     setState(() => isLoading = true);
-
     this.history = await HistoryDatabase.instance.read(widget.historyId);
-
     setState(() => isLoading = false);
   }
 

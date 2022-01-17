@@ -33,21 +33,20 @@ class HistoryDatabase{
 CREATE TABLE $tableHistory ( 
   ${HistoryFields.id} $idType, 
   ${HistoryFields.dateTime} $textType,
-  ${HistoryFields.name} $textType
+  ${HistoryFields.name} $textType,
+  ${HistoryFields.liveData} $textType
   )
 ''');
   }
 
   Future<History> create(History hist)async{
     final db = await instance.database;
-
     final id = await db.insert(tableHistory, hist.toJSON());
     return hist.copy(id: id);
   }
 
   Future<History> read(int id) async{
     final db = await instance.database;
-
     final maps = await db.query(
       tableHistory,
       columns: HistoryFields.values,
@@ -60,6 +59,7 @@ CREATE TABLE $tableHistory (
     } else{
       throw Exception('ID $id not found');
     }
+
   }
 
   Future<List<History>> readAllHistory() async{
@@ -74,7 +74,6 @@ CREATE TABLE $tableHistory (
 
   Future<int> update(History hist) async{
     final db = await instance.database;
-
     return db.update(
       tableHistory,
       hist.toJSON(),
@@ -86,7 +85,6 @@ CREATE TABLE $tableHistory (
 
   Future<int> delete(int id) async{
     final db = await instance.database;
-
     return await db.delete(
       tableHistory,
       where: '${HistoryFields.id} = ?',
@@ -100,11 +98,4 @@ CREATE TABLE $tableHistory (
     db.close();
   }
 
-  /**
-   * ${HistoryFields.leftFoot} $integerType,
-    ${HistoryFields.rightFoot} $integerType,
-    ${HistoryFields.reactionTime} $integerType,
-    ${HistoryFields.startTime} $integerType,
-    ${HistoryFields.totalTime} $integerType,
-  * */
 }

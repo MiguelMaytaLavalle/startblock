@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:startblock/db/history_database.dart';
+import 'package:startblock/db/database_helper.dart';
 import 'package:startblock/model/history.dart';
+import 'package:startblock/model/livedata.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'dart:async';
 import 'dart:math' as math;
@@ -38,7 +39,7 @@ class Test extends StatelessWidget {
 }
 
 class TestPage extends StatefulWidget {
-  TestPage({Key? key, required this.title}) : super(key: key);
+  const TestPage({Key? key, required this.title}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -121,7 +122,8 @@ class _TestPageState extends State<TestPage> {
   Future addHistory() async {
     final history =  History(
       dateTime: DateTime.now(),
-      name: 'Ernst',
+      name: 'Ricardo',
+      liveData: getChartData(),
     );
 
       await HistoryDatabase.instance.create(history);
@@ -129,39 +131,33 @@ class _TestPageState extends State<TestPage> {
 
   int time = 19;
   void updateDataSource(Timer timer) {
-    chartData.add(LiveData(time++, (math.Random().nextInt(60) + 30)));
+    chartData.add(LiveData(time: time++, speed: (math.Random().nextInt(60) + 30)));
     chartData.removeAt(0);
     _chartSeriesController.updateDataSource(
         addedDataIndex: chartData.length - 1, removedDataIndex: 0);
   }
-
   List<LiveData> getChartData() {
     return <LiveData>[
-      LiveData(0, 42),
-      LiveData(1, 47),
-      LiveData(2, 43),
-      LiveData(3, 49),
-      LiveData(4, 54),
-      LiveData(5, 41),
-      LiveData(6, 58),
-      LiveData(7, 51),
-      LiveData(8, 98),
-      LiveData(9, 41),
-      LiveData(10, 53),
-      LiveData(11, 72),
-      LiveData(12, 86),
-      LiveData(13, 52),
-      LiveData(14, 94),
-      LiveData(15, 92),
-      LiveData(16, 86),
-      LiveData(17, 72),
-      LiveData(18, 94)
+      LiveData(time: 0, speed: 42),
+      LiveData(time: 1, speed: 47),
+      LiveData(time: 2, speed: 43),
+      LiveData(time: 3, speed: 49),
+      LiveData(time: 4, speed: 54),
+      LiveData(time: 5, speed: 41),
+      LiveData(time: 6, speed: 58),
+      LiveData(time: 7, speed: 51),
+      LiveData(time: 8, speed: 98),
+      LiveData(time: 9, speed: 41),
+      LiveData(time: 10, speed: 53),
+      LiveData(time: 11, speed: 72),
+      LiveData(time: 12, speed: 86),
+      LiveData(time: 13, speed: 52),
+      LiveData(time: 14, speed: 94),
+      LiveData(time: 15, speed: 92),
+      LiveData(time: 16, speed: 86),
+      LiveData(time: 17, speed: 72),
+      LiveData(time: 18, speed: 18)
+
     ];
   }
-}
-
-class LiveData {
-  LiveData(this.time, this.speed);
-  final int time;
-  final num speed;
 }

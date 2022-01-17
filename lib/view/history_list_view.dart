@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:startblock/view/history_card.dart';
 
-import '../db/history_database.dart';
+import '../db/database_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:startblock/model/history.dart';
 
