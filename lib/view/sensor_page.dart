@@ -22,7 +22,8 @@ class SensorPage extends StatefulWidget {
 class _SensorPageState extends State<SensorPage> {
   var sensorPageViewModel = SensorPageViewModel();
   late Stream<List<int>> stream;
-  late ChartSeriesController _chartSeriesController;
+  late ChartSeriesController _chartSeriesRightController;
+  late ChartSeriesController _chartSeriesLeftController;
   late ZoomPanBehavior _zoomPanBehavior;
   late CrosshairBehavior _crosshairBehavior;
   //late Timer timer;
@@ -160,7 +161,7 @@ class _SensorPageState extends State<SensorPage> {
                               //title: ChartTitle(text: "Startblock"),
                               crosshairBehavior: _crosshairBehavior,
                               legend: Legend(isVisible: true),
-                              zoomPanBehavior: _zoomPanBehavior,
+                              //zoomPanBehavior: _zoomPanBehavior,
                               series: _getLiveUpdateSeries(),
                               primaryXAxis: NumericAxis(
                                   interactiveTooltip: const InteractiveTooltip(
@@ -173,7 +174,7 @@ class _SensorPageState extends State<SensorPage> {
                               ),
                               primaryYAxis: NumericAxis(
                                 minimum: 0,
-                                  maximum: 800,
+                                  //maximum: 800,
                                   interactiveTooltip: const InteractiveTooltip(
                                     enable: true,
                                   ),
@@ -249,14 +250,26 @@ class _SensorPageState extends State<SensorPage> {
     sensorPageViewModel.getLeftChartData().add(LiveData(
         sensorPageViewModel.getTime(),
         sensorPageViewModel.getLeftFootArray().last));
-
-        _chartSeriesController.updateDataSource(
-          addedDataIndexes: <int>[sensorPageViewModel.getRightChartData().length - 1],
+    if(sensorPageViewModel.getRightChartData().length == 20 && sensorPageViewModel.getLeftChartData().length == 20)
+      {
+        sensorPageViewModel.getRightChartData().removeAt(0);
+        _chartSeriesRightController.updateDataSource(
+            addedDataIndexes: <int>[sensorPageViewModel.getRightChartData().length - 1],removedDataIndex: 0
         );
-        _chartSeriesController.updateDataSource(
-          addedDataIndexes: <int>[sensorPageViewModel.getLeftChartData().length - 1],
+        sensorPageViewModel.getLeftChartData().removeAt(0);
+        _chartSeriesLeftController.updateDataSource(
+            addedDataIndexes: <int>[sensorPageViewModel.getLeftChartData().length - 1],removedDataIndex: 0
         );
-
+      }
+    else
+    {
+      _chartSeriesRightController.updateDataSource(
+          addedDataIndexes: <int>[sensorPageViewModel.getRightChartData().length - 1],removedDataIndex: 0
+      );
+      _chartSeriesLeftController.updateDataSource(
+          addedDataIndexes: <int>[sensorPageViewModel.getLeftChartData().length - 1],removedDataIndex: 0
+      );
+    }
 /*    if(sensorPageViewModel.getRightChartData().length == 15){
       sensorPageViewModel.getRightChartData().removeAt(0);
       sensorPageViewModel.getLeftChartData().removeAt(0);
@@ -324,7 +337,7 @@ class _SensorPageState extends State<SensorPage> {
         width: 2,
         name: 'Left foot',
         onRendererCreated: (ChartSeriesController controller) {
-          _chartSeriesController = controller; //Updates the chart live
+          _chartSeriesLeftController = controller; //Updates the chart live
         },
         xValueMapper: (LiveData livedata, _) => livedata.time,
         yValueMapper: (LiveData livedata, _) => livedata.speed,
@@ -334,7 +347,7 @@ class _SensorPageState extends State<SensorPage> {
         width: 2,
         name: 'Right foot',
         onRendererCreated: (ChartSeriesController controller) {
-          _chartSeriesController = controller; //Updates the chart live
+          _chartSeriesRightController = controller; //Updates the chart live
         },
         xValueMapper: (LiveData livedata, _) => livedata.time,
         yValueMapper: (LiveData livedata, _) => livedata.speed,
