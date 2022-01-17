@@ -12,7 +12,7 @@ class ScanResultTile extends StatelessWidget {
   final VoidCallback onTap;
 
   Widget _buildTitle(BuildContext context) {
-    try{
+    /*try{
       if (result.device.name.isNotEmpty) {
         return Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -33,8 +33,8 @@ class ScanResultTile extends StatelessWidget {
       print (e);
       return Column();
     }
-    return Column();
-    /*if (result.device.name.isNotEmpty) {
+    return Column();*/
+    if (result.device.name.isNotEmpty) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,7 +51,7 @@ class ScanResultTile extends StatelessWidget {
       );
     } else {
       return Text(result.device.id.toString());
-    }*/
+    }
   }
 
   Widget _buildAdvRow(BuildContext context, String title, String value) {
