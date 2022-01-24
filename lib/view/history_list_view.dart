@@ -1,4 +1,4 @@
-import 'package:flutter/gestures.dart';
+import 'package:intl/intl.dart';
 import 'package:startblock/view/history_card.dart';
 
 import '../db/database_helper.dart';
@@ -11,7 +11,7 @@ class HistoryScreen extends StatefulWidget{
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-  late List<History> histories;
+  late List<History> listHistory;
   bool isLoading = false;
 
   @override
@@ -29,7 +29,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   Future refreshHistory() async {
     setState(() => isLoading = true);
-    histories = await HistoryDatabase.instance.readAllHistory();
+    listHistory = await HistoryDatabase.instance.readAllHistory();
     setState(() => isLoading = false);
   }
 
@@ -45,7 +45,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     body: Center(
       child: isLoading
           ? CircularProgressIndicator()
-          : histories.isEmpty
+          : listHistory.isEmpty
           ? const Text('No History', style: TextStyle(color: Colors.white, fontSize: 24),)
           : buildHistory(),
     ),
@@ -53,9 +53,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   Widget buildHistory() => ListView.separated(
     padding: const EdgeInsets.all(8),
-    itemCount: histories.length,
+    itemCount: listHistory.length,
     itemBuilder: (context, index) {
-      final history = histories[index];
+      final history = listHistory[index];
+      String date = DateFormat.yMMMd().format(history.dateTime);
       return GestureDetector(
         onTap: () async{
           await Navigator.of(context).push(MaterialPageRoute(
@@ -66,7 +67,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         child: Container(
           height: 70,
           color: Colors.amber,
-          child: Center(child: Text('Entry $history')),
+          child: Center(child: Text('${index+1}. ${history.name} $date')),
         )
       );
 

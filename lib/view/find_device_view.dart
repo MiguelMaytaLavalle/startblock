@@ -1,12 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
-import 'package:startblock/view/history_list_view.dart';
 import 'package:startblock/view/sensor_view.dart';
-import 'package:startblock/view/tmp_view.dart';
 import 'package:startblock/view_model/home_view_model.dart';
 import 'dart:async';
-
 import 'package:startblock/view_model/widgets.dart';
 
 class BluetoothOffScreen extends StatelessWidget {
@@ -79,7 +76,7 @@ class FindDevicesScreen extends StatelessWidget {
                       onTap: () => Navigator.of(context)
                           .push(MaterialPageRoute(builder: (context) {
                         //r.device.connect();
-                        return SensorPage(device: r.device);
+                        return SensorScreen(device: r.device);
                       })),
                     ),
                   )
