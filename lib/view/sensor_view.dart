@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:convert' show utf8;
 import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:startblock/model/livedata.dart';
@@ -11,15 +9,15 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:startblock/constant/constants.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 
-class SensorPage extends StatefulWidget {
-  const SensorPage({Key? key, required this.device}) : super(key: key);
+class SensorScreen extends StatefulWidget {
+  const SensorScreen({Key? key, required this.device}) : super(key: key);
   final BluetoothDevice device;
 
   @override
-  _SensorPageState createState() => _SensorPageState();
+  _SensorScreenState createState() => _SensorScreenState();
 }
 
-class _SensorPageState extends State<SensorPage> {
+class _SensorScreenState extends State<SensorScreen> {
   var sensorPageViewModel = SensorPageViewModel();
   late Stream<List<int>> stream;
   late ChartSeriesController _chartSeriesRightController;
@@ -131,9 +129,6 @@ class _SensorPageState extends State<SensorPage> {
 
   @override
   Widget build(BuildContext context) {
-    final ButtonStyle style =
-      ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 20));
-
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
@@ -264,10 +259,10 @@ class _SensorPageState extends State<SensorPage> {
     else
     {
       _chartSeriesRightController.updateDataSource(
-          addedDataIndexes: <int>[sensorPageViewModel.getRightChartData().length - 1],removedDataIndex: 0
+          addedDataIndexes: <int>[sensorPageViewModel.getRightChartData().length - 1]
       );
       _chartSeriesLeftController.updateDataSource(
-          addedDataIndexes: <int>[sensorPageViewModel.getLeftChartData().length - 1],removedDataIndex: 0
+          addedDataIndexes: <int>[sensorPageViewModel.getLeftChartData().length - 1]
       );
     }
 /*    if(sensorPageViewModel.getRightChartData().length == 15){

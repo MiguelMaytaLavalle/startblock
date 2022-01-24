@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:startblock/db/database_helper.dart';
 import 'package:startblock/model/history.dart';
@@ -6,11 +7,11 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'dart:async';
 import 'dart:math' as math;
 
-class Test extends StatelessWidget {
+class TestScreen extends StatelessWidget {
   // This widget is the root of your application.
   final History? history;
 
-  const Test({
+  const TestScreen({
     Key? key,
     this.history,
 }) : super(key: key);
@@ -33,7 +34,7 @@ class Test extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: TestPage(title: 'Flutter Demo Home Page'),
+      home: const TestPage(title: 'Flutter Demo Home Page'),
     );
   }
 }
@@ -57,7 +58,6 @@ class TestPage extends StatefulWidget {
 }
 
 class _TestPageState extends State<TestPage> {
-  final _formKey = GlobalKey<FormState>();
   late List<LiveData> chartData;
   late ChartSeriesController _chartSeriesController;
 
@@ -120,12 +120,18 @@ class _TestPageState extends State<TestPage> {
   }
 
   Future addHistory() async {
+    List<LiveData> test = getChartData();
+    List<LiveData> test1 = getChartData1();
+
     final history =  History(
       dateTime: DateTime.now(),
       name: 'Ricardo',
-      liveData: getChartData(),
-    );
+      liveData: jsonEncode(test),
+      rightData: jsonEncode(test),
+      leftData: jsonEncode(test1),
 
+      //liveData: getChartData(),
+    );
       await HistoryDatabase.instance.create(history);
   }
 
@@ -157,6 +163,30 @@ class _TestPageState extends State<TestPage> {
       LiveData(time: 16, speed: 86),
       LiveData(time: 17, speed: 72),
       LiveData(time: 18, speed: 18)
+
+    ];
+  }
+  List<LiveData> getChartData1() {
+    return <LiveData>[
+      LiveData(time: 0, speed: 20),
+      LiveData(time: 1, speed: 34),
+      LiveData(time: 2, speed: 56),
+      LiveData(time: 3, speed: 67),
+      LiveData(time: 4, speed: 83),
+      LiveData(time: 5, speed: 64),
+      LiveData(time: 6, speed: 100),
+      LiveData(time: 7, speed: 106),
+      LiveData(time: 8, speed: 120),
+      LiveData(time: 9, speed: 135),
+      LiveData(time: 10, speed: 153),
+      LiveData(time: 11, speed: 120),
+      LiveData(time: 12, speed: 100),
+      LiveData(time: 13, speed: 60),
+      LiveData(time: 14, speed: 24),
+      LiveData(time: 15, speed: 54),
+      LiveData(time: 16, speed: 12),
+      LiveData(time: 17, speed: 64),
+      LiveData(time: 18, speed: 80)
 
     ];
   }

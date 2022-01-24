@@ -12,7 +12,7 @@ class HistoryDatabase{
   Future<Database> get database async{
     if(_database != null) return _database!;
 
-    _database = await  _initDB('history.db');
+    _database = await  _initDB('test4.db');
     return _database!;
   }
 
@@ -34,14 +34,16 @@ CREATE TABLE $tableHistory (
   ${HistoryFields.id} $idType, 
   ${HistoryFields.dateTime} $textType,
   ${HistoryFields.name} $textType,
-  ${HistoryFields.liveData} $textType
+  ${HistoryFields.liveData} $textType,
+  ${HistoryFields.rightData} $textType,
+  ${HistoryFields.leftData} $textType
   )
 ''');
   }
 
   Future<History> create(History hist)async{
     final db = await instance.database;
-    final id = await db.insert(tableHistory, hist.toJSON());
+    final id = await db.insert(tableHistory, hist.toJson());
     return hist.copy(id: id);
   }
 
@@ -55,7 +57,7 @@ CREATE TABLE $tableHistory (
     );
 
     if(maps.isNotEmpty) {
-      return History.fromJSON(maps.first);
+      return History.fromJson(maps.first);
     } else{
       throw Exception('ID $id not found');
     }
@@ -69,14 +71,14 @@ CREATE TABLE $tableHistory (
 
     final result = await db.query(tableHistory, orderBy: orderBy);
 
-    return result.map((json) => History.fromJSON(json)).toList();
+    return result.map((json) => History.fromJson(json)).toList();
   }
 
   Future<int> update(History hist) async{
     final db = await instance.database;
     return db.update(
       tableHistory,
-      hist.toJSON(),
+      hist.toJson(),
       where: '${HistoryFields.id} = ?',
       whereArgs: [hist.id],
 

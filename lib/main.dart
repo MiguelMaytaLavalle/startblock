@@ -1,10 +1,9 @@
 // Copyright 2017, Paul DeMarco.
 // All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
-
 import 'package:flutter/material.dart';
-import 'package:startblock/view/find_device_view.dart';
-import 'package:flutter_blue/flutter_blue.dart';
+import 'package:startblock/view/menu_view.dart';
+
 void main() {
   runApp(FlutterBlueApp());
 }
@@ -15,7 +14,8 @@ class FlutterBlueApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       color: Colors.lightBlue,
-      home: StreamBuilder<BluetoothState>(
+      home: MenuScreen()
+      /*StreamBuilder<BluetoothState>(
           stream: FlutterBlue.instance.state,
           initialData: BluetoothState.unknown,
           builder: (c, snapshot) {
@@ -24,7 +24,7 @@ class FlutterBlueApp extends StatelessWidget {
               return FindDevicesScreen();
             }
             return BluetoothOffScreen(state: state);
-          }),
+          }),*/
     );
   }
 }
