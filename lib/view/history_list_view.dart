@@ -5,12 +5,12 @@ import '../db/database_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:startblock/model/history.dart';
 
-class HistoryPage extends StatefulWidget{
+class HistoryScreen extends StatefulWidget{
   @override
-  _HistoryPageState createState() => _HistoryPageState();
+  _HistoryScreenState createState() => _HistoryScreenState();
 }
 
-class _HistoryPageState extends State<HistoryPage> {
+class _HistoryScreenState extends State<HistoryScreen> {
   late List<History> histories;
   bool isLoading = false;
 

@@ -3,7 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:startblock/view/main_view.dart';
+import 'package:startblock/view/find_device_view.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 void main() {
   runApp(FlutterBlueApp());
