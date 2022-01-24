@@ -245,11 +245,11 @@ class _SensorPageState extends State<SensorPage> {
     //chartData.add(LiveData(time++, traceDust.last));
 
       sensorPageViewModel.getRightChartData().add(LiveData(
-          sensorPageViewModel.getTime(),
-          sensorPageViewModel.getRightFootArray().last));
+          time: sensorPageViewModel.getTime(),
+          speed: sensorPageViewModel.getRightFootArray().last));
     sensorPageViewModel.getLeftChartData().add(LiveData(
-        sensorPageViewModel.getTime(),
-        sensorPageViewModel.getLeftFootArray().last));
+        time: sensorPageViewModel.getTime(),
+        speed: sensorPageViewModel.getLeftFootArray().last));
     if(sensorPageViewModel.getRightChartData().length == 20 && sensorPageViewModel.getLeftChartData().length == 20)
       {
         sensorPageViewModel.getRightChartData().removeAt(0);
