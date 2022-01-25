@@ -1,7 +1,7 @@
 import 'package:startblock/model/sensor.dart';
 
 class SensorPageViewModel{
-  var sensorPageModel = SensorPageModel();
+  var sensorPageModel = SensorModel();
 
   getTimer(){
     return sensorPageModel.timer;
@@ -17,10 +17,6 @@ class SensorPageViewModel{
 
   setIsReady(bool set){
     sensorPageModel.isReady = set;
-  }
-
-  getTraceDust(){
-    return sensorPageModel.traceDust;
   }
 
   getRightFootArray(){
@@ -47,6 +43,5 @@ class SensorPageViewModel{
   /// to keep the chart live without stacking up
   void removeDataAtIndexZero() {
     sensorPageModel.rightChartData.removeAt(0);
-    //sensorPageModel.leftChartData.removeAt(0);
   }
 }

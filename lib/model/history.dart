@@ -18,7 +18,6 @@ class History{
   final String liveData;
   final String rightData;
   final String leftData;
-  //List<LiveData> liveData = [];
   History({
     this.id,
     required this.dateTime,
@@ -35,12 +34,8 @@ class History{
     HistoryFields.liveData: liveData,
     HistoryFields.rightData: rightData,
     HistoryFields.leftData: leftData,
-    //HistoryFields.liveData: List<String>.from(liveData.map((x) => x.toJSON())),
-    //HistoryFields.liveData: List<dynamic>.from(liveData.map((e) => e)),
-    //HistoryFields.liveData: liveData,
   };
 
-  //static History fromJSON(Map<String,dynamic> json) => History(
   factory History.fromJson(Map<String, dynamic> json) => History(
     id:json[HistoryFields.id] as int?,
     dateTime: DateTime.parse(json[HistoryFields.dateTime] as String),
@@ -48,8 +43,6 @@ class History{
     liveData: json[HistoryFields.liveData] as String,
     rightData: json[HistoryFields.rightData] as String,
     leftData: json[HistoryFields.leftData] as String,
-    //liveData: List<LiveData>.from(json[HistoryFields.liveData].map((x) => LiveData.fromJSON(x))),
-    //liveData: json[HistoryFields.liveData] as List<LiveData>,
   );
 
   History copy({
@@ -59,7 +52,6 @@ class History{
     String? liveData,
     String? rightData,
     String? leftData,
-    //List<LiveData>? liveData,
   }) =>
       History(
         id: id ?? this.id,
