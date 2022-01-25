@@ -1,6 +1,7 @@
 # startblock
 
-Application for a thesis project
+Application for a thesis project at KTH
+
 
 ## Getting Started
 
