@@ -74,8 +74,10 @@ class _SensorScreenState extends State<SensorScreen> {
 
    // connectServicesAndCharacteristics(Contants.SERVICE_UUID, Contants.CHARACTERISTIC_UUID);
 
-   /// Reads the UART services and characteristics for the Micro:Bit
+
+/*   /// Reads the UART services and characteristics for the Micro:Bit
     List<BluetoothService> services = await widget.device.discoverServices();
+
     for (var service in services) {
       print("Servfound ${service.uuid.toString()}");
       if (service.uuid.toString() == Contants.SERVICE_UUID) {
@@ -89,12 +91,13 @@ class _SensorScreenState extends State<SensorScreen> {
           }
         }
       }
-    }
+    }*/
 
     //if (!isReady) {
     if (!sensorPageViewModel.getIsReady()){
       _Pop();
     }
+
   }
 
   Future<bool> _onWillPop() {

@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:startblock/db/database_helper.dart';
-import 'package:startblock/model/history.dart';
 import 'package:startblock/model/livedata.dart';
+import 'package:startblock/view_model/history_card_view_model.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class HistoryCard extends StatefulWidget {
@@ -20,11 +20,7 @@ class HistoryCard extends StatefulWidget {
 }
 
 class _HistoryCardState extends State<HistoryCard> {
-  late History history;
-  bool isLoading = false;
-  late List<LiveData> liveData = [];
-  late List<LiveData> rightData = [];
-  late List<LiveData> leftData = [];
+  var hCardVM = HistoryCardViewModel();
   late SfCartesianChart chart;
   late TooltipBehavior _tooltipBehavior;
 
@@ -36,15 +32,23 @@ class _HistoryCardState extends State<HistoryCard> {
   }
 
   Future refreshHistory() async {
-    setState(() => isLoading = true);
-    this.history = await HistoryDatabase.instance.read(widget.historyId);
-    this.rightData = (json.decode(history.rightData) as List)
+    setState(() => hCardVM.setIsLoading(true));
+    //this.history = await HistoryDatabase.instance.read(widget.historyId);
+    hCardVM.setHistory(await HistoryDatabase.instance.read(widget.historyId));
+    /*this.rightData = (json.decode(history.rightData) as List)
         .map((e) => LiveData.fromJson(e))
-        .toList();
-    this.leftData = (json.decode(history.leftData) as List)
+        .toList();*/
+    hCardVM.setRightHistory((json.decode(hCardVM.getHistory().rightData) as List)
         .map((e) => LiveData.fromJson(e))
-        .toList();
-    setState(() => isLoading = false);
+        .toList());
+    /*this.leftData = (json.decode(history.leftData) as List)
+        .map((e) => LiveData.fromJson(e))
+        .toList();*/
+    hCardVM.setLeftHistory((json.decode(hCardVM.getHistory().leftData) as List)
+        .map((e) => LiveData.fromJson(e))
+        .toList());
+    //setState(() => isLoading = false);
+    setState(() => hCardVM.setIsLoading(false));
   }
 
   @override
@@ -52,7 +56,7 @@ class _HistoryCardState extends State<HistoryCard> {
         appBar: AppBar(
             //actions: [editButton(), deleteButton()],
             ),
-        body: isLoading
+        body: hCardVM.getIsLoading()
             ? const Center(child: CircularProgressIndicator())
             : Padding(
                 padding: const EdgeInsets.all(12),
@@ -60,7 +64,8 @@ class _HistoryCardState extends State<HistoryCard> {
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   children: [
                     Text(
-                      '${history.id.toString()}. ${history.name}',
+                      //'${history.id.toString()}. ${history.name}',
+                      '${hCardVM.getHistory().id.toString()}. ${hCardVM.getHistory().name}',
                       style: const TextStyle(
                         color: Colors.blue,
                         fontSize: 22,
@@ -69,7 +74,8 @@ class _HistoryCardState extends State<HistoryCard> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      DateFormat.yMMMMEEEEd().format(history.dateTime),
+                      //DateFormat.yMMMMEEEEd().format(history.dateTime),
+                      DateFormat.yMMMMEEEEd().format(hCardVM.getHistory().dateTime),
                       style: const TextStyle(color: Colors.blue),
                     ),
                     /*
@@ -136,14 +142,16 @@ class _HistoryCardState extends State<HistoryCard> {
   List<SplineSeries<LiveData, int>> _getLiveUpdateSeries() {
     return <SplineSeries<LiveData, int>>[
       SplineSeries<LiveData, int>(
-        dataSource: rightData,
+        //dataSource: rightData,
+        dataSource: hCardVM.getRightHistory(),
         width: 2,
         name: 'Right foot',
         xValueMapper: (LiveData livedata, _) => livedata.time,
         yValueMapper: (LiveData livedata, _) => livedata.speed,
       ),
       SplineSeries<LiveData, int>(
-        dataSource: leftData,
+        //dataSource: leftData,
+        dataSource: hCardVM.getLeftHistory(),
         width: 2,
         name: 'Left foot',
         xValueMapper: (LiveData livedata, _) => livedata.time,

@@ -1,9 +1,9 @@
 import 'package:intl/intl.dart';
 import 'package:startblock/view/history_card.dart';
+import 'package:startblock/view_model/history_list_view_model.dart';
 
 import '../db/database_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:startblock/model/history.dart';
 
 class HistoryScreen extends StatefulWidget{
   @override
@@ -11,7 +11,7 @@ class HistoryScreen extends StatefulWidget{
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-  late List<History> listHistory;
+  var historyListViewModel = HistoryListViewModel();
   bool isLoading = false;
 
   @override
@@ -29,15 +29,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   Future refreshHistory() async {
     setState(() => isLoading = true);
-    listHistory = await HistoryDatabase.instance.readAllHistory();
+    //listHistory = await HistoryDatabase.instance.readAllHistory();
+    historyListViewModel.setHistoryList(await HistoryDatabase.instance.readAllHistory());
     setState(() => isLoading = false);
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
-      title: const Text(
-        'History',
+      title: Text(historyListViewModel.historyListTitle,
         style: TextStyle(fontSize: 24),
       ),
       actions: [Icon(Icons.search), SizedBox(width: 12)],
@@ -45,7 +45,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
     body: Center(
       child: isLoading
           ? CircularProgressIndicator()
-          : listHistory.isEmpty
+          //: listHistory.isEmpty
+          : historyListViewModel.getHistoryList().isEmpty
           ? const Text('No History', style: TextStyle(color: Colors.white, fontSize: 24),)
           : buildHistory(),
     ),
@@ -53,9 +54,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   Widget buildHistory() => ListView.separated(
     padding: const EdgeInsets.all(8),
-    itemCount: listHistory.length,
+    itemCount: historyListViewModel.getHistoryList().length,
     itemBuilder: (context, index) {
-      final history = listHistory[index];
+      final history = historyListViewModel.getHistoryList()[index];
       String date = DateFormat.yMMMd().format(history.dateTime);
       return GestureDetector(
         onTap: () async{
