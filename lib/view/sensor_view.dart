@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert' show utf8;
+import 'dart:ffi';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
@@ -25,7 +26,7 @@ class _SensorScreenState extends State<SensorScreen> {
   late ZoomPanBehavior _zoomPanBehavior;
   late CrosshairBehavior _crosshairBehavior;
   //late List<String> listKrille = <String>[];
-  late List<Byte> listKrille = <><[];
+  late List<Uint8> listKrille = <Uint8>[];
   //late Timer timer;
 
 
@@ -243,20 +244,27 @@ class _SensorScreenState extends State<SensorScreen> {
   ///Krilles algoritm
   /// rad 156 anropas den här metoden för att läsa in strömmen från microbiten till mobilen
   /// Tanken är att istället för att göra uträkningar först så samlar vi in allt från snapshot
-  /// till en String list och sen göra uträkningar när den är klar
+  /// till en lämplig list och sen göra uträkningar när den är klar
   ///
   ///
   void krillesMetod(AsyncSnapshot<List<int>> snapshot){
     //var currentValue = _dataParser(snapshot.data!);
-    //listKrille.add(currentValue);
-    print('Length: ${listKrille.length}');
+    var c = snapshot.data!;
+    //listKrille.add(c);
+    //print('Length: ${listKrille.length}');
     //sensorPageVM.getRightFootArray().add(int.tryParse(currentValue) ?? 1000);
 
 
   }
 
   /// Efter hämtning från microbit kan man göra uträkningen här
-  /// Finns en knapp på sensorview för att anropa metoden
+  /// Finns en knapp på sensorview för att anropa metod
+  void calculateKrilles(){
+
+  }
+
+
+
   void testUpdate() {
     for(int i = 0; i < sensorPageVM.getLeftFootArray().length; i++){
       print("Left: ${sensorPageVM.getLeftFootArray()[i]}");
