@@ -1,6 +1,7 @@
-class Contants {
-  static const SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
-  static const CHARACTERISTIC_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
+class Constants {
+  static const SERVICE_UART = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
+  static const CHARACTERISTIC_UART_RECIEVE = "6e400002-b5a3-f393-e0a9-e50e24dcca9e"; //Read to micro:bit. RX
+  static const CHARACTERISTIC_UART_SEND = "6e400003-b5a3-f393-e0a9-e50e24dcca9e";  //Send from micro:bit. TX
 
   static const IOPINSERVICE_SERVICE_UUID = "E95D127B251D470AA062FA1922DFA9A8";
   static const PINDATA_CHARACTERISTIC_UUID = "E95D8D00251D470AA062FA1922DFA9A8";

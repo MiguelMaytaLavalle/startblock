@@ -36,7 +36,7 @@ class _SensorScreenState extends State<SensorScreen> {
       enablePanning: true,
     );
     _crosshairBehavior = CrosshairBehavior(enable: true);
-    Timer.periodic(const Duration(milliseconds: 500), updateDataSource);
+    //Timer.periodic(const Duration(milliseconds: 500), updateDataSource);
     connectToDevice();
   }
 
@@ -75,14 +75,14 @@ class _SensorScreenState extends State<SensorScreen> {
    // connectServicesAndCharacteristics(Contants.SERVICE_UUID, Contants.CHARACTERISTIC_UUID);
 
 
-/*   /// Reads the UART services and characteristics for the Micro:Bit
+/// Reads the UART services and characteristics for the Micro:Bit
     List<BluetoothService> services = await widget.device.discoverServices();
 
     for (var service in services) {
       print("Servfound ${service.uuid.toString()}");
-      if (service.uuid.toString() == Contants.SERVICE_UUID) {
+      if (service.uuid.toString() == Constants.SERVICE_UART) {
         for (var characteristic in service.characteristics) {
-          if (characteristic.uuid.toString() == Contants.CHARACTERISTIC_UUID) {
+          if (characteristic.uuid.toString() == Constants.CHARACTERISTIC_UART_RECIEVE) {
             characteristic.setNotifyValue(!characteristic.isNotifying);
             stream = characteristic.value;
             setState(() {
@@ -91,7 +91,7 @@ class _SensorScreenState extends State<SensorScreen> {
           }
         }
       }
-    }*/
+    }
 
     //if (!isReady) {
     if (!sensorPageViewModel.getIsReady()){
@@ -228,84 +228,6 @@ class _SensorScreenState extends State<SensorScreen> {
 
 // Save the Excel file in the local machine.
     File('Output.xlsx').writeAsBytes(bytes);
-
-  }
-
-
-  /**
-   * Updates the data sources for right and left foot
-   */
-  void updateDataSource(Timer timer) {
-    //if (sensorPageViewModel.getTime() == 15) {
-      //timer.cancel();
-    //}
-
-    //chartData.add(LiveData(time++, traceDust.last));
-
-      sensorPageViewModel.getRightChartData().add(LiveData(
-          time: sensorPageViewModel.getTime(),
-          speed: sensorPageViewModel.getRightFootArray().last));
-    sensorPageViewModel.getLeftChartData().add(LiveData(
-        time: sensorPageViewModel.getTime(),
-        speed: sensorPageViewModel.getLeftFootArray().last));
-    if(sensorPageViewModel.getRightChartData().length == 20 && sensorPageViewModel.getLeftChartData().length == 20)
-      {
-        sensorPageViewModel.getRightChartData().removeAt(0);
-        _chartSeriesRightController.updateDataSource(
-            addedDataIndexes: <int>[sensorPageViewModel.getRightChartData().length - 1],removedDataIndex: 0
-        );
-        sensorPageViewModel.getLeftChartData().removeAt(0);
-        _chartSeriesLeftController.updateDataSource(
-            addedDataIndexes: <int>[sensorPageViewModel.getLeftChartData().length - 1],removedDataIndex: 0
-        );
-      }
-    else
-    {
-      _chartSeriesRightController.updateDataSource(
-          addedDataIndexes: <int>[sensorPageViewModel.getRightChartData().length - 1]
-      );
-      _chartSeriesLeftController.updateDataSource(
-          addedDataIndexes: <int>[sensorPageViewModel.getLeftChartData().length - 1]
-      );
-    }
-/*    if(sensorPageViewModel.getRightChartData().length == 15){
-      sensorPageViewModel.getRightChartData().removeAt(0);
-      sensorPageViewModel.getLeftChartData().removeAt(0);
-
-      _chartSeriesController.updateDataSource(
-        addedDataIndexes: <int>[sensorPageViewModel.getRightChartData().length - 1],
-        removedDataIndexes: <int>[0],
-      );
-      _chartSeriesController.updateDataSource(
-        addedDataIndexes: <int>[sensorPageViewModel.getLeftChartData().length - 1],
-        removedDataIndexes: <int>[0],
-      );
-    } else {
-      _chartSeriesController.updateDataSource(
-        addedDataIndexes: <int>[sensorPageViewModel.getRightChartData().length - 1],
-      );
-      _chartSeriesController.updateDataSource(
-        addedDataIndexes: <int>[sensorPageViewModel.getLeftChartData().length - 1],
-
-      );
-    }*/
-      sensorPageViewModel.incrementTime();
-
-    /*sensorPageViewModel.getRightChartData().add(LiveData(sensorPageViewModel.getTime(), sensorPageViewModel.getRightFootArray().last));
-    sensorPageViewModel.getLeftChartData().add(LiveData(sensorPageViewModel.getTime(), sensorPageViewModel.getLeftFootArray().last));
-
-    if(sensorPageViewModel.getRightChartData().length == 15){
-      sensorPageViewModel.getRightChartData().removeAt(0);
-      _chartSeriesController.updateDataSource(
-        addedDataIndexes: <int>[sensorPageViewModel.getRightChartData().length - 1],
-        removedDataIndexes: <int>[0],
-      );
-    } else {
-      _chartSeriesController.updateDataSource(
-        addedDataIndexes: <int>[sensorPageViewModel.getRightChartData().length - 1],
-      );
-    }
-    sensorPageViewModel.incrementTime();*/
   }
 
   void readData(AsyncSnapshot<List<int>> snapshot) {
@@ -358,9 +280,9 @@ class _SensorScreenState extends State<SensorScreen> {
     /// Send a GO signal to the Micro:Bit
     List<BluetoothService> services = await widget.device.discoverServices();
     for (var service in services) {
-      if (service.uuid.toString() == Contants.LEDSERVICE_SERVICE_UUID) {
+      if (service.uuid.toString() == Constants.LEDSERVICE_SERVICE_UUID) {
         for (var c in service.characteristics) {
-          if (c.uuid.toString() == Contants.LEDTEXT_CHARACTERISTIC_UUID) {
+          if (c.uuid.toString() == Constants.LEDTEXT_CHARACTERISTIC_UUID) {
             //characteristic.setNotifyValue(!characteristic.isNotifying);
             String test = ',1';
             List<int> bytes = utf8.encode(test);
