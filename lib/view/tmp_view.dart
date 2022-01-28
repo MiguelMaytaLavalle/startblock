@@ -81,7 +81,7 @@ class _TestPageState extends State<TestPage> {
                     dataSource: chartData,
                     color: const Color.fromRGBO(192, 108, 132, 1),
                     xValueMapper: (LiveData sales, _) => sales.time,
-                    yValueMapper: (LiveData sales, _) => sales.speed,
+                    yValueMapper: (LiveData sales, _) => sales.force,
                   )
                 ],
                 primaryXAxis: NumericAxis(
@@ -137,56 +137,56 @@ class _TestPageState extends State<TestPage> {
 
   int time = 19;
   void updateDataSource(Timer timer) {
-    chartData.add(LiveData(time: time++, speed: (math.Random().nextInt(60) + 30)));
+    chartData.add(LiveData(time: time++, force: (math.Random().nextInt(60) + 30)));
     chartData.removeAt(0);
     _chartSeriesController.updateDataSource(
         addedDataIndex: chartData.length - 1, removedDataIndex: 0);
   }
   List<LiveData> getChartData() {
     return <LiveData>[
-      LiveData(time: 0, speed: 42),
-      LiveData(time: 1, speed: 47),
-      LiveData(time: 2, speed: 43),
-      LiveData(time: 3, speed: 49),
-      LiveData(time: 4, speed: 54),
-      LiveData(time: 5, speed: 41),
-      LiveData(time: 6, speed: 58),
-      LiveData(time: 7, speed: 51),
-      LiveData(time: 8, speed: 98),
-      LiveData(time: 9, speed: 41),
-      LiveData(time: 10, speed: 53),
-      LiveData(time: 11, speed: 72),
-      LiveData(time: 12, speed: 86),
-      LiveData(time: 13, speed: 52),
-      LiveData(time: 14, speed: 94),
-      LiveData(time: 15, speed: 92),
-      LiveData(time: 16, speed: 86),
-      LiveData(time: 17, speed: 72),
-      LiveData(time: 18, speed: 18)
+      LiveData(time: 0, force: 42),
+      LiveData(time: 1, force: 47),
+      LiveData(time: 2, force: 43),
+      LiveData(time: 3, force: 49),
+      LiveData(time: 4, force: 54),
+      LiveData(time: 5, force: 41),
+      LiveData(time: 6, force: 58),
+      LiveData(time: 7, force: 51),
+      LiveData(time: 8, force: 98),
+      LiveData(time: 9, force: 41),
+      LiveData(time: 10, force: 53),
+      LiveData(time: 11, force: 72),
+      LiveData(time: 12, force: 86),
+      LiveData(time: 13, force: 52),
+      LiveData(time: 14, force: 94),
+      LiveData(time: 15, force: 92),
+      LiveData(time: 16, force: 86),
+      LiveData(time: 17, force: 72),
+      LiveData(time: 18, force: 18)
 
     ];
   }
   List<LiveData> getChartData1() {
     return <LiveData>[
-      LiveData(time: 0, speed: 20),
-      LiveData(time: 1, speed: 34),
-      LiveData(time: 2, speed: 56),
-      LiveData(time: 3, speed: 67),
-      LiveData(time: 4, speed: 83),
-      LiveData(time: 5, speed: 64),
-      LiveData(time: 6, speed: 100),
-      LiveData(time: 7, speed: 106),
-      LiveData(time: 8, speed: 120),
-      LiveData(time: 9, speed: 135),
-      LiveData(time: 10, speed: 153),
-      LiveData(time: 11, speed: 120),
-      LiveData(time: 12, speed: 100),
-      LiveData(time: 13, speed: 60),
-      LiveData(time: 14, speed: 24),
-      LiveData(time: 15, speed: 54),
-      LiveData(time: 16, speed: 12),
-      LiveData(time: 17, speed: 64),
-      LiveData(time: 18, speed: 80)
+      LiveData(time: 0, force: 20),
+      LiveData(time: 1, force: 34),
+      LiveData(time: 2, force: 56),
+      LiveData(time: 3, force: 67),
+      LiveData(time: 4, force: 83),
+      LiveData(time: 5, force: 64),
+      LiveData(time: 6, force: 100),
+      LiveData(time: 7, force: 106),
+      LiveData(time: 8, force: 120),
+      LiveData(time: 9, force: 135),
+      LiveData(time: 10, force: 153),
+      LiveData(time: 11, force: 120),
+      LiveData(time: 12, force: 100),
+      LiveData(time: 13, force: 60),
+      LiveData(time: 14, force: 24),
+      LiveData(time: 15, force: 54),
+      LiveData(time: 16, force: 12),
+      LiveData(time: 17, force: 64),
+      LiveData(time: 18, force: 80)
 
     ];
   }

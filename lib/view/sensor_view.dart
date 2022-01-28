@@ -18,12 +18,14 @@ class SensorScreen extends StatefulWidget {
 }
 
 class _SensorScreenState extends State<SensorScreen> {
-  var sensorPageViewModel = SensorPageViewModel();
+  var sensorPageVM = SensorPageViewModel();
   late Stream<List<int>> stream;
   late ChartSeriesController _chartSeriesRightController;
   late ChartSeriesController _chartSeriesLeftController;
   late ZoomPanBehavior _zoomPanBehavior;
   late CrosshairBehavior _crosshairBehavior;
+  //late List<String> listKrille = <String>[];
+  late List<Byte> listKrille = <><[];
   //late Timer timer;
 
 
@@ -36,7 +38,6 @@ class _SensorScreenState extends State<SensorScreen> {
       enablePanning: true,
     );
     _crosshairBehavior = CrosshairBehavior(enable: true);
-    //Timer.periodic(const Duration(milliseconds: 500), updateDataSource);
     connectToDevice();
   }
 
@@ -48,7 +49,7 @@ class _SensorScreenState extends State<SensorScreen> {
 
     Timer(const Duration(seconds: 15), () {
       //if (!isReady) {
-      if(!sensorPageViewModel.getIsReady()){
+      if(!sensorPageVM.getIsReady()){
         disconnectFromDevice();
         _Pop();
       }
@@ -86,7 +87,7 @@ class _SensorScreenState extends State<SensorScreen> {
             characteristic.setNotifyValue(!characteristic.isNotifying);
             stream = characteristic.value;
             setState(() {
-              sensorPageViewModel.setIsReady(true);
+              sensorPageVM.setIsReady(true);
             });
           }
         }
@@ -94,7 +95,7 @@ class _SensorScreenState extends State<SensorScreen> {
     }
 
     //if (!isReady) {
-    if (!sensorPageViewModel.getIsReady()){
+    if (!sensorPageVM.getIsReady()){
       _Pop();
     }
 
@@ -140,7 +141,7 @@ class _SensorScreenState extends State<SensorScreen> {
         ),
         body: SizedBox(
           height: 500,
-            child: !sensorPageViewModel.getIsReady()
+            child: !sensorPageVM.getIsReady()
                 ? const Center(
               child: Text(
                 "Connecting...",
@@ -152,7 +153,8 @@ class _SensorScreenState extends State<SensorScreen> {
                   builder: (BuildContext context, AsyncSnapshot<List<int>> snapshot) {
                     if (snapshot.hasError) return Text('Error: ${snapshot.error}');
                     if (snapshot.connectionState == ConnectionState.active) {
-                      readData(snapshot);
+                      //readData(snapshot);
+                      krillesMetod(snapshot);
                       return SafeArea(
                           child: Scaffold(
                             body: SfCartesianChart(
@@ -195,6 +197,13 @@ class _SensorScreenState extends State<SensorScreen> {
             Container(
                 margin:const EdgeInsets.all(10),
                 child: ElevatedButton(
+                  onPressed: testUpdate,
+                  child: const Icon(Icons.flare),
+                )
+            ),
+            Container(
+                margin:const EdgeInsets.all(10),
+                child: ElevatedButton(
                   onPressed: () => _createExcel,
                   child: const Icon(Icons.save_alt),
                 )
@@ -230,9 +239,56 @@ class _SensorScreenState extends State<SensorScreen> {
     File('Output.xlsx').writeAsBytes(bytes);
   }
 
+
+  ///Krilles algoritm
+  /// rad 156 anropas den här metoden för att läsa in strömmen från microbiten till mobilen
+  /// Tanken är att istället för att göra uträkningar först så samlar vi in allt från snapshot
+  /// till en String list och sen göra uträkningar när den är klar
+  ///
+  ///
+  void krillesMetod(AsyncSnapshot<List<int>> snapshot){
+    //var currentValue = _dataParser(snapshot.data!);
+    //listKrille.add(currentValue);
+    print('Length: ${listKrille.length}');
+    //sensorPageVM.getRightFootArray().add(int.tryParse(currentValue) ?? 1000);
+
+
+  }
+
+  /// Efter hämtning från microbit kan man göra uträkningen här
+  /// Finns en knapp på sensorview för att anropa metoden
+  void testUpdate() {
+    for(int i = 0; i < sensorPageVM.getLeftFootArray().length; i++){
+      print("Left: ${sensorPageVM.getLeftFootArray()[i]}");
+      sensorPageVM.getLeftChartData().add(LiveData(
+          time: i,
+          force: sensorPageVM.getLeftFootArray()[i]));
+
+    }
+    for(int i = 0; i < sensorPageVM.getRightFootArray().length; i++){
+      print("Right: ${sensorPageVM.getRightFootArray()[i]}");
+      sensorPageVM.getRightChartData().add(LiveData(
+          time: i,
+          force: sensorPageVM.getRightFootArray()[i]));
+      print("Index: $i");
+      print("-----------");
+    }
+
+    print("DONE");
+  }
+
+
+  /// Här hämtar vi data från plattan som strängar också.
+  /// Vi vill göra omvandlingar efter vi har samlat in allt från respektive fot
   void readData(AsyncSnapshot<List<int>> snapshot) {
     var currentValue = _dataParser(snapshot.data!);
-    var tag = currentValue.split(':');
+    /// data hantering för plattan
+    ///tar emot lf först
+    ///switch sats
+    ///ta emot rf nästa när lf är klar.
+    ///två string lists.
+
+/*    var tag = currentValue.split(':');
     switch(tag[0]){
       case 'RF': {
         sensorPageViewModel.getRightFootArray().add(int.tryParse(tag[1]) ?? 0);
@@ -246,31 +302,31 @@ class _SensorScreenState extends State<SensorScreen> {
         print('No data to read');
       }
       break;
-    }
+    }*/
   }
 
   /// Updates the chart
   List<SplineSeries<LiveData, int>> _getLiveUpdateSeries() {
     return <SplineSeries<LiveData, int>>[
       SplineSeries<LiveData, int>(
-        dataSource: sensorPageViewModel.getLeftChartData()!,
+        dataSource: sensorPageVM.getLeftChartData()!,
         width: 2,
         name: 'Left foot',
         onRendererCreated: (ChartSeriesController controller) {
           _chartSeriesLeftController = controller; //Updates the chart live
         },
         xValueMapper: (LiveData livedata, _) => livedata.time,
-        yValueMapper: (LiveData livedata, _) => livedata.speed,
+        yValueMapper: (LiveData livedata, _) => livedata.force,
       ),
       SplineSeries<LiveData, int>(
-        dataSource: sensorPageViewModel.getRightChartData()!,
+        dataSource: sensorPageVM.getRightChartData()!,
         width: 2,
         name: 'Right foot',
         onRendererCreated: (ChartSeriesController controller) {
           _chartSeriesRightController = controller; //Updates the chart live
         },
         xValueMapper: (LiveData livedata, _) => livedata.time,
-        yValueMapper: (LiveData livedata, _) => livedata.speed,
+        yValueMapper: (LiveData livedata, _) => livedata.force,
       ),
     ];
   }
@@ -294,18 +350,5 @@ class _SensorScreenState extends State<SensorScreen> {
     }
   }
 
-}
-
-class MyStatelessWidget extends StatelessWidget {
-  const MyStatelessWidget({Key? key}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return OutlinedButton(
-      onPressed: () {
-        debugPrint('Received click');
-      },
-      child: const Text('Click Me'),
-    );
-  }
 }
 

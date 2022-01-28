@@ -2,20 +2,20 @@ class LiveData {
 
   LiveData({
     required this.time,
-    required this.speed
+    required this.force
 }); //Constructor
 
   int time = 0;
-  num speed = 0;
+  num force = 0;
 
   Map<String, Object?> toJson() => {
     'time': time,
-    'speed': speed,
+    'speed': force,
   };
 
   factory LiveData.fromJson(Map<String, dynamic> json) => LiveData(
     time: json['time'],
-    speed: json['speed'],
+    force: json['speed'],
   );
 
 }

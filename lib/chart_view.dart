@@ -49,7 +49,7 @@ class _ChartSate extends State<Chart> {
               _chartSeriesController = controller; //Updates the chart live
             },
             xValueMapper: (LiveData livedata, _) => livedata.time,
-            yValueMapper: (LiveData livedata, _) => livedata.speed,
+            yValueMapper: (LiveData livedata, _) => livedata.force,
           )
         ],
         primaryXAxis: NumericAxis(
@@ -72,7 +72,7 @@ class _ChartSate extends State<Chart> {
     if (time == 30) {
       timer.cancel();
     }
-    chartData.add(LiveData(time: time++, speed:(math.Random().nextInt(60) + 30)));
+    chartData.add(LiveData(time: time++, force:(math.Random().nextInt(60) + 30)));
     //chartData.removeAt(0);
     _chartSeriesController.updateDataSource(
         addedDataIndex: chartData.length - 1);
@@ -81,25 +81,25 @@ class _ChartSate extends State<Chart> {
 
   List<LiveData> getChartData() {
     return <LiveData>[
-      LiveData(time:0, speed:42),
-      LiveData(time:1, speed:47),
-      LiveData(time:2, speed:43),
-      LiveData(time:3, speed:49),
-      LiveData(time:4, speed:54),
-      LiveData(time:5, speed:41),
-      LiveData(time:6, speed:58),
-      LiveData(time:7, speed:51),
-      LiveData(time:8, speed:98),
-      LiveData(time:9, speed:41),
-      LiveData(time:10, speed:53),
-      LiveData(time:11, speed:72),
-      LiveData(time:12, speed:86),
-      LiveData(time:13, speed:52),
-      LiveData(time:14, speed:94),
-      LiveData(time:15, speed:92),
-      LiveData(time:16, speed:86),
-      LiveData(time:17, speed:72),
-      LiveData(time:18, speed:94)
+      LiveData(time:0, force:42),
+      LiveData(time:1, force:47),
+      LiveData(time:2, force:43),
+      LiveData(time:3, force:49),
+      LiveData(time:4, force:54),
+      LiveData(time:5, force:41),
+      LiveData(time:6, force:58),
+      LiveData(time:7, force:51),
+      LiveData(time:8, force:98),
+      LiveData(time:9, force:41),
+      LiveData(time:10, force:53),
+      LiveData(time:11, force:72),
+      LiveData(time:12, force:86),
+      LiveData(time:13, force:52),
+      LiveData(time:14, force:94),
+      LiveData(time:15, force:92),
+      LiveData(time:16, force:86),
+      LiveData(time:17, force:72),
+      LiveData(time:18, force:94)
     ];
   }
 }

@@ -147,7 +147,7 @@ class _HistoryCardState extends State<HistoryCard> {
         width: 2,
         name: 'Right foot',
         xValueMapper: (LiveData livedata, _) => livedata.time,
-        yValueMapper: (LiveData livedata, _) => livedata.speed,
+        yValueMapper: (LiveData livedata, _) => livedata.force,
       ),
       SplineSeries<LiveData, int>(
         //dataSource: leftData,
@@ -155,7 +155,7 @@ class _HistoryCardState extends State<HistoryCard> {
         width: 2,
         name: 'Left foot',
         xValueMapper: (LiveData livedata, _) => livedata.time,
-        yValueMapper: (LiveData livedata, _) => livedata.speed,
+        yValueMapper: (LiveData livedata, _) => livedata.force,
       ),
     ];
   }
