@@ -262,28 +262,6 @@ class _SensorScreenState extends State<SensorScreen> {
     ),
   );
 
-  Future<void> _startNewScan() {
-    return showDialog(
-        context: context,
-        builder: (BuildContext context) =>
-            AlertDialog(
-              title: const Text('Are you sure?'),
-              content: const Text('Do you want to start a new measure without saving?'),
-              actions: <Widget>[
-                TextButton(
-                    onPressed: () {
-                      isSaved = true;
-                    },
-                    child: const Text('No')),
-                TextButton(
-                    onPressed:
-                      flushData,
-                    child: const Text('Yes')),
-              ],
-            )
-    );
-  }
-
   void submit(){
     Navigator.of(context).pop(controller.text );
     controller.clear();
@@ -300,18 +278,6 @@ class _SensorScreenState extends State<SensorScreen> {
       rightData: jsonEncode(rightList),
     );
     await HistoryDatabase.instance.create(history);
-  }
-  
-  void flushData() async
-  {
-    print("flush");
-    isSaved = false;
-    sensorPageVM.getRightFootArray().clear();
-    sensorPageVM.getLeftFootArray().clear();
-    sensorPageVM.getTimes().clear();
-    clientRecieveTime.clear();
-    clientSendTime.clear();
-    serverTime.clear();
   }
 
   ///Krilles algoritm
@@ -437,25 +403,20 @@ class _SensorScreenState extends State<SensorScreen> {
     /// Reads the services and characteristics UUID for the Micro:Bit
     /// Send a GO signal to the Micro:Bit
     ///
-    print(isSaved);
-    if(!isSaved)
-      {
-        clientRecieveTime.clear();
-        clientSendTime.clear();
-        serverTime.clear();
-        for(int i = 0; i < 30; i++){
-          print("SEND $i");
-          String test = '\n';
-          List<int> bytes = utf8.encode(test);
-          int currentTime = DateTime.now().millisecondsSinceEpoch;
-          clientSendTime.add(currentTime);
-          await sendChar.write(bytes);
-        }
+      sensorPageVM.getRightFootArray().clear();
+      sensorPageVM.getLeftFootArray().clear();
+      sensorPageVM.getTimes().clear();
+      clientRecieveTime.clear();
+      clientSendTime.clear();
+      serverTime.clear();
+      for(int i = 0; i < 30; i++){
+        print("SEND $i");
+        String test = '\n';
+        List<int> bytes = utf8.encode(test);
+        int currentTime = DateTime.now().millisecondsSinceEpoch;
+        clientSendTime.add(currentTime);
+        await sendChar.write(bytes);
       }
-    else
-    {
-      _startNewScan();
-    }
   }
 }
 
