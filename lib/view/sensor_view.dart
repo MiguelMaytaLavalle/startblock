@@ -305,14 +305,11 @@ class _SensorScreenState extends State<SensorScreen> {
    * AsyncSnapshot<List<int>> snapshot.data will contain data in UInt8 type
    */
   void krillesMetod(AsyncSnapshot<List<int>> snapshot){
-    if(snapshot.hasData)
-      {
-        var c = utf8.decode(snapshot.data!);
-        var x = int.tryParse(c);
-        serverTime.add(x!);
-        int currentTime = DateTime.now().millisecondsSinceEpoch;
-        clientRecieveTime.add(currentTime);
-      }
+      var c = utf8.decode(snapshot.data!);
+      var x = int.tryParse(c) ?? 0; //Assign x = 0 if data is null
+      serverTime.add(x);
+      int currentTime = DateTime.now().millisecondsSinceEpoch;
+      clientRecieveTime.add(currentTime);
     //sensorPageVM.getRightFootArray().add(int.tryParse(currentValue) ?? 1000);
   }
 
