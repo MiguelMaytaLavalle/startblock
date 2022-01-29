@@ -54,9 +54,9 @@ class ExportToExcel{
     workbook.dispose();
 
     //Get the storage folder location using path_provider package.
-    final Directory directory = await getExternalStorageDirectory();
+    final Directory? directory = await getExternalStorageDirectory();
 //Get the directory path
-    final String path = directory.path;
+    final String? path = directory?.path;
 //Create an empty file to write the Excel data
     final File file = File('$path/ImportData.xlsx');
     //Write Excel data

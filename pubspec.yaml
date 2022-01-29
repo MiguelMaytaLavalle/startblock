@@ -39,8 +39,8 @@ dependencies:
   syncfusion_flutter_charts: ^19.4.40
   syncfusion_flutter_xlsio: ^19.4.41-beta
   sqflite: ^2.0.1
-  path_provider: ^1.6.5
   open_file: ^3.0.1
+  path_provider: ^2.0.8
 
 dev_dependencies:
   flutter_test:
