@@ -38,7 +38,10 @@ class SensorPageViewModel{
   getRightChartData() {
     return sensorPageModel.rightChartData;
   }
-
+  getTimes()
+  {
+    return sensorPageModel.times;
+  }
   /// Remove the very first index from the arrays that represents the chart
   /// to keep the chart live without stacking up
   void removeDataAtIndexZero() {
