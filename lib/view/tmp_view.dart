@@ -126,7 +126,6 @@ class _TestPageState extends State<TestPage> {
     final history =  History(
       dateTime: DateTime.now(),
       name: 'Ricardo',
-      liveData: jsonEncode(test),
       rightData: jsonEncode(test),
       leftData: jsonEncode(test1),
 

@@ -10,6 +10,7 @@ class SensorModel{
   List<int> rightFootArray = [];
   List<int> leftFootArray = [];
   List<int> times = [];
+
   late Timer timer;
   int time = 0;
   late bool isReady = false;
