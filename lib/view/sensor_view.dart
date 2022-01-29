@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert' show utf8;
 import 'dart:ffi';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:startblock/model/livedata.dart';
@@ -9,7 +10,6 @@ import 'package:startblock/view_model/sensor_page_view_model.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:startblock/constant/constants.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
-
 class SensorScreen extends StatefulWidget {
   const SensorScreen({Key? key, required this.device}) : super(key: key);
   final BluetoothDevice device;
@@ -26,8 +26,14 @@ class _SensorScreenState extends State<SensorScreen> {
   late ZoomPanBehavior _zoomPanBehavior;
   late CrosshairBehavior _crosshairBehavior;
   //late List<String> listKrille = <String>[];
-  late List<Uint8> listKrille = <Uint8>[];
+  late List<int> serverTime = <int>[];
+  late List<int> clientSendTime = <int>[];
+  late List<int> clientRecieveTime = <int>[];
+  late List<num> listRTT = <num>[];
   //late Timer timer;
+  late List<BluetoothService> services;
+  late num timeSend, timeServer, timeRecieve, RTT, RTT_mean,latestMeasure;
+  late BluetoothCharacteristic sendChar;
 
 
   @override
@@ -78,7 +84,8 @@ class _SensorScreenState extends State<SensorScreen> {
 
 
 /// Reads the UART services and characteristics for the Micro:Bit
-    List<BluetoothService> services = await widget.device.discoverServices();
+    //List<BluetoothService> services = await widget.device.discoverServices();
+    services = await widget.device.discoverServices();
 
     for (var service in services) {
       print("Servfound ${service.uuid.toString()}");
@@ -90,6 +97,24 @@ class _SensorScreenState extends State<SensorScreen> {
             setState(() {
               sensorPageVM.setIsReady(true);
             });
+          }
+        }
+      }
+    }
+
+    for (var service in services) {
+      if (service.uuid.toString() == Constants.SERVICE_UART) {
+        for (var c in service.characteristics) {
+          if (c.uuid.toString() == Constants.CHARACTERISTIC_UART_SEND) {
+            sendChar = c;
+            print("Fuck off");
+/*            //c.setNotifyValue(!c.isNotifying);
+            print("SEND");
+            String test = '\n';
+            List<int> bytes = utf8.encode(test);
+            num currentTime = DateTime.now().millisecondsSinceEpoch;
+            t1 = currentTime - sensor.previousTime;
+            await c.write(bytes);*/
           }
         }
       }
@@ -198,7 +223,7 @@ class _SensorScreenState extends State<SensorScreen> {
             Container(
                 margin:const EdgeInsets.all(10),
                 child: ElevatedButton(
-                  onPressed: testUpdate,
+                  onPressed: calculateKrilles,
                   child: const Icon(Icons.flare),
                 )
             ),
@@ -212,7 +237,7 @@ class _SensorScreenState extends State<SensorScreen> {
             Container(
                 margin:const EdgeInsets.all(10),
                 child: ElevatedButton(
-                  onPressed: () => initGo(),
+                  onPressed: initGo,
                   child: const Text('START'),
                 )
             ),
@@ -247,20 +272,41 @@ class _SensorScreenState extends State<SensorScreen> {
   /// till en lämplig list och sen göra uträkningar när den är klar
   ///
   ///
+  /**
+   * AsyncSnapshot<List<int>> snapshot.data will contain data in UInt8 type
+   */
   void krillesMetod(AsyncSnapshot<List<int>> snapshot){
-    //var currentValue = _dataParser(snapshot.data!);
-    var c = snapshot.data!;
-    //listKrille.add(c);
-    //print('Length: ${listKrille.length}');
+    var c = utf8.decode(snapshot.data!);
+    var x = int.parse(c);
+    serverTime.add(x);
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
+    clientRecieveTime.add(currentTime);
     //sensorPageVM.getRightFootArray().add(int.tryParse(currentValue) ?? 1000);
-
-
   }
 
   /// Efter hämtning från microbit kan man göra uträkningen här
   /// Finns en knapp på sensorview för att anropa metod
   void calculateKrilles(){
-
+    print(clientSendTime.length);
+    print(clientRecieveTime.length);
+    print(serverTime.length);
+    for(int i=0; i<30; i++)
+      {
+        timeSend = clientSendTime[i];
+        timeServer = serverTime[i];
+        timeRecieve = clientRecieveTime[i];
+        RTT = timeServer+((timeRecieve-timeSend)/2);
+        listRTT.add(RTT);
+        print(timeRecieve - timeSend);
+      }
+    num sum = 0;
+    for(int i = 0; i < listRTT.length; i++)
+      {
+        sum += listRTT[i];
+      }
+    RTT_mean = sum/listRTT.length;
+    latestMeasure = RTT;
+    print(RTT_mean);
   }
 
 
@@ -342,19 +388,48 @@ class _SensorScreenState extends State<SensorScreen> {
   initGo() async {
     /// Reads the services and characteristics UUID for the Micro:Bit
     /// Send a GO signal to the Micro:Bit
-    List<BluetoothService> services = await widget.device.discoverServices();
+    /*List<BluetoothService> services = await widget.device.discoverServices();
     for (var service in services) {
-      if (service.uuid.toString() == Constants.LEDSERVICE_SERVICE_UUID) {
+      if (service.uuid.toString() == Constants.SERVICE_UART) {
         for (var c in service.characteristics) {
-          if (c.uuid.toString() == Constants.LEDTEXT_CHARACTERISTIC_UUID) {
+          if (c.uuid.toString() == Constants.CHARACTERISTIC_UART_SEND) {
             //characteristic.setNotifyValue(!characteristic.isNotifying);
-            String test = ',1';
+            String test = '\n';
             List<int> bytes = utf8.encode(test);
 
             await c.write(bytes);
           }
         }
       }
+    }*/
+    clientRecieveTime.clear();
+    clientSendTime.clear();
+    serverTime.clear();
+    /*late BluetoothCharacteristic bt;
+    for (var service in services) {
+      if (service.uuid.toString() == Constants.SERVICE_UART) {
+        for (var c in service.characteristics) {
+          if (c.uuid.toString() == Constants.CHARACTERISTIC_UART_SEND) {
+            bt = c;
+            print("Fuck off");
+*//*            //c.setNotifyValue(!c.isNotifying);
+            print("SEND");
+            String test = '\n';
+            List<int> bytes = utf8.encode(test);
+            num currentTime = DateTime.now().millisecondsSinceEpoch;
+            t1 = currentTime - sensor.previousTime;
+            await c.write(bytes);*//*
+          }
+        }
+      }
+    }*/
+    for(int i = 0; i < 30; i++){
+      print("SEND $i");
+      String test = '\n';
+      List<int> bytes = utf8.encode(test);
+      int currentTime = DateTime.now().millisecondsSinceEpoch;
+      clientSendTime.add(currentTime);
+      await sendChar.write(bytes);
     }
   }
 
