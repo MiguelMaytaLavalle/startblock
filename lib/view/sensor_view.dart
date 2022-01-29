@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'dart:convert' show utf8;
-import 'dart:ffi';
+import 'dart:convert' show jsonEncode, utf8;
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:startblock/db/database_helper.dart';
+import 'package:startblock/model/history.dart';
 import 'package:startblock/model/livedata.dart';
 import 'package:startblock/view_model/sensor_page_view_model.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -32,8 +32,10 @@ class _SensorScreenState extends State<SensorScreen> {
   late List<num> listRTT = <num>[];
   //late Timer timer;
   late List<BluetoothService> services;
+  late TextEditingController controller;
   late num timeSend, timeServer, timeRecieve, RTT, RTT_mean,latestMeasure;
   late BluetoothCharacteristic sendChar;
+  String name = '';
 
 
   @override
@@ -86,9 +88,7 @@ class _SensorScreenState extends State<SensorScreen> {
 /// Reads the UART services and characteristics for the Micro:Bit
     //List<BluetoothService> services = await widget.device.discoverServices();
     services = await widget.device.discoverServices();
-
     for (var service in services) {
-      print("Servfound ${service.uuid.toString()}");
       if (service.uuid.toString() == Constants.SERVICE_UART) {
         for (var characteristic in service.characteristics) {
           if (characteristic.uuid.toString() == Constants.CHARACTERISTIC_UART_RECIEVE) {
@@ -107,20 +107,11 @@ class _SensorScreenState extends State<SensorScreen> {
         for (var c in service.characteristics) {
           if (c.uuid.toString() == Constants.CHARACTERISTIC_UART_SEND) {
             sendChar = c;
-            print("Fuck off");
-/*            //c.setNotifyValue(!c.isNotifying);
-            print("SEND");
-            String test = '\n';
-            List<int> bytes = utf8.encode(test);
-            num currentTime = DateTime.now().millisecondsSinceEpoch;
-            t1 = currentTime - sensor.previousTime;
-            await c.write(bytes);*/
           }
         }
       }
     }
 
-    //if (!isReady) {
     if (!sensorPageVM.getIsReady()){
       _Pop();
     }
@@ -188,7 +179,7 @@ class _SensorScreenState extends State<SensorScreen> {
                               crosshairBehavior: _crosshairBehavior,
                               legend: Legend(isVisible: true),
                               //zoomPanBehavior: _zoomPanBehavior,
-                              series: _getLiveUpdateSeries(),
+                              series: _getUpdateSeries(),
                               primaryXAxis: NumericAxis(
                                   interactiveTooltip: const InteractiveTooltip(
                                     enable: true,
@@ -230,7 +221,12 @@ class _SensorScreenState extends State<SensorScreen> {
             Container(
                 margin:const EdgeInsets.all(10),
                 child: ElevatedButton(
-                  onPressed: () => _createExcel,
+                  onPressed: () async {
+                    final name = await openDialog();
+                    if(name == null || name.isEmpty) return;
+                    setState(() => this.name = name);
+                    addHistory();
+                  },
                   child: const Icon(Icons.save_alt),
                 )
             ),
@@ -247,24 +243,42 @@ class _SensorScreenState extends State<SensorScreen> {
     );
   }
 
-  Future<void> _createExcel() async {
-// Create a new Excel Document.
-    final Workbook workbook = Workbook();
+  Future<String?> openDialog() => showDialog<String>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text('Enter Name'),
+      content: TextField(
+        autofocus: true,
+        decoration: const InputDecoration(hintText: 'Enter Name Here'),
+        controller: controller,
+        onSubmitted: (_) => submit(),
+      ),
+      actions: [
+        TextButton(
+          child: Text('Submit'),
+          onPressed: submit,
+        ),
+      ],
+    ),
+  );
 
-// Accessing worksheet via index.
-    final Worksheet sheet = workbook.worksheets[0];
-
-// Set the text value.
-    sheet.getRangeByName('A1').setText('Hello World!');
-
-// Save and dispose the document.
-    final List<int> bytes = workbook.saveAsStream();
-    workbook.dispose();
-
-// Save the Excel file in the local machine.
-    File('Output.xlsx').writeAsBytes(bytes);
+  void submit(){
+    Navigator.of(context).pop(controller.text );
+    controller.clear();
   }
 
+  Future addHistory() async {
+    List<LiveData> leftList = sensorPageVM.getLeftChartData();
+    List<LiveData> rightList = sensorPageVM.getRightChartData();
+
+    final history =  History(
+      dateTime: DateTime.now(),
+      name: this.name,
+      leftData: jsonEncode(leftList),
+      rightData: jsonEncode(rightList),
+    );
+    await HistoryDatabase.instance.create(history);
+  }
 
   ///Krilles algoritm
   /// rad 156 anropas den här metoden för att läsa in strömmen från microbiten till mobilen
@@ -360,7 +374,7 @@ class _SensorScreenState extends State<SensorScreen> {
   }
 
   /// Updates the chart
-  List<SplineSeries<LiveData, int>> _getLiveUpdateSeries() {
+  List<SplineSeries<LiveData, int>> _getUpdateSeries() {
     return <SplineSeries<LiveData, int>>[
       SplineSeries<LiveData, int>(
         dataSource: sensorPageVM.getLeftChartData()!,

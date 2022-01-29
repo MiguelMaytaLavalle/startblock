@@ -17,13 +17,13 @@ class HistoryCardViewModel{
     hCardModel.history = hist;
   }
 
-  getRightHistory(){
+  getRightLiveData(){
     return hCardModel.rightData;
   }
   setRightHistory(List<LiveData> list){
     hCardModel.rightData = list;
   }
-  getLeftHistory(){
+  getLeftLiveData(){
     return hCardModel.leftData;
   }
   setLeftHistory(List<LiveData> list){

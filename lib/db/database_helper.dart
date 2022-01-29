@@ -12,7 +12,7 @@ class HistoryDatabase{
   Future<Database> get database async{
     if(_database != null) return _database!;
 
-    _database = await  _initDB('test4.db');
+    _database = await  _initDB('test5.db');
     return _database!;
   }
 
@@ -34,7 +34,6 @@ CREATE TABLE $tableHistory (
   ${HistoryFields.id} $idType, 
   ${HistoryFields.dateTime} $textType,
   ${HistoryFields.name} $textType,
-  ${HistoryFields.liveData} $textType,
   ${HistoryFields.rightData} $textType,
   ${HistoryFields.leftData} $textType
   )

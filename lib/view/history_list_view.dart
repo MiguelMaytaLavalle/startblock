@@ -29,7 +29,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   Future refreshHistory() async {
     setState(() => isLoading = true);
-    //listHistory = await HistoryDatabase.instance.readAllHistory();
     historyListViewModel.setHistoryList(await HistoryDatabase.instance.readAllHistory());
     setState(() => isLoading = false);
   }
@@ -71,18 +70,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
           child: Center(child: Text('${index+1}. ${history.name} $date')),
         )
       );
-
-/*      return GestureDetector(
-        onTap: () async {
-          await Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => HistoryDetailPage(historyId: history.id!),
-          ));
-
-          refreshHistory();
-        },
-        child: NoteCardWidget(note: note, index: index),
-      );*/
-
     }, separatorBuilder: (BuildContext context, int index) => const Divider() ,
   );
 
