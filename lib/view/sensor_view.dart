@@ -1,15 +1,15 @@
 import 'dart:async';
 import 'dart:convert' show jsonEncode, utf8;
-import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:startblock/constant/constants.dart';
 import 'package:startblock/db/database_helper.dart';
 import 'package:startblock/model/history.dart';
 import 'package:startblock/model/livedata.dart';
 import 'package:startblock/view_model/sensor_page_view_model.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:startblock/constant/constants.dart';
-import 'package:syncfusion_flutter_xlsio/xlsio.dart';
+
 class SensorScreen extends StatefulWidget {
   const SensorScreen({Key? key, required this.device}) : super(key: key);
   final BluetoothDevice device;
@@ -37,6 +37,10 @@ class _SensorScreenState extends State<SensorScreen> {
   late BluetoothCharacteristic sendChar;
   String name = '';
   bool isSaved = false;
+  String whichSide = 'LF';
+
+  late List<String> tmpListRight = <String>[];
+  late List<String> tmpListLeft = <String>[];
 
 
   @override
@@ -84,7 +88,6 @@ class _SensorScreenState extends State<SensorScreen> {
     }
 
    // connectServicesAndCharacteristics(Contants.SERVICE_UUID, Contants.CHARACTERISTIC_UUID);
-
 
 /// Reads the UART services and characteristics for the Micro:Bit
     //List<BluetoothService> services = await widget.device.discoverServices();
@@ -157,57 +160,82 @@ class _SensorScreenState extends State<SensorScreen> {
         appBar: AppBar(
           title: const Text('Startblock'),
         ),
-        body: SizedBox(
-          height: 500,
-            child: !sensorPageVM.getIsReady()
-                ? const Center(
-              child: Text(
-                "Connecting...",
-                style: TextStyle(fontSize: 24, color: Colors.blue),
-              ),
-            )
-                : StreamBuilder<List<int>>(
+        body: Column(
+          children: [
+            SizedBox(
+                height: 450,
+                child: !sensorPageVM.getIsReady() ? const Center(
+                  child: Text("Connecting...", style: TextStyle(fontSize: 24, color: Colors.blue),),
+                ) : StreamBuilder<List<int>>(
                   stream: stream,
                   builder: (BuildContext context, AsyncSnapshot<List<int>> snapshot) {
                     if (snapshot.hasError) return Text('Error: ${snapshot.error}');
                     if (snapshot.connectionState == ConnectionState.active) {
                       //readData(snapshot);
-                      krillesMetod(snapshot);
+                      testReadDataLoss(snapshot);
+                      //krillesMetod(snapshot);
                       return SafeArea(
-                          child: Scaffold(
-                            body: SfCartesianChart(
-                              //title: ChartTitle(text: "Startblock"),
-                              crosshairBehavior: _crosshairBehavior,
-                              legend: Legend(isVisible: true),
-                              //zoomPanBehavior: _zoomPanBehavior,
-                              series: _getUpdateSeries(),
-                              primaryXAxis: NumericAxis(
-                                  interactiveTooltip: const InteractiveTooltip(
-                                    enable: true,
+                        child: Scaffold(
+                          body: SfCartesianChart(
+                            crosshairBehavior: _crosshairBehavior,
+                            legend: Legend(isVisible: true),
+                            zoomPanBehavior: _zoomPanBehavior,
+                            series: _getUpdateSeries(),
+                            primaryXAxis: NumericAxis(
+                                interactiveTooltip: const InteractiveTooltip(
+                                  enable: true,
                                 ),
-                                  majorGridLines: const MajorGridLines(width: 0),
-                                  edgeLabelPlacement: EdgeLabelPlacement.shift,
-                                  interval: 3,
-                                  title: AxisTitle(text: 'Time [S]')
-                              ),
-                              primaryYAxis: NumericAxis(
-                                minimum: 0,
-                                  //maximum: 800,
-                                  interactiveTooltip: const InteractiveTooltip(
-                                    enable: true,
-                                  ),
-                                  axisLine: const AxisLine(width: 0),
-                                  majorTickLines: const MajorTickLines(size: 0),
-                                  title: AxisTitle(text: 'Force [N]')
-                              ),
-
+                                majorGridLines: const MajorGridLines(width: 0),
+                                edgeLabelPlacement: EdgeLabelPlacement.shift,
+                                interval: 3,
+                                title: AxisTitle(text: 'Time [S]')
                             ),
+                            primaryYAxis: NumericAxis(
+                                minimum: 0,
+                                //maximum: 800,
+                                interactiveTooltip: const InteractiveTooltip(
+                                  enable: true,
+                                ),
+                                axisLine: const AxisLine(width: 0),
+                                majorTickLines: const MajorTickLines(size: 0),
+                                title: AxisTitle(text: 'Force [N]')
+                            ),
+
+                          ),
                         ),
                       );
                     } else { return const Text('Check the stream'); }
                   },
                 )
+            ),
+            Wrap(
+              direction: Axis.vertical,
+              children: const <Widget>[
+                Material(
+                    //margin:const EdgeInsets.all(10),
+                    child: Text('Rate of force (RFD): 0'
+                    )
+                ),
+                Material(
+                  //margin:const EdgeInsets.all(10),
+                    child: Text('Time to peak (TTP): 0'
+                    )
+                ),
+                Material(
+                  //margin:const EdgeInsets.all(10),
+                    child: Text('Force impulse: 0'
+                    )
+                ),
+                Material(
+                  //margin:const EdgeInsets.all(10),
+                    child: Text('Peak force: 0'
+                    )
+                ),
+              ],
+            ),
+          ],
         ),
+
         floatingActionButton:Wrap(
           direction: Axis.horizontal,
           children: <Widget>[
@@ -239,6 +267,7 @@ class _SensorScreenState extends State<SensorScreen> {
             ),
           ],
         ),
+
       ),
     );
   }
@@ -301,7 +330,7 @@ class _SensorScreenState extends State<SensorScreen> {
     );
     await HistoryDatabase.instance.create(history);
   }
-  
+
   void flushData() async
   {
     print("flush");
@@ -357,8 +386,6 @@ class _SensorScreenState extends State<SensorScreen> {
     print(RTT_mean);
   }
 
-
-
   void testUpdate() {
     for(int i = 0; i < sensorPageVM.getLeftFootArray().length; i++){
       print("Left: ${sensorPageVM.getLeftFootArray()[i]}");
@@ -379,6 +406,11 @@ class _SensorScreenState extends State<SensorScreen> {
     print("DONE");
   }
 
+  void testUpdateDataLoss() {
+    print(tmpListLeft.length);
+    print(tmpListRight.length);
+  }
+
 
   /// Här hämtar vi data från plattan som strängar också.
   /// Vi vill göra omvandlingar efter vi har samlat in allt från respektive fot
@@ -390,21 +422,64 @@ class _SensorScreenState extends State<SensorScreen> {
     ///ta emot rf nästa när lf är klar.
     ///två string lists.
 
-/*    var tag = currentValue.split(':');
+    var tag = currentValue.split(':');
+
+
     switch(tag[0]){
       case 'RF': {
-        sensorPageViewModel.getRightFootArray().add(int.tryParse(tag[1]) ?? 0);
+        //print('RF: ${tag[1]}');
+        //sensorPageVM.getRightFootArray().add(int.tryParse(tag[1]) ?? 0);
+        double tmpDoubleR = double.parse(tag[1]);
+        int tmpIntR = tmpDoubleR.toInt();
+        print('LF: $tmpIntR');
+        sensorPageVM.getRightFootArray().add(tmpIntR);
       }
       break;
       case 'LF': {
-        sensorPageViewModel.getLeftFootArray().add(int.tryParse(tag[1]) ?? 0);
+        //print('LF: ${tag[1]}');
+        //sensorPageVM.getLeftFootArray().add(int.tryParse(tag[1]) ?? 0);
+        double tmpDoubleL = double.parse(tag[1]);
+        int tmpIntL = tmpDoubleL.toInt();
+        print('LF: $tmpIntL');
+        sensorPageVM.getRightFootArray().add(tmpIntL);
+      }
+      break;
+      case 'D' :{
+        testUpdate();
       }
       break;
       default:{
         print('No data to read');
       }
       break;
-    }*/
+    }
+  }
+
+
+  void testReadDataLoss(AsyncSnapshot<List<int>> snapshot){
+    var currentValue = _dataParser(snapshot.data!);
+
+    if(currentValue == '!'){
+      print('Sideswitch!');
+      whichSide = 'RF';
+      return;
+    }else if(currentValue == 'D'){
+      testUpdateDataLoss();
+    }
+
+    switch(whichSide){
+      case 'RF': {
+        print('Right!');
+        tmpListRight.add(currentValue);
+      }
+      break;
+      case 'LF': {
+        print('Left!');
+        tmpListLeft.add(currentValue);
+      }
+      break;
+    }
+
   }
 
   /// Updates the chart
@@ -436,8 +511,13 @@ class _SensorScreenState extends State<SensorScreen> {
   initGo() async {
     /// Reads the services and characteristics UUID for the Micro:Bit
     /// Send a GO signal to the Micro:Bit
-    ///
-    print(isSaved);
+
+    String test = '\n';
+    List<int> bytes = utf8.encode(test);
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
+    clientSendTime.add(currentTime);
+    await sendChar.write(bytes);
+    /*print(isSaved);
     if(!isSaved)
       {
         clientRecieveTime.clear();
@@ -455,7 +535,7 @@ class _SensorScreenState extends State<SensorScreen> {
     else
     {
       _startNewScan();
-    }
+    }*/
   }
 }
 

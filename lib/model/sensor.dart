@@ -7,8 +7,8 @@ class SensorModel{
   late List<LiveData> leftChartData = <LiveData>[];
   late List<LiveData> timess = <LiveData>[];
 
-  List<int> rightFootArray = [];
-  List<int> leftFootArray = [];
+  late List<int> rightFootArray = <int>[];
+  late List<int> leftFootArray = <int>[];
   List<int> times = [];
 
   late Timer timer;
