@@ -53,9 +53,8 @@ class _SensorScreenState extends State<SensorScreen> {
       enablePanning: true,
     );
     _crosshairBehavior = CrosshairBehavior(enable: true);
-    establishStream();
     connectToDevice();
-    sendKrille();
+    //sendKrille();
   }
 
   establishStream() async{
@@ -116,11 +115,35 @@ class _SensorScreenState extends State<SensorScreen> {
       _Pop();
       return;
     }
-
+    //establishStream();
    // connectServicesAndCharacteristics(Contants.SERVICE_UUID, Contants.CHARACTERISTIC_UUID);
 
 /// Reads the UART services and characteristics for the Micro:Bit
     //List<BluetoothService> services = await widget.device.discoverServices();
+    services = await widget.device.discoverServices();
+    for (var service in services) {
+      if (service.uuid.toString() == Constants.SERVICE_UART) {
+        for (var characteristic in service.characteristics) {
+          if (characteristic.uuid.toString() == Constants.CHARACTERISTIC_UART_RECIEVE) {
+            characteristic.setNotifyValue(!characteristic.isNotifying);
+            stream = characteristic.value;
+            setState(() {
+              sensorPageVM.setIsReady(true);
+            });
+          }
+        }
+      }
+    }
+
+    for (var service in services) {
+      if (service.uuid.toString() == Constants.SERVICE_UART) {
+        for (var c in service.characteristics) {
+          if (c.uuid.toString() == Constants.CHARACTERISTIC_UART_SEND) {
+            sendChar = c;
+          }
+        }
+      }
+    }
 
     if (!sensorPageVM.getIsReady()){
       _Pop();
@@ -176,10 +199,12 @@ class _SensorScreenState extends State<SensorScreen> {
                   stream: stream,
                   builder: (BuildContext context, AsyncSnapshot<List<int>> snapshot) {
                     if (snapshot.hasError) return Text('Error: ${snapshot.error}');
-                    if (snapshot.connectionState == ConnectionState.active) {
+                    if (snapshot.connectionState ==
+                        ConnectionState.active) {
+                      //sendKrille();
                       //readData(snapshot);
-                      testReadDataLoss(snapshot);
-                      //krillesMetod(snapshot);
+                      //testReadDataLoss(snapshot);
+                      krillesMetod(snapshot);
                       return SafeArea(
                         child: Scaffold(
                           body: SfCartesianChart(
@@ -267,7 +292,7 @@ class _SensorScreenState extends State<SensorScreen> {
             Container(
                 margin:const EdgeInsets.all(10),
                 child: ElevatedButton(
-                  onPressed: initGo,
+                  onPressed:  sendKrille,
                   child: const Text('START'),
                 )
             ),
@@ -361,27 +386,34 @@ class _SensorScreenState extends State<SensorScreen> {
   void krillesMetod(AsyncSnapshot<List<int>> snapshot){
       var c = utf8.decode(snapshot.data!);
       var x = int.tryParse(c) ?? 0; //Assign x = 0 if data is null
+      print("Data: $x");
       if(x != 0) //Micro:bit sends nulldata at first connection
         {
+          print('Data: $x. server time');
           serverTime.add(x);
           int currentTime = DateTime.now().millisecondsSinceEpoch;
           clientRecieveTime.add(currentTime);
           _krilleCounter++;
-          if(_krilleCounter <= 30)
+          if(_krilleCounter < 30)
           {
+            print('Send Data: $x');
             sendKrille();
           }
-          else
+          else if(_krilleCounter == 30)
           {
             calculateKrilles();
           }
-        }
+        }else{
+        print('Send to microbit');
+        sendKrille();
+      }
     //sensorPageVM.getRightFootArray().add(int.tryParse(currentValue) ?? 1000);
   }
 
   /// Init time sync with Cristian's algortihm
   void sendKrille() async
   {
+    print('Time to send');
     String test = '\n';
     List<int> bytes = utf8.encode(test);
     int currentTime = DateTime.now().millisecondsSinceEpoch;
@@ -411,6 +443,17 @@ class _SensorScreenState extends State<SensorScreen> {
     RTT_mean = sum/listRTT.length;
     latestMeasure = RTT;
     print(RTT_mean);
+
+    clientRecieveTime.clear();
+    clientSendTime.clear();
+    serverTime.clear();
+    _krilleCounter = 0;
+
+    print('Client Receive Time: ${clientRecieveTime.length}');
+    print('Client Send Time: ${clientSendTime.length}');
+    print('Server Time: ${serverTime.length}');
+    print('Cristian Counter: ${_krilleCounter}');
+
   }
 
   void testUpdate() {
@@ -548,6 +591,7 @@ class _SensorScreenState extends State<SensorScreen> {
     int currentTime = DateTime.now().millisecondsSinceEpoch;
     clientSendTime.add(currentTime);
     await sendChar.write(bytes);
+
     /*print(isSaved);
     if(!isSaved)
       {
