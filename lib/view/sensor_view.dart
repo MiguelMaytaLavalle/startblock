@@ -41,8 +41,9 @@ class _SensorScreenState extends State<SensorScreen> {
 
   late List<String> tmpListRight = <String>[];
   late List<String> tmpListLeft = <String>[];
-
-
+  int counterLeft = 0;
+  int counterRight = 0;
+  int _krilleCounter = 0;
   @override
   void initState() {
     super.initState();
@@ -52,7 +53,36 @@ class _SensorScreenState extends State<SensorScreen> {
       enablePanning: true,
     );
     _crosshairBehavior = CrosshairBehavior(enable: true);
+    establishStream();
     connectToDevice();
+    sendKrille();
+  }
+
+  establishStream() async{
+    services = await widget.device.discoverServices();
+    for (var service in services) {
+      if (service.uuid.toString() == Constants.SERVICE_UART) {
+        for (var characteristic in service.characteristics) {
+          if (characteristic.uuid.toString() == Constants.CHARACTERISTIC_UART_RECIEVE) {
+            characteristic.setNotifyValue(!characteristic.isNotifying);
+            stream = characteristic.value;
+            setState(() {
+              sensorPageVM.setIsReady(true);
+            });
+          }
+        }
+      }
+    }
+
+    for (var service in services) {
+      if (service.uuid.toString() == Constants.SERVICE_UART) {
+        for (var c in service.characteristics) {
+          if (c.uuid.toString() == Constants.CHARACTERISTIC_UART_SEND) {
+            sendChar = c;
+          }
+        }
+      }
+    }
   }
 
   connectToDevice() async {
@@ -91,30 +121,6 @@ class _SensorScreenState extends State<SensorScreen> {
 
 /// Reads the UART services and characteristics for the Micro:Bit
     //List<BluetoothService> services = await widget.device.discoverServices();
-    services = await widget.device.discoverServices();
-    for (var service in services) {
-      if (service.uuid.toString() == Constants.SERVICE_UART) {
-        for (var characteristic in service.characteristics) {
-          if (characteristic.uuid.toString() == Constants.CHARACTERISTIC_UART_RECIEVE) {
-            characteristic.setNotifyValue(!characteristic.isNotifying);
-            stream = characteristic.value;
-            setState(() {
-              sensorPageVM.setIsReady(true);
-            });
-          }
-        }
-      }
-    }
-
-    for (var service in services) {
-      if (service.uuid.toString() == Constants.SERVICE_UART) {
-        for (var c in service.characteristics) {
-          if (c.uuid.toString() == Constants.CHARACTERISTIC_UART_SEND) {
-            sendChar = c;
-          }
-        }
-      }
-    }
 
     if (!sensorPageVM.getIsReady()){
       _Pop();
@@ -355,12 +361,33 @@ class _SensorScreenState extends State<SensorScreen> {
   void krillesMetod(AsyncSnapshot<List<int>> snapshot){
       var c = utf8.decode(snapshot.data!);
       var x = int.tryParse(c) ?? 0; //Assign x = 0 if data is null
-      serverTime.add(x);
-      int currentTime = DateTime.now().millisecondsSinceEpoch;
-      clientRecieveTime.add(currentTime);
+      if(x != 0) //Micro:bit sends nulldata at first connection
+        {
+          serverTime.add(x);
+          int currentTime = DateTime.now().millisecondsSinceEpoch;
+          clientRecieveTime.add(currentTime);
+          _krilleCounter++;
+          if(_krilleCounter <= 30)
+          {
+            sendKrille();
+          }
+          else
+          {
+            calculateKrilles();
+          }
+        }
     //sensorPageVM.getRightFootArray().add(int.tryParse(currentValue) ?? 1000);
   }
 
+  /// Init time sync with Cristian's algortihm
+  void sendKrille() async
+  {
+    String test = '\n';
+    List<int> bytes = utf8.encode(test);
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
+    clientSendTime.add(currentTime);
+    await sendChar.write(bytes);
+  }
   /// Efter hämtning från microbit kan man göra uträkningen här
   /// Finns en knapp på sensorview för att anropa metod
   void calculateKrilles(){
@@ -407,6 +434,8 @@ class _SensorScreenState extends State<SensorScreen> {
   }
 
   void testUpdateDataLoss() {
+    print("Counter LF says $counterLeft");
+    print("Counter RF says $counterRight");
     print(tmpListLeft.length);
     print(tmpListRight.length);
   }
@@ -471,11 +500,13 @@ class _SensorScreenState extends State<SensorScreen> {
       case 'RF': {
         print('Right!');
         tmpListRight.add(currentValue);
+        counterRight +=1;
       }
       break;
       case 'LF': {
         print('Left!');
         tmpListLeft.add(currentValue);
+        counterLeft +=1;
       }
       break;
     }
