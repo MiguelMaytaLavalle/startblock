@@ -202,9 +202,9 @@ class _SensorScreenState extends State<SensorScreen> {
                     if (snapshot.connectionState ==
                         ConnectionState.active) {
                       //sendKrille();
-                      //readData(snapshot);
+                      readData(snapshot);
                       //testReadDataLoss(snapshot);
-                      krillesMetod(snapshot);
+                      //krillesMetod(snapshot);
                       return SafeArea(
                         child: Scaffold(
                           body: SfCartesianChart(
@@ -292,7 +292,7 @@ class _SensorScreenState extends State<SensorScreen> {
             Container(
                 margin:const EdgeInsets.all(10),
                 child: ElevatedButton(
-                  onPressed:  sendKrille,
+                  onPressed:  initGo,
                   child: const Text('START'),
                 )
             ),
@@ -372,6 +372,7 @@ class _SensorScreenState extends State<SensorScreen> {
     clientRecieveTime.clear();
     clientSendTime.clear();
     serverTime.clear();
+    _krilleCounter = 0;
   }
 
   ///Krilles algoritm
@@ -444,16 +445,11 @@ class _SensorScreenState extends State<SensorScreen> {
     latestMeasure = RTT;
     print(RTT_mean);
 
-    clientRecieveTime.clear();
-    clientSendTime.clear();
-    serverTime.clear();
-    _krilleCounter = 0;
-
+    flushData();
     print('Client Receive Time: ${clientRecieveTime.length}');
     print('Client Send Time: ${clientSendTime.length}');
     print('Server Time: ${serverTime.length}');
     print('Cristian Counter: ${_krilleCounter}');
-
   }
 
   void testUpdate() {
@@ -477,8 +473,6 @@ class _SensorScreenState extends State<SensorScreen> {
   }
 
   void testUpdateDataLoss() {
-    print("Counter LF says $counterLeft");
-    print("Counter RF says $counterRight");
     print(tmpListLeft.length);
     print(tmpListRight.length);
   }
@@ -501,23 +495,25 @@ class _SensorScreenState extends State<SensorScreen> {
       case 'RF': {
         //print('RF: ${tag[1]}');
         //sensorPageVM.getRightFootArray().add(int.tryParse(tag[1]) ?? 0);
-        double tmpDoubleR = double.parse(tag[1]);
-        int tmpIntR = tmpDoubleR.toInt();
-        print('LF: $tmpIntR');
-        sensorPageVM.getRightFootArray().add(tmpIntR);
+        //double tmpDoubleR = double.parse(tag[1]);
+        //int tmpIntR = tmpDoubleR.toInt();
+        //print('LF: $tmpIntR');
+        //sensorPageVM.getRightFootArray().add(tmpIntR);
+        tmpListRight.add(tag[1]);
       }
       break;
       case 'LF': {
         //print('LF: ${tag[1]}');
         //sensorPageVM.getLeftFootArray().add(int.tryParse(tag[1]) ?? 0);
-        double tmpDoubleL = double.parse(tag[1]);
-        int tmpIntL = tmpDoubleL.toInt();
-        print('LF: $tmpIntL');
-        sensorPageVM.getRightFootArray().add(tmpIntL);
+        //double tmpDoubleL = double.parse(tag[1]);
+        //int tmpIntL = tmpDoubleL.toInt();
+        //print('LF: $tmpIntL');
+        //sensorPageVM.getRightFootArray().add(tmpIntL);
+        tmpListLeft.add(tag[1]);
       }
       break;
       case 'D' :{
-        testUpdate();
+        testUpdateDataLoss();
       }
       break;
       default:{
@@ -584,8 +580,8 @@ class _SensorScreenState extends State<SensorScreen> {
 
   initGo() async {
     /// Reads the services and characteristics UUID for the Micro:Bit
-    /// Send a GO signal to the Micro:Bit
-
+    /// Send a GO signal to the Micro:BitflushData();
+    //sendKrille();
     String test = '\n';
     List<int> bytes = utf8.encode(test);
     int currentTime = DateTime.now().millisecondsSinceEpoch;
