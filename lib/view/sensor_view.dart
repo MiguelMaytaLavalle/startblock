@@ -365,9 +365,10 @@ class _SensorScreenState extends State<SensorScreen> {
   void flushData() async
   {
     print("flush");
+    tmpListLeft.clear();
+    tmpListRight.clear();
     isSaved = false;
-    sensorPageVM.getRightFootArray().clear();
-    sensorPageVM.getLeftFootArray().clear();
+    sensorPageVM.flushData();
     sensorPageVM.getTimes().clear();
     clientRecieveTime.clear();
     clientSendTime.clear();
@@ -458,7 +459,6 @@ class _SensorScreenState extends State<SensorScreen> {
       sensorPageVM.getLeftChartData().add(LiveData(
           time: i,
           force: sensorPageVM.getLeftFootArray()[i]));
-
     }
     for(int i = 0; i < sensorPageVM.getRightFootArray().length; i++){
       print("Right: ${sensorPageVM.getRightFootArray()[i]}");
@@ -468,7 +468,8 @@ class _SensorScreenState extends State<SensorScreen> {
       print("Index: $i");
       print("-----------");
     }
-
+    print("RF Len:${sensorPageVM.getRightFootArray().length}");
+    print("LF:len ${sensorPageVM.getLeftFootArray().length}");
     print("DONE");
   }
 
@@ -493,27 +494,25 @@ class _SensorScreenState extends State<SensorScreen> {
 
     switch(tag[0]){
       case 'RF': {
-        //print('RF: ${tag[1]}');
+        print('RF: ${tag[1]}');
         //sensorPageVM.getRightFootArray().add(int.tryParse(tag[1]) ?? 0);
-        //double tmpDoubleR = double.parse(tag[1]);
-        //int tmpIntR = tmpDoubleR.toInt();
+        double tmpDoubleR = double.parse(tag[1]);
+        int tmpIntR = tmpDoubleR.toInt();
         //print('LF: $tmpIntR');
-        //sensorPageVM.getRightFootArray().add(tmpIntR);
-        tmpListRight.add(tag[1]);
+        sensorPageVM.getRightFootArray().add(tmpIntR);
       }
       break;
       case 'LF': {
-        //print('LF: ${tag[1]}');
+        print('LF: ${tag[1]}');
         //sensorPageVM.getLeftFootArray().add(int.tryParse(tag[1]) ?? 0);
-        //double tmpDoubleL = double.parse(tag[1]);
-        //int tmpIntL = tmpDoubleL.toInt();
+        double tmpDoubleL = double.parse(tag[1]);
+        int tmpIntL = tmpDoubleL.toInt();
         //print('LF: $tmpIntL');
-        //sensorPageVM.getRightFootArray().add(tmpIntL);
-        tmpListLeft.add(tag[1]);
+        sensorPageVM.getRightFootArray().add(tmpIntL);
       }
       break;
       case 'D' :{
-        testUpdateDataLoss();
+        testUpdate();
       }
       break;
       default:{
@@ -580,7 +579,8 @@ class _SensorScreenState extends State<SensorScreen> {
 
   initGo() async {
     /// Reads the services and characteristics UUID for the Micro:Bit
-    /// Send a GO signal to the Micro:BitflushData();
+    /// Send a GO signal to the Micro:Bit
+    flushData();
     //sendKrille();
     String test = '\n';
     List<int> bytes = utf8.encode(test);

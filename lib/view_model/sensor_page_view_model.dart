@@ -42,9 +42,11 @@ class SensorPageViewModel{
   {
     return sensorPageModel.times;
   }
-  /// Remove the very first index from the arrays that represents the chart
-  /// to keep the chart live without stacking up
-  void removeDataAtIndexZero() {
-    sensorPageModel.rightChartData.removeAt(0);
+  flushData()
+  {
+    sensorPageModel.rightFootArray.clear();
+    sensorPageModel.leftFootArray.clear();
+    print(sensorPageModel.rightFootArray.length);
+    print(sensorPageModel.leftFootArray.length);
   }
 }
