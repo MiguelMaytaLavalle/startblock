@@ -416,7 +416,7 @@ class _SensorScreenState extends State<SensorScreen> {
   void sendKrille() async
   {
     print('Time to send');
-    String test = '\n';
+    String test = "#";
     List<int> bytes = utf8.encode(test);
     int currentTime = DateTime.now().millisecondsSinceEpoch;
     clientSendTime.add(currentTime);
@@ -494,25 +494,28 @@ class _SensorScreenState extends State<SensorScreen> {
 
     switch(tag[0]){
       case 'RF': {
-        print('RF: ${tag[1]}');
+        //print('RF: ${tag[1]}');
         //sensorPageVM.getRightFootArray().add(int.tryParse(tag[1]) ?? 0);
         double tmpDoubleR = double.parse(tag[1]);
         int tmpIntR = tmpDoubleR.toInt();
         //print('LF: $tmpIntR');
         sensorPageVM.getRightFootArray().add(tmpIntR);
+        //tmpListRight.add(tag[1]);
       }
       break;
       case 'LF': {
-        print('LF: ${tag[1]}');
+        //print('LF: ${tag[1]}');
         //sensorPageVM.getLeftFootArray().add(int.tryParse(tag[1]) ?? 0);
         double tmpDoubleL = double.parse(tag[1]);
         int tmpIntL = tmpDoubleL.toInt();
         //print('LF: $tmpIntL');
-        sensorPageVM.getRightFootArray().add(tmpIntL);
+        sensorPageVM.getLeftFootArray().add(tmpIntL);
+        //tmpListLeft.add(tag[1]);
       }
       break;
       case 'D' :{
         testUpdate();
+        //testUpdateDataLoss();
       }
       break;
       default:{
