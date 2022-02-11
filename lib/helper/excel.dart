@@ -1,11 +1,13 @@
 import 'dart:io';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:startblock/model/history.dart';
 import 'package:startblock/model/livedata.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 
 class ExportToExcel{
 
+  /// Rename function
   Future<List<ExcelDataRow>> _buildCustomersDataRowsIH(List<LiveData> list) async {
     List<ExcelDataRow> excelDataRows = <ExcelDataRow>[];
     final Future<List<LiveData>> reports = _getCustomersImageHyperlink(list);
@@ -19,10 +21,12 @@ class ExportToExcel{
     return excelDataRows;
   }
 
+  /// rename function
   Future<List<LiveData>> _getCustomersImageHyperlink(List<LiveData> list) async {
     final List<LiveData> reports = list;
     return reports;
   }
+
 
   Future<void> exportToExcel(List<LiveData> leftList, List<LiveData> rightList) async {
     //Create a Excel document.
@@ -62,6 +66,17 @@ class ExportToExcel{
     //Write Excel data
     await file.writeAsBytes(bytes, flush: true);
     //Launch the file (used open_file package)
-    await OpenFile.open('$path/ImportData.xlsx');
+    //await OpenFile.open('$path/ImportData.xlsx');
+    String excelPath = '$path/output.xlsx';
+    // Attach excel file to the email
+    //attachments.add(excelPath);
+    //sendEmailVM.addAttachment(excelPath);
   }
+
+  String attachExcel(History history){
+    exportToExcel(history.leftData, history.rightData);
+    return '';
+  }
+
+
 }

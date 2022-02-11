@@ -52,6 +52,7 @@ class _SensorScreenState extends State<SensorScreen> {
       zoomMode: ZoomMode.xy,
       enablePanning: true,
     );
+    controller = TextEditingController();
     _crosshairBehavior = CrosshairBehavior(enable: true);
     connectToDevice();
     //sendKrille();
@@ -459,6 +460,8 @@ class _SensorScreenState extends State<SensorScreen> {
       sensorPageVM.getLeftChartData().add(LiveData(
           time: i,
           force: sensorPageVM.getLeftFootArray()[i]));
+      print("Index: $i");
+      print("-----------");
     }
     for(int i = 0; i < sensorPageVM.getRightFootArray().length; i++){
       print("Right: ${sensorPageVM.getRightFootArray()[i]}");

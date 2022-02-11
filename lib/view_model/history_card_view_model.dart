@@ -13,6 +13,18 @@ class HistoryCardViewModel{
     return hCardModel.history;
   }
 
+  getHistoryId(){
+    return hCardModel.history.id;
+  }
+
+  getDateTime(){
+    return hCardModel.history.dateTime;
+  }
+
+  getHistoryName(){
+    return hCardModel.history.name;
+  }
+
   setHistory(History hist){
     hCardModel.history = hist;
   }
