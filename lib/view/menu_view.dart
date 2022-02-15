@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:startblock/view/find_device_view.dart';
 import 'package:startblock/view/history_list_view.dart';
+import 'package:startblock/view/microbit_view.dart';
 import 'package:startblock/view/tmp_view.dart';
 import 'package:startblock/view_model/menu_view_model.dart';
 
@@ -69,6 +70,19 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
               );
             },
             child: const Text('Test'),
+
+          ),
+          const SizedBox(height: 30),
+          ElevatedButton(
+            style: style,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => microbitScreen()),
+              );
+            },
+            child: const Text('Instant'),
+
           ),
         ],
       ),

@@ -140,6 +140,9 @@ class _SensorScreenState extends State<SensorScreen> {
       if (service.uuid.toString() == Constants.SERVICE_UART) {
         for (var c in service.characteristics) {
           if (c.uuid.toString() == Constants.CHARACTERISTIC_UART_SEND) {
+            c.value.listen((event) {
+
+            });
             sendChar = c;
           }
         }

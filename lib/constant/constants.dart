@@ -12,6 +12,8 @@ class Constants {
   static const LEDMATRIXSTATE_CHARACTERISTIC_UUID = "e95d7b77-251d-470a-a062-fa1922dfa9a8";
   static const LEDTEXT_CHARACTERISTIC_UUID = "e95d93ee-251d-470a-a062-fa1922dfa9a8";
   static const SCROLLINGDELAY_CHARACTERISTIC_UUID = "e95d0d2d-251d-470a-a062-fa1922dfa9a8";
+
+  static const TARGET_DEVICE_NAME = 'BBC micro:bit [tizez]';
 }
 
 
