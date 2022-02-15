@@ -73,10 +73,10 @@ class ExportToExcel{
     //sendEmailVM.addAttachment(excelPath);
   }
 
-  String attachExcel(History history){
+ /* String attachExcel(History history){
     exportToExcel(history.leftData, history.rightData);
     return '';
-  }
+  }*/
 
 
 }

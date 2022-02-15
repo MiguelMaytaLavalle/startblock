@@ -24,7 +24,7 @@ class EmailScreen extends StatefulWidget {
 class _EmailScreenState extends State<EmailScreen> {
   SendEmailViewModel sendEmailVM = SendEmailViewModel();
   ExportToExcel exportExcel = ExportToExcel();
-  HistoryWrapper histWrapper = HistoryWrapper(leftData, widget.rightData);
+  //HistoryWrapper histWrapper = HistoryWrapper(leftData, widget.rightData);
 
   Future<void> send() async {
     final Email email = Email(
@@ -143,16 +143,17 @@ class _EmailScreenState extends State<EmailScreen> {
                         )
                       ],
                     ),
-                  Align(
+                  /*Align(
                     alignment: Alignment.centerRight,
                     child: IconButton(
                       icon: Icon(Icons.attach_file),
                       onPressed: (){},
                       //icon: Icon(Icons.attach_file), onPressed: attachExcel,
-                      icon: Icon(Icons.attach_file), onPressed: exportExcel.exportToExcel(),
+                      icon: Icon(Icons.attach_file),
+                      onPressed: exportExcel.exportToExcel(),
                       //onPressed: _openImagePicker,
                     ),
-                  ),
+                  ),*/
                 ],
               ),
             ),

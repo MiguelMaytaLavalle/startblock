@@ -120,7 +120,7 @@ class _HistoryCardState extends State<HistoryCard> {
               child: const Icon(Icons.delete),
             )
         ),
-        Container(
+        /*Container(
             margin:const EdgeInsets.all(10),
             child: ElevatedButton(
               onPressed: () => {
@@ -133,7 +133,7 @@ class _HistoryCardState extends State<HistoryCard> {
               },
               child: const Icon(Icons.email),
             )
-        ),
+        ),*/
       ],
     ),
       );

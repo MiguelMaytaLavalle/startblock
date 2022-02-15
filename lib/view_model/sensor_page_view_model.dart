@@ -1,3 +1,4 @@
+import 'package:startblock/model/livedata.dart';
 import 'package:startblock/model/sensor.dart';
 
 class SensorPageViewModel{
@@ -35,17 +36,31 @@ class SensorPageViewModel{
     return sensorPageModel.leftChartData;
   }
 
+  setLeftChartData(List<LiveData> leftList){
+    sensorPageModel.leftChartData = leftList;
+  }
+
   getRightChartData() {
     return sensorPageModel.rightChartData;
   }
+
+  setRightChartData(List<LiveData> rightList){
+    sensorPageModel.rightChartData = rightList;
+  }
+
+
   getTimes()
   {
     return sensorPageModel.times;
   }
+
+
   flushData()
   {
     sensorPageModel.rightFootArray.clear();
     sensorPageModel.leftFootArray.clear();
+    sensorPageModel.leftChartData.clear();
+    sensorPageModel.rightChartData.clear();
     print(sensorPageModel.rightFootArray.length);
     print(sensorPageModel.leftFootArray.length);
   }
