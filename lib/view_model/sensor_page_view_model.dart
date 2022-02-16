@@ -57,10 +57,10 @@ class SensorPageViewModel{
 
   flushData()
   {
-    /*sensorPageModel.rightFootArray.clear();
+    sensorPageModel.rightFootArray.clear();
     sensorPageModel.leftFootArray.clear();
     sensorPageModel.leftChartData.clear();
-    sensorPageModel.rightChartData.clear();*/
+    sensorPageModel.rightChartData.clear();
 
 
     print(sensorPageModel.rightFootArray.length);

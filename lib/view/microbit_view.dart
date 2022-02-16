@@ -114,9 +114,14 @@ class _MicrobitState extends State<MicrobitScreen> {
       if (service.uuid.toString() == Constants.SERVICE_UART) {
         for (var c in service.characteristics) {
           if (c.uuid.toString() == Constants.CHARACTERISTIC_UART_RECIEVE) {
-            c.setNotifyValue(!c.isNotifying);
+            await c.setNotifyValue(!c.isNotifying);
             //writeData("Hi there, CircuitPython");
-            receiveChar = c;
+            //receiveChar = c;
+            c.value.listen((event) {
+              //print('event');
+              //print('${event}');
+              readDataTest(event);
+            });
             stream = c.value;
             setState(() {
               sensorPageVM.setIsReady(true);
@@ -194,7 +199,7 @@ class _MicrobitState extends State<MicrobitScreen> {
                   builder: (BuildContext context, AsyncSnapshot<List<int>> snapshot) {
                     if (snapshot.hasError) return Text('Error: ${snapshot.error}');
                     if (snapshot.connectionState == ConnectionState.active) {
-                      readData(snapshot);
+                      //readData(snapshot);
                       return SafeArea(
                         child: Scaffold(
                           body: SfCartesianChart(
@@ -375,6 +380,32 @@ class _MicrobitState extends State<MicrobitScreen> {
     String test = '\n';
     List<int> bytes = utf8.encode(test);
     await writeChar.write(bytes);
+  }
+
+  void readDataTest(List<int> event) {
+
+    var currentValue = _dataParser(event);
+    var tag = currentValue.split(':');
+    switch(tag[0]){
+      case 'RF': {
+        double tmpDoubleR = double.parse(tag[1]);
+        sensorPageVM.getRightFootArray().add(tmpDoubleR);
+      }
+      break;
+      case 'LF': {
+        double tmpDoubleL = double.parse(tag[1]);
+        sensorPageVM.getLeftFootArray().add(tmpDoubleL);
+      }
+      break;
+      case 'D' :{
+        testUpdateSetState();
+      }
+      break;
+      default:{
+        print('No data to read');
+      }
+      break;
+    }
   }
 
 

@@ -39,7 +39,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          ElevatedButton(
+/*          ElevatedButton(
             style: style,
             onPressed: () {
               Navigator.push(
@@ -49,7 +49,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
             },
             child: const Text('Connect'),
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 30),*/
           ElevatedButton(
             style: style,
             onPressed: () {
