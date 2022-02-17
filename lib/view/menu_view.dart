@@ -39,17 +39,17 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-/*          ElevatedButton(
+          ElevatedButton(
             style: style,
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => FindDevicesScreen()),
+                MaterialPageRoute(builder: (context) => MicrobitScreen()),
               );
             },
             child: const Text('Connect'),
           ),
-          const SizedBox(height: 30),*/
+          const SizedBox(height: 30),
           ElevatedButton(
             style: style,
             onPressed: () {
@@ -70,18 +70,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
               );
             },
             child: const Text('Test'),
-
-          ),
-          const SizedBox(height: 30),
-          ElevatedButton(
-            style: style,
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => microbitScreen()),
-              );
-            },
-            child: const Text('Instant'),
 
           ),
         ],

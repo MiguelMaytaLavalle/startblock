@@ -4,6 +4,8 @@ import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:startblock/helper/excel.dart';
+import 'package:startblock/model/history.dart';
+import 'package:startblock/model/history_card.dart';
 import 'package:startblock/model/history_wrapper.dart';
 import 'package:startblock/model/livedata.dart';
 import 'package:startblock/view_model/send_email_view_model.dart';
@@ -14,9 +16,9 @@ import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 
 class EmailScreen extends StatefulWidget {
-  const EmailScreen({Key? key, required this.rightData, required this.leftData}) : super(key: key);
-  final List<LiveData> rightData;
-  final List<LiveData> leftData;
+  const EmailScreen({Key? key, required this.hCardModel}) : super(key: key);
+  final HistoryCardModel hCardModel;
+
   @override
   _EmailScreenState createState() => _EmailScreenState();
 }
@@ -24,6 +26,7 @@ class EmailScreen extends StatefulWidget {
 class _EmailScreenState extends State<EmailScreen> {
   SendEmailViewModel sendEmailVM = SendEmailViewModel();
   ExportToExcel exportExcel = ExportToExcel();
+
   //HistoryWrapper histWrapper = HistoryWrapper(leftData, widget.rightData);
 
   Future<void> send() async {
@@ -50,6 +53,7 @@ class _EmailScreenState extends State<EmailScreen> {
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -143,17 +147,18 @@ class _EmailScreenState extends State<EmailScreen> {
                         )
                       ],
                     ),
-                  /*Align(
+                  Align(
                     alignment: Alignment.centerRight,
                     child: IconButton(
-                      icon: Icon(Icons.attach_file),
-                      onPressed: (){},
                       //icon: Icon(Icons.attach_file), onPressed: attachExcel,
                       icon: Icon(Icons.attach_file),
-                      onPressed: exportExcel.exportToExcel(),
+                      onPressed: () async {
+                        String tmp = await exportExcel.attachExcel(widget.hCardModel);
+                        sendEmailVM.addAttachment(tmp);
+                      },
                       //onPressed: _openImagePicker,
                     ),
-                  ),*/
+                  ),
                 ],
               ),
             ),

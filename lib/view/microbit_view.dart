@@ -1,28 +1,15 @@
 import 'dart:async';
-import 'dart:convert' show utf8;
+import 'dart:convert' show jsonEncode, utf8;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:startblock/constant/constants.dart';
+import 'package:startblock/db/database_helper.dart';
+import 'package:startblock/model/history.dart';
 import 'package:startblock/model/livedata.dart';
 import 'package:startblock/view_model/sensor_page_view_model.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-
-class microbitScreen extends StatelessWidget {
-
-@override
-Widget build(BuildContext context) {
-  return  Scaffold(
-    appBar: AppBar(
-      title: Text('Microbit'),
-    ),
-    body: MicrobitScreen(),
-  );
-}
-
-}
-
 
 class MicrobitScreen extends StatefulWidget {
   @override
@@ -43,7 +30,10 @@ class _MicrobitState extends State<MicrobitScreen> {
 
   late ChartSeriesController _chartSeriesRightController;
   late ChartSeriesController _chartSeriesLeftController;
+  late TextEditingController controller;
   String connectionText = "";
+  String name = '';
+  bool isNotStarted = true;
 
   @override
   void initState() {
@@ -52,13 +42,13 @@ class _MicrobitState extends State<MicrobitScreen> {
   }
 
   startScan() {
+    controller = TextEditingController();
     setState(() {
       connectionText = "Start Scanning";
     });
 
     scanSubScription = flutterBlue.scan().listen((scanResult) {
       if (scanResult.device.name == Constants.TARGET_DEVICE_NAME) {
-        print('DEVICE found');
         stopScan();
         setState(() {
           connectionText = "Found Target Device";
@@ -94,10 +84,11 @@ class _MicrobitState extends State<MicrobitScreen> {
   }
 
   disconnectFromDevice() {
-    if(targetDevice == null){
+    if (targetDevice == null) {
       _Pop();
       return;
     }
+
     targetDevice.disconnect();
 
     setState(() {
@@ -115,17 +106,14 @@ class _MicrobitState extends State<MicrobitScreen> {
         for (var c in service.characteristics) {
           if (c.uuid.toString() == Constants.CHARACTERISTIC_UART_RECIEVE) {
             await c.setNotifyValue(!c.isNotifying);
-            //writeData("Hi there, CircuitPython");
-            //receiveChar = c;
             c.value.listen((event) {
-              //print('event');
-              //print('${event}');
               readDataTest(event);
             });
             stream = c.value;
             setState(() {
               sensorPageVM.setIsReady(true);
               connectionText = "All Ready with ${targetDevice.name}";
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(connectionText)));
             });
           }
         }
@@ -202,6 +190,9 @@ class _MicrobitState extends State<MicrobitScreen> {
                       //readData(snapshot);
                       return SafeArea(
                         child: Scaffold(
+                          appBar: AppBar(
+                            title:Text('${targetDevice.name}'),
+                          ),
                           body: SfCartesianChart(
                             //crosshairBehavior: _crosshairBehavior,
                             legend: Legend(isVisible: true),
@@ -268,7 +259,34 @@ class _MicrobitState extends State<MicrobitScreen> {
             Container(
                 margin:const EdgeInsets.all(10),
                 child: ElevatedButton(
-                  onPressed:  initGo,
+                  onPressed: isNotStarted ? discoverServices: null,
+                  child: const Text('RECONNECT'),
+                )
+            ),
+
+            Container(
+                margin:const EdgeInsets.all(10),
+                child: ElevatedButton(
+                  onPressed: () async {
+
+                    if(sensorPageVM.getLeftChartData().length == 0 &&
+                        sensorPageVM.getRightChartData().length == 0){
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please start a run")));
+                    }else{
+                      final name = await openDialog();
+                      if(name == null || name.isEmpty) return;
+                      setState(() => this.name = name);
+                      addHistory();
+                    }
+
+                  },
+                  child: const Icon(Icons.save_alt),
+                )
+            ),
+            Container(
+                margin:const EdgeInsets.all(10),
+                child: ElevatedButton(
+                  onPressed: isNotStarted ? initGo: null,
                   child: const Text('START'),
                 )
             ),
@@ -279,39 +297,60 @@ class _MicrobitState extends State<MicrobitScreen> {
     );
   }
 
-  void readData(AsyncSnapshot<List<int>> snapshot) {
-    var currentValue = _dataParser(snapshot.data!);
-    var tag = currentValue.split(':');
-    switch(tag[0]){
-      case 'RF': {
-        double tmpDoubleR = double.parse(tag[1]);
-        sensorPageVM.getRightFootArray().add(tmpDoubleR);
-      }
-      break;
-      case 'LF': {
-        double tmpDoubleL = double.parse(tag[1]);
-        sensorPageVM.getLeftFootArray().add(tmpDoubleL);
-      }
-      break;
-      case 'D' :{
-        testUpdateSetState();
-      }
-      break;
-      default:{
-        print('No data to read');
-      }
-      break;
-    }
+  Future<String?> openDialog() => showDialog<String>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Enter Name'),
+      content: TextField(
+        autofocus: true,
+        decoration: const InputDecoration(hintText: 'Enter Name Here'),
+        controller: controller,
+        onSubmitted: (_) => submit(),
+      ),
+      actions: [
+        TextButton(
+          child: const Text('Submit'),
+          onPressed: submit,
+        ),
+      ],
+    ),
+  );
+
+  void submit(){
+    Navigator.of(context).pop(controller.text );
+    controller.clear();
   }
+
+  Future addHistory() async {
+      try{
+        List<LiveData> leftList = sensorPageVM.getLeftChartData();
+        List<LiveData> rightList = sensorPageVM.getRightChartData();
+        final history =  History(
+          dateTime: DateTime.now(),
+          name: this.name,
+          leftData: jsonEncode(leftList),
+          rightData: jsonEncode(rightList),
+        );
+        await HistoryDatabase.instance.create(history);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Saved Successfully!")));
+      }catch(error){
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+      }
+  }
+
   void testUpdateSetState() {
 
     List<LiveData> tmpLeft = _getChartDataLeft();
     sensorPageVM.setLeftChartData(_getChartDataLeft());
     sensorPageVM.setRightChartData(_getChartDataRight());
-
+    setState(() {
+      isNotStarted = true;
+    });
     print('Left length: ${sensorPageVM.getLeftChartData().length}');
     print('Right length: ${sensorPageVM.getRightChartData().length}');
+
   }
+
   List<LiveData> _getChartDataLeft (){
     List<LiveData> tmpLeftList = <LiveData>[];
     for(int i = 0; i < sensorPageVM.getLeftFootArray().length; i++){
@@ -375,11 +414,21 @@ class _MicrobitState extends State<MicrobitScreen> {
   initGo() async {
     /// Reads the services and characteristics UUID for the Micro:Bit
     /// Send a GO signal to the Micro:Bit
-    flushData();
 
+    setState(() {
+      isNotStarted = false;
+    });
+    flushData();
     String test = '\n';
     List<int> bytes = utf8.encode(test);
-    await writeChar.write(bytes);
+    try{
+      await writeChar.write(bytes);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Start")));
+    }catch(error){
+      //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Lost connection")));
+    }
+
   }
 
   void readDataTest(List<int> event) {

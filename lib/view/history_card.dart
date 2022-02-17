@@ -120,20 +120,20 @@ class _HistoryCardState extends State<HistoryCard> {
               child: const Icon(Icons.delete),
             )
         ),
-        /*Container(
-            margin:const EdgeInsets.all(10),
+        Container(
+            margin: EdgeInsets.all(10),
             child: ElevatedButton(
               onPressed: () => {
                 Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => EmailScreen()),
+                MaterialPageRoute(builder: (context) => EmailScreen(hCardModel: hCardVM.getHCardModel(),)),
                 )
                 //excel.exportToExcel(hCardVM.getLeftLiveData(), hCardVM.getRightLiveData())
                 //excel.exportToExcel(hCardVM.getHistory().leftData, hCardVM.getHistory().rightData)
               },
               child: const Icon(Icons.email),
             )
-        ),*/
+        ),
       ],
     ),
       );
