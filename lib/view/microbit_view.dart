@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert' show jsonEncode, utf8;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:startblock/constant/constants.dart';
 import 'package:startblock/db/database_helper.dart';
@@ -22,7 +21,7 @@ class _MicrobitState extends State<MicrobitScreen> {
   late StreamSubscription<ScanResult> scanSubScription;
   late List<BluetoothService> services;
 
-  late BluetoothDevice targetDevice;
+  late BluetoothDevice? targetDevice = null;
   late BluetoothCharacteristic receiveChar;
   late BluetoothCharacteristic writeChar;
 
@@ -66,7 +65,7 @@ class _MicrobitState extends State<MicrobitScreen> {
 
   connectToDevice() async {
     if(targetDevice == null){
-      _Pop();
+      _pop();
       return;
     }
 
@@ -74,7 +73,7 @@ class _MicrobitState extends State<MicrobitScreen> {
       connectionText = "Device Connecting";
     });
 
-    await targetDevice.connect();
+    await targetDevice?.connect();
     print('DEVICE CONNECTED');
     setState(() {
       connectionText = "Device Connected";
@@ -85,11 +84,11 @@ class _MicrobitState extends State<MicrobitScreen> {
 
   disconnectFromDevice() {
     if (targetDevice == null) {
-      _Pop();
+      _pop();
       return;
     }
 
-    targetDevice.disconnect();
+    targetDevice?.disconnect();
 
     setState(() {
       connectionText = "Device Disconnected";
@@ -99,7 +98,7 @@ class _MicrobitState extends State<MicrobitScreen> {
   discoverServices() async {
     if (targetDevice == null) return;
 
-    services = await targetDevice.discoverServices();
+    services = (await targetDevice?.discoverServices())!;
     for (var service in services) {
       // do something with service
       if (service.uuid.toString() == Constants.SERVICE_UART) {
@@ -112,7 +111,7 @@ class _MicrobitState extends State<MicrobitScreen> {
             stream = c.value;
             setState(() {
               sensorPageVM.setIsReady(true);
-              connectionText = "All Ready with ${targetDevice.name}";
+              connectionText = "All Ready with ${targetDevice?.name}";
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(connectionText)));
             });
           }
@@ -163,7 +162,7 @@ class _MicrobitState extends State<MicrobitScreen> {
     ).then((value) => value ?? false);
   }
 
-  _Pop() {
+  _pop() {
     Navigator.of(context).pop(true);
   }
 
@@ -176,10 +175,13 @@ class _MicrobitState extends State<MicrobitScreen> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
+        appBar: AppBar(
+          title:Text('${targetDevice?.name}'),
+        ),
         body: Column(
           children: [
             SizedBox(
-                height: 450,
+                height: 500,
                 child: !sensorPageVM.getIsReady() ? const Center(
                   child: Text("Connecting...", style: TextStyle(fontSize: 24, color: Colors.blue),),
                 ) : StreamBuilder<List<int>>(
@@ -187,12 +189,8 @@ class _MicrobitState extends State<MicrobitScreen> {
                   builder: (BuildContext context, AsyncSnapshot<List<int>> snapshot) {
                     if (snapshot.hasError) return Text('Error: ${snapshot.error}');
                     if (snapshot.connectionState == ConnectionState.active) {
-                      //readData(snapshot);
                       return SafeArea(
                         child: Scaffold(
-                          appBar: AppBar(
-                            title:Text('${targetDevice.name}'),
-                          ),
                           body: SfCartesianChart(
                             //crosshairBehavior: _crosshairBehavior,
                             legend: Legend(isVisible: true),
@@ -207,6 +205,7 @@ class _MicrobitState extends State<MicrobitScreen> {
                                 interval: 3,
                                 title: AxisTitle(text: 'Time [S]')
                             ),
+
                             primaryYAxis: NumericAxis(
                                 minimum: 0,
                                 //maximum: 800,
@@ -259,7 +258,7 @@ class _MicrobitState extends State<MicrobitScreen> {
             Container(
                 margin:const EdgeInsets.all(10),
                 child: ElevatedButton(
-                  onPressed: isNotStarted ? discoverServices: null,
+                  onPressed: isNotStarted ? startScan: null,
                   child: const Text('RECONNECT'),
                 )
             ),
