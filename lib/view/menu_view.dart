@@ -2,8 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:startblock/view/find_device_view.dart';
 import 'package:startblock/view/history_list_view.dart';
+import 'package:startblock/view/microbit_view.dart';
 import 'package:startblock/view/tmp_view.dart';
 import 'package:startblock/view_model/menu_view_model.dart';
+
+import 'send_email_view.dart';
 
 class MenuScreen extends StatelessWidget {
 
@@ -41,7 +44,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => FindDevicesScreen()),
+                MaterialPageRoute(builder: (context) => MicrobitScreen()),
               );
             },
             child: const Text('Connect'),
@@ -67,6 +70,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
               );
             },
             child: const Text('Test'),
+
           ),
         ],
       ),

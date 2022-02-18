@@ -52,6 +52,7 @@ class _SensorScreenState extends State<SensorScreen> {
       zoomMode: ZoomMode.xy,
       enablePanning: true,
     );
+    controller = TextEditingController();
     _crosshairBehavior = CrosshairBehavior(enable: true);
     connectToDevice();
     //sendKrille();
@@ -139,6 +140,9 @@ class _SensorScreenState extends State<SensorScreen> {
       if (service.uuid.toString() == Constants.SERVICE_UART) {
         for (var c in service.characteristics) {
           if (c.uuid.toString() == Constants.CHARACTERISTIC_UART_SEND) {
+            c.value.listen((event) {
+
+            });
             sendChar = c;
           }
         }
@@ -459,6 +463,8 @@ class _SensorScreenState extends State<SensorScreen> {
       sensorPageVM.getLeftChartData().add(LiveData(
           time: i,
           force: sensorPageVM.getLeftFootArray()[i]));
+      print("Index: $i");
+      print("-----------");
     }
     for(int i = 0; i < sensorPageVM.getRightFootArray().length; i++){
       print("Right: ${sensorPageVM.getRightFootArray()[i]}");
@@ -497,9 +503,9 @@ class _SensorScreenState extends State<SensorScreen> {
         //print('RF: ${tag[1]}');
         //sensorPageVM.getRightFootArray().add(int.tryParse(tag[1]) ?? 0);
         double tmpDoubleR = double.parse(tag[1]);
-        int tmpIntR = tmpDoubleR.toInt();
+        //int tmpIntR = tmpDoubleR.toInt();
         //print('LF: $tmpIntR');
-        sensorPageVM.getRightFootArray().add(tmpIntR);
+        sensorPageVM.getRightFootArray().add(tmpDoubleR);
         //tmpListRight.add(tag[1]);
       }
       break;
@@ -507,14 +513,15 @@ class _SensorScreenState extends State<SensorScreen> {
         //print('LF: ${tag[1]}');
         //sensorPageVM.getLeftFootArray().add(int.tryParse(tag[1]) ?? 0);
         double tmpDoubleL = double.parse(tag[1]);
-        int tmpIntL = tmpDoubleL.toInt();
+        //int tmpIntL = tmpDoubleL.toInt();
         //print('LF: $tmpIntL');
-        sensorPageVM.getLeftFootArray().add(tmpIntL);
+        sensorPageVM.getLeftFootArray().add(tmpDoubleL);
         //tmpListLeft.add(tag[1]);
       }
       break;
       case 'D' :{
-        testUpdate();
+        testUpdateSetState();
+        //testUpdate();
         //testUpdateDataLoss();
       }
       break;
@@ -553,6 +560,44 @@ class _SensorScreenState extends State<SensorScreen> {
     }
 
   }
+
+  void testUpdateSetState() {
+
+    List<LiveData> tmpLeft = _getChartDataLeft();
+    sensorPageVM.setLeftChartData(_getChartDataLeft());
+    sensorPageVM.setRightChartData(_getChartDataRight());
+
+    print('Left length: ${sensorPageVM.getLeftChartData().length}');
+    print('Right length: ${sensorPageVM.getRightChartData().length}');
+  }
+
+
+  List<LiveData> _getChartDataLeft (){
+    List<LiveData> tmpLeftList = <LiveData>[];
+    for(int i = 0; i < sensorPageVM.getLeftFootArray().length; i++){
+      print("Left: ${sensorPageVM.getLeftFootArray()[i]}");
+      tmpLeftList.add(LiveData(
+          time: i,
+          force: sensorPageVM.getLeftFootArray()[i]));
+      print("Index: $i");
+      print("-----------");
+    }
+    return tmpLeftList;
+  }
+
+  List<LiveData> _getChartDataRight (){
+    List<LiveData> tmpRightList = <LiveData>[];
+    for(int i = 0; i < sensorPageVM.getRightFootArray().length; i++){
+      print("Right: ${sensorPageVM.getRightFootArray()[i]}");
+      tmpRightList.add(LiveData(
+          time: i,
+          force: sensorPageVM.getRightFootArray()[i]));
+      print("Index: $i");
+      print("-----------");
+    }
+    return tmpRightList;
+  }
+
 
   /// Updates the chart
   List<SplineSeries<LiveData, int>> _getUpdateSeries() {

@@ -1,3 +1,4 @@
+/*
 // Copyright 2017, Paul DeMarco.
 // All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
@@ -12,7 +13,8 @@ class ScanResultTile extends StatelessWidget {
   final VoidCallback onTap;
 
   Widget _buildTitle(BuildContext context) {
-    /*try{
+    */
+/*try{
       if (result.device.name.isNotEmpty) {
         return Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -33,7 +35,8 @@ class ScanResultTile extends StatelessWidget {
       print (e);
       return Column();
     }
-    return Column();*/
+    return Column();*//*
+
     if (result.device.name.isNotEmpty) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -113,10 +116,12 @@ class ScanResultTile extends StatelessWidget {
       title: _buildTitle(context),
       leading: Text(result.rssi.toString()),
 
-      /*trailing: ElevatedButton(
+      */
+/*trailing: ElevatedButton(
         onPressed: () { result.advertisementData.connectable ? onTap : null;},
         child: const Text('CONNECT')
-      ),*/
+      ),*//*
+
       //TODO deprecated raisedbutton change to ElevatedButton
         trailing: RaisedButton(
         child: const Text('CONNECT'),
@@ -148,3 +153,4 @@ class ScanResultTile extends StatelessWidget {
     );
   }
 }
+*/

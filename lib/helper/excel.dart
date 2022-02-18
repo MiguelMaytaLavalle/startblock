@@ -1,11 +1,14 @@
 import 'dart:io';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:startblock/model/history.dart';
+import 'package:startblock/model/history_card.dart';
 import 'package:startblock/model/livedata.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 
 class ExportToExcel{
 
+  /// Rename function
   Future<List<ExcelDataRow>> _buildCustomersDataRowsIH(List<LiveData> list) async {
     List<ExcelDataRow> excelDataRows = <ExcelDataRow>[];
     final Future<List<LiveData>> reports = _getCustomersImageHyperlink(list);
@@ -19,12 +22,14 @@ class ExportToExcel{
     return excelDataRows;
   }
 
+  /// rename function
   Future<List<LiveData>> _getCustomersImageHyperlink(List<LiveData> list) async {
     final List<LiveData> reports = list;
     return reports;
   }
 
-  Future<void> exportToExcel(List<LiveData> leftList, List<LiveData> rightList) async {
+
+  Future<String> exportToExcel(HistoryCardModel history) async {
     //Create a Excel document.
     //Creating a workbook.
     print('Excel');
@@ -34,8 +39,8 @@ class ExportToExcel{
     final Worksheet sheet = workbook.worksheets[0];
 
     //List of data to import data.
-    final Future<List<ExcelDataRow>> dataRowsLeft = _buildCustomersDataRowsIH(leftList);
-    final Future<List<ExcelDataRow>> dataRowsRight = _buildCustomersDataRowsIH(rightList);
+    final Future<List<ExcelDataRow>> dataRowsLeft = _buildCustomersDataRowsIH(history.leftData);
+    final Future<List<ExcelDataRow>> dataRowsRight = _buildCustomersDataRowsIH(history.rightData);
     List<ExcelDataRow> dataRows_Left = await Future.value(dataRowsLeft);
     List<ExcelDataRow> dataRows_Right = await Future.value(dataRowsRight);
 
@@ -61,7 +66,22 @@ class ExportToExcel{
     final File file = File('$path/ImportData.xlsx');
     //Write Excel data
     await file.writeAsBytes(bytes, flush: true);
-    //Launch the file (used open_file package)
-    await OpenFile.open('$path/ImportData.xlsx');
+
+    String excelPath = '$path/ImportData.xlsx';
+    return excelPath;
+
   }
+
+ Future<String> attachExcel(HistoryCardModel hCardModel) async {
+   //final Workbook workbook = Workbook();
+    String tmp = await exportToExcel(hCardModel);
+   //final List<int> bytes = workbook.saveAsStream();
+   //Dispose the document.
+   //workbook.dispose();
+   //String tmp = await getExcelPath(bytes);
+   //String tmp2 = tmp.toString();
+   return tmp;
+  }
+
+
 }

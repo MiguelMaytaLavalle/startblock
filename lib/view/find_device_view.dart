@@ -1,3 +1,4 @@
+/*
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
@@ -110,6 +111,7 @@ class FindDevicesScreen extends StatelessWidget {
                   }
                 },
               ),
+*/
 /*              Container(
                   margin:const EdgeInsets.all(10),
                   child: ElevatedButton(
@@ -121,7 +123,9 @@ class FindDevicesScreen extends StatelessWidget {
                     },
                     child: const Text('History'),
                   )
-              ),*/
+              ),*//*
+
+*/
 /*              Container(
                   margin:const EdgeInsets.all(10),
                   child: ElevatedButton(
@@ -133,7 +137,8 @@ class FindDevicesScreen extends StatelessWidget {
                     },
                     child: const Text('test'),
                   )
-              ),*/
+              ),*//*
+
             ],
           )
 
@@ -141,3 +146,4 @@ class FindDevicesScreen extends StatelessWidget {
   }
 }
 
+*/

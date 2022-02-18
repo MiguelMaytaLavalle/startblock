@@ -6,7 +6,7 @@ class LiveData {
 }); //Constructor
 
   int time = 0;
-  num force = 0;
+  double force = 0;
 
   Map<String, Object?> toJson() => {
     'time': time,

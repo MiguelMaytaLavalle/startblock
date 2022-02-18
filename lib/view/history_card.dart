@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:startblock/db/database_helper.dart';
 import 'package:startblock/helper/excel.dart';
 import 'package:startblock/model/livedata.dart';
+import 'package:startblock/view/send_email_view.dart';
 import 'package:startblock/view_model/history_card_view_model.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -62,7 +63,8 @@ class _HistoryCardState extends State<HistoryCard> {
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   children: [
                     Text(
-                      '${hCardVM.getHistory().id.toString()}. ${hCardVM.getHistory().name}',
+                      //'${hCardVM.getHistory().id.toString()}. ${hCardVM.getHistory().name}',
+                      '${hCardVM.getHistoryId().toString()}. ${hCardVM.getHistoryName()}',
                       style: const TextStyle(
                         color: Colors.blue,
                         fontSize: 22,
@@ -71,7 +73,8 @@ class _HistoryCardState extends State<HistoryCard> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      DateFormat.yMMMMEEEEd().format(hCardVM.getHistory().dateTime),
+                      //DateFormat.yMMMMEEEEd().format(hCardVM.getHistory().dateTime),
+                      DateFormat.yMMMMEEEEd().format(hCardVM.getDateTime()),
                       style: const TextStyle(color: Colors.blue),
                     ),
                     Container(
@@ -118,10 +121,14 @@ class _HistoryCardState extends State<HistoryCard> {
             )
         ),
         Container(
-            margin:const EdgeInsets.all(10),
+            margin: EdgeInsets.all(10),
             child: ElevatedButton(
               onPressed: () => {
-                excel.exportToExcel(hCardVM.getLeftLiveData(), hCardVM.getRightLiveData())
+                Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => EmailScreen(hCardModel: hCardVM.getHCardModel(),)),
+                )
+                //excel.exportToExcel(hCardVM.getLeftLiveData(), hCardVM.getRightLiveData())
                 //excel.exportToExcel(hCardVM.getHistory().leftData, hCardVM.getHistory().rightData)
               },
               child: const Icon(Icons.email),
