@@ -33,7 +33,15 @@ class _MicrobitState extends State<MicrobitScreen> {
   String connectionText = "";
   String name = '';
   bool isNotStarted = true;
-
+  List <int> time = <int>[];
+  late List<int> serverTime = <int>[];
+  late List<int> clientSendTime = <int>[];
+  late List<int> clientRecieveTime = <int>[];
+  late List<num> listRTT = <num>[];
+  late num timeSend, timeServer, timeRecieve, RTT, RTT_mean,latestMeasure;
+  int _krilleCounter = 0;
+  double _sampleFrequency = 100;
+  late Timer _krilleTimer;
   @override
   void initState() {
     super.initState();
@@ -127,6 +135,17 @@ class _MicrobitState extends State<MicrobitScreen> {
             //characteristic.setNotifyValue(!characteristic.isNotifying);
             writeChar = c;
             //writeData("Hi there, CircuitPython");
+            sendKrille(); //As soon as device is connected to micro:bit - Time Sync immediately
+            //sendConfigRequest(); //Get the sample frequency from micro:bit
+            /*
+            _krilleTimer = Timer.periodic(Duration(minutes: 15), (timer) {
+             if(connected && senasteTiden > 15 min)
+                {
+                  sendKrille()
+                }
+            });
+
+             */
           }
         }
       }
@@ -202,7 +221,7 @@ class _MicrobitState extends State<MicrobitScreen> {
                                 ),
                                 majorGridLines: const MajorGridLines(width: 0),
                                 edgeLabelPlacement: EdgeLabelPlacement.shift,
-                                interval: 3,
+                                interval: 1000, //1000ms between two timestamps equals a second
                                 title: AxisTitle(text: 'Time [S]')
                             ),
 
@@ -216,7 +235,6 @@ class _MicrobitState extends State<MicrobitScreen> {
                                 majorTickLines: const MajorTickLines(size: 0),
                                 title: AxisTitle(text: 'Force [N]')
                             ),
-
                           ),
                         ),
                       );
@@ -355,7 +373,7 @@ class _MicrobitState extends State<MicrobitScreen> {
     for(int i = 0; i < sensorPageVM.getLeftFootArray().length; i++){
       print("Left: ${sensorPageVM.getLeftFootArray()[i]}");
       tmpLeftList.add(LiveData(
-          time: i,
+          time: time[i],
           force: sensorPageVM.getLeftFootArray()[i]));
       print("Index: $i");
       print("-----------");
@@ -368,7 +386,7 @@ class _MicrobitState extends State<MicrobitScreen> {
     for(int i = 0; i < sensorPageVM.getRightFootArray().length; i++){
       print("Right: ${sensorPageVM.getRightFootArray()[i]}");
       tmpRightList.add(LiveData(
-          time: i,
+          time: time[i],
           force: sensorPageVM.getRightFootArray()[i]));
       print("Index: $i");
       print("-----------");
@@ -407,6 +425,7 @@ class _MicrobitState extends State<MicrobitScreen> {
     //receiveChar = null;
     sensorPageVM.flushData();
     sensorPageVM.getTimes().clear();
+    _krilleCounter = 0;
   }
 
 
@@ -418,7 +437,7 @@ class _MicrobitState extends State<MicrobitScreen> {
       isNotStarted = false;
     });
     flushData();
-    String test = '\n';
+    String test = 'Start\n';
     List<int> bytes = utf8.encode(test);
     try{
       await writeChar.write(bytes);
@@ -445,8 +464,22 @@ class _MicrobitState extends State<MicrobitScreen> {
         sensorPageVM.getLeftFootArray().add(tmpDoubleL);
       }
       break;
+      case 'T':{
+        time.add(int.parse(tag[1]));
+      }
+      break;
       case 'D' :{
         testUpdateSetState();
+      }
+      break;
+      case 'S' :{
+        clientRecieveTime.add(DateTime.now().millisecondsSinceEpoch);
+        krillesMetod(int.parse(tag[1]));
+      }
+      break;
+      case "Frequency" :{
+        _sampleFrequency = double.parse(tag[1]);
+        print("Freq : $_sampleFrequency");
       }
       break;
       default:{
@@ -455,6 +488,73 @@ class _MicrobitState extends State<MicrobitScreen> {
       break;
     }
   }
+  void krillesMetod(int data){
+    serverTime.add(data);
+    _krilleCounter++;
+    if(_krilleCounter < 30)
+    {
+      sendKrille();
+    }
+    else if(_krilleCounter == 30)
+    {
+      calculateKrilles();
+    }
+  }
+  void sendKrille() async
+  {
+    print('Time to send');
+    String test = "TS\n";
+    List<int> bytes = utf8.encode(test);
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
+    clientSendTime.add(currentTime);
+    try{
+      await writeChar.write(bytes);
+    }catch(error){
+      //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Error synchronizing time.")));
+    }
+  }
+  void calculateKrilles(){
+    print(clientSendTime.length);
+    print(clientRecieveTime.length);
+    print(serverTime.length);
+    for(int i = 0; i < 30; i++)
+    {
+      timeSend = clientSendTime[i];
+      timeServer = serverTime[i];
+      timeRecieve = clientRecieveTime[i];
+      RTT = timeServer+((timeRecieve-timeSend)/2);
+      listRTT.add(RTT);
+      print(timeRecieve - timeSend);
+    }
+    num sum = 0;
+    for(int i = 0; i < listRTT.length; i++)
+    {
+      sum += listRTT[i];
+    }
+    RTT_mean = sum/listRTT.length;
+    latestMeasure = RTT;
+    print(RTT_mean);
 
+    /*
+    flushData();
+    print('Client Receive Time: ${clientRecieveTime.length}');
+    print('Client Send Time: ${clientSendTime.length}');
+    print('Server Time: ${serverTime.length}');
+    print('Cristian Counter: ${_krilleCounter}');
 
+     */
+  }
+  void sendConfigRequest() async
+  {
+    print('Config request');
+    String test = "Conf\n";
+    List<int> bytes = utf8.encode(test);
+    try{
+      await writeChar.write(bytes);
+    }catch(error){
+      //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Error getting configs.")));
+    }
+  }
 }
