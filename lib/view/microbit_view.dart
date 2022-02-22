@@ -37,8 +37,9 @@ class _MicrobitState extends State<MicrobitScreen> {
   late List<int> serverTime = <int>[];
   late List<int> clientSendTime = <int>[];
   late List<int> clientRecieveTime = <int>[];
+  late List<num> listSyncedTime = <num>[];
   late List<num> listRTT = <num>[];
-  late num timeSend, timeServer, timeRecieve, RTT, RTT_mean,latestMeasure;
+  late num timeSend, timeServer, timeRecieve, syncedTime, RTT, RTT_mean,latestMeasure, timeError;
   int _krilleCounter = 0;
   double _sampleFrequency = 100;
   late Timer _krilleTimer;
@@ -515,26 +516,46 @@ class _MicrobitState extends State<MicrobitScreen> {
     }
   }
   void calculateKrilles(){
-    print(clientSendTime.length);
-    print(clientRecieveTime.length);
-    print(serverTime.length);
+    print(clientSendTime);
+    print("--------------");
+    print(clientRecieveTime);
+    print("--------------");
+    print(serverTime);
+    print("--------------");
     for(int i = 0; i < 30; i++)
     {
       timeSend = clientSendTime[i];
       timeServer = serverTime[i];
       timeRecieve = clientRecieveTime[i];
-      RTT = timeServer+((timeRecieve-timeSend)/2);
+      RTT = (timeRecieve-timeSend)/2;
       listRTT.add(RTT);
-      print(timeRecieve - timeSend);
+      syncedTime = (timeServer+(timeRecieve-timeSend)/2);
+      listSyncedTime.add(syncedTime);
+      //timeError = (timeSend - timeServer) + ((timeRecieve - timeServer)/2);
     }
     num sum = 0;
-    for(int i = 0; i < listRTT.length; i++)
+    for(int i = 0; i < listSyncedTime.length; i++)
     {
       sum += listRTT[i];
     }
+    for(int i = 0; i < 30; i++)
+    {
+      num currentTime = DateTime.now().millisecondsSinceEpoch;
+
+      timeError = (clientSendTime[i] - serverTime[i]) + ((clientRecieveTime[i] - clientSendTime[i])/2);
+      print("Offset: ${timeError}");
+      //print(currentTime - (clientSendTime[i] - serverTime[i]));
+    }
+    print("----------------------");
+    for(int i = 0; i < 30; i++)
+    {
+      num currentTime = DateTime.now().millisecondsSinceEpoch;
+      print(currentTime - (clientRecieveTime[i] - serverTime[i]));
+    }
     RTT_mean = sum/listRTT.length;
-    latestMeasure = RTT;
-    print(RTT_mean);
+    latestMeasure = syncedTime;
+    print("RTT Mean: $RTT_mean");
+    print(DateTime.now().millisecondsSinceEpoch);
 
     /*
     flushData();
