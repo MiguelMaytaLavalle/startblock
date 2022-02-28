@@ -100,7 +100,7 @@ class _MicrobitState extends State<MicrobitScreen> {
       _pop();
       return;
     }
-
+    _krilleTimer.cancel();
     targetDevice?.disconnect();
 
     setState(() {
@@ -141,16 +141,9 @@ class _MicrobitState extends State<MicrobitScreen> {
             writeChar = c;
             //writeData("Hi there, CircuitPython");
             sendKrille(); //As soon as device is connected to micro:bit - Time Sync immediately
-            //sendConfigRequest(); //Get the sample frequency from micro:bit
-            /*
-            _krilleTimer = Timer.periodic(Duration(minutes: 15), (timer) {
-             if(connected && senasteTiden > 15 min)
-                {
-                  sendKrille()
-                }
+            _krilleTimer = Timer.periodic(Duration(minutes: 10), (timer) {
+                sendKrille();
             });
-
-             */
           }
         }
       }
