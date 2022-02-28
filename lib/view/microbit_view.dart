@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'dart:convert' show jsonEncode, utf8;
 
 import 'package:flutter/material.dart';
@@ -39,7 +40,10 @@ class _MicrobitState extends State<MicrobitScreen> {
   late List<int> clientRecieveTime = <int>[];
   late List<num> listSyncedTime = <num>[];
   late List<num> listRTT = <num>[];
-  late num timeSend, timeServer, timeRecieve, syncedTime, RTT, RTT_mean,latestMeasure, timeError;
+  late List<num> tMaxList = <num>[];
+  late List<num> tMinList = <num>[];
+  late List<num> krilleOffsets = <num>[];
+  late num timeSend, timeServer, timeRecieve, syncedTime, RTT, RTT_mean,latestMeasure, timeOffset,offsetMean;
   int _krilleCounter = 0;
   double _sampleFrequency = 100;
   late Timer _krilleTimer;
@@ -277,8 +281,8 @@ class _MicrobitState extends State<MicrobitScreen> {
             Container(
                 margin:const EdgeInsets.all(10),
                 child: ElevatedButton(
-                  onPressed: isNotStarted ? startScan: null,
-                  child: const Text('RECONNECT'),
+                  onPressed: isNotStarted ? sendKrille: null,
+                  child: const Text('Krille'),
                 )
             ),
 
@@ -427,6 +431,12 @@ class _MicrobitState extends State<MicrobitScreen> {
     sensorPageVM.flushData();
     sensorPageVM.getTimes().clear();
     _krilleCounter = 0;
+    offsetMean = 0;
+    listRTT.clear();
+    krilleOffsets.clear();
+    serverTime.clear();
+    clientSendTime.clear();
+    clientRecieveTime.clear();
   }
 
 
@@ -492,13 +502,14 @@ class _MicrobitState extends State<MicrobitScreen> {
   void krillesMetod(int data){
     serverTime.add(data);
     _krilleCounter++;
-    if(_krilleCounter < 30)
+    if(_krilleCounter < Constants.LIST_LEN)
     {
       sendKrille();
     }
-    else if(_krilleCounter == 30)
+    else if(_krilleCounter == Constants.LIST_LEN)
     {
       calculateKrilles();
+      _krilleCounter = 0;
     }
   }
   void sendKrille() async
@@ -516,55 +527,82 @@ class _MicrobitState extends State<MicrobitScreen> {
     }
   }
   void calculateKrilles(){
-    print(clientSendTime);
-    print("--------------");
-    print(clientRecieveTime);
-    print("--------------");
-    print(serverTime);
-    print("--------------");
-    for(int i = 0; i < 30; i++)
+    /**
+     * Calculate Cristian's RTT Value
+     */
+    for(int i = 0; i < Constants.LIST_LEN; i++)
     {
       timeSend = clientSendTime[i];
       timeServer = serverTime[i];
       timeRecieve = clientRecieveTime[i];
-      RTT = (timeRecieve-timeSend)/2;
+      RTT = (timeRecieve-timeSend);
       listRTT.add(RTT);
       syncedTime = (timeServer+(timeRecieve-timeSend)/2);
       listSyncedTime.add(syncedTime);
       //timeError = (timeSend - timeServer) + ((timeRecieve - timeServer)/2);
     }
+    /**
+     * Calculate Cristian's RTT-mean value
+     */
     num sum = 0;
-    for(int i = 0; i < listSyncedTime.length; i++)
+    for(int i = 0; i < listRTT.length; i++)
     {
       sum += listRTT[i];
     }
-    for(int i = 0; i < 30; i++)
+    /**
+     * Caluclate Cristian's offset Value
+     */
+    print("------------Krille Offsets------------");
+    for(int i = 0; i < Constants.LIST_LEN; i++)
     {
-      num currentTime = DateTime.now().millisecondsSinceEpoch;
-
-      timeError = (clientSendTime[i] - serverTime[i]) + ((clientRecieveTime[i] - clientSendTime[i])/2);
-      print("Offset: ${timeError}");
+      timeOffset = (clientSendTime[i] - serverTime[i]) + ((clientRecieveTime[i] - clientSendTime[i])/2);
+      krilleOffsets.add(timeOffset);
+      print("Offset: ${timeOffset}");
       //print(currentTime - (clientSendTime[i] - serverTime[i]));
     }
-    print("----------------------");
-    for(int i = 0; i < 30; i++)
+    num sum2 = 0;
+    for(int i = 0; i < krilleOffsets.length; i++)
     {
-      num currentTime = DateTime.now().millisecondsSinceEpoch;
-      print(currentTime - (clientRecieveTime[i] - serverTime[i]));
+      sum2 += krilleOffsets[i];
     }
     RTT_mean = sum/listRTT.length;
+    offsetMean = sum2/krilleOffsets.length;
     latestMeasure = syncedTime;
-    print("RTT Mean: $RTT_mean");
-    print(DateTime.now().millisecondsSinceEpoch);
-
+    //print("RTT Mean: $RTT_mean");
+    print("Offset mean: $offsetMean");
     /*
-    flushData();
-    print('Client Receive Time: ${clientRecieveTime.length}');
-    print('Client Send Time: ${clientSendTime.length}');
-    print('Server Time: ${serverTime.length}');
-    print('Cristian Counter: ${_krilleCounter}');
-
+    print("-----------Krille RTT-----------");
+    for(int i = 0; i < listRTT.length; i++)
+    {
+      print(listRTT[i]);
+    }
      */
+    /**
+     * Calculate offset with Marzullo's Algorithm
+     */
+    /*
+    for(int i = 0; i < Constants.LIST_LEN; i++)
+    {
+      tMaxList.add(clientSendTime[i] - serverTime[i]);
+      tMinList.add(clientRecieveTime[i] - serverTime [i]);
+    }
+    print("----------Marzullo T1 - T2------------");
+    for(int i = 0; i < tMaxList.length;  i++)
+    {
+      print(tMaxList[i]);
+    }
+    print("----------Marzullo T3 - T2------------");
+    for(int i = 0; i < tMinList.length;  i++)
+    {
+      print(tMinList[i]);
+    }
+    num maxVal = tMaxList.reduce((current, next) => current < next ? current : next);
+    num minVal = tMinList.reduce((current, next) => current > next ? current : next);
+    num timeOffset2 = (maxVal + minVal)/2;
+     */
+    //print("Offset $timeOffset2");
+
+    flushData();
   }
   void sendConfigRequest() async
   {

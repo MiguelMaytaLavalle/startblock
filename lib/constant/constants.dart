@@ -14,6 +14,7 @@ class Constants {
   static const SCROLLINGDELAY_CHARACTERISTIC_UUID = "e95d0d2d-251d-470a-a062-fa1922dfa9a8";
 
   static const TARGET_DEVICE_NAME = 'BBC micro:bit [zivit]';
+  static const LIST_LEN = 100;
 }
 
 
