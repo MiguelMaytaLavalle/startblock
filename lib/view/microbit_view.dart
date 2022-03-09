@@ -46,6 +46,7 @@ class _MicrobitState extends State<MicrobitScreen> {
   int _krilleCounter = 0;
   double _sampleFrequency = 100;
   late Timer _krilleTimer;
+  int _selectedIndex = 0;
   @override
   void initState() {
     super.initState();
@@ -269,7 +270,21 @@ class _MicrobitState extends State<MicrobitScreen> {
             ),
           ],
         ),
-
+        bottomNavigationBar: BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.fiber_new),
+              label: 'Record',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.auto_graph_rounded),
+              label: 'View Data',
+            ),
+          ],
+          currentIndex: _selectedIndex,
+          selectedItemColor: Colors.amber[800],
+          onTap: _onItemTapped,
+        ),
         floatingActionButton:Wrap(
           direction: Axis.horizontal,
           children: <Widget>[
@@ -309,8 +324,8 @@ class _MicrobitState extends State<MicrobitScreen> {
             ),
           ],
         ),
-
       ),
+
     );
   }
 
@@ -333,6 +348,12 @@ class _MicrobitState extends State<MicrobitScreen> {
     ),
   );
 
+  /// Bottom NavBar on tap action
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
   void submit(){
     Navigator.of(context).pop(controller.text );
     controller.clear();
