@@ -1,7 +1,5 @@
 import 'dart:io';
-import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:startblock/model/history.dart';
 import 'package:startblock/model/history_card.dart';
 import 'package:startblock/model/livedata.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
@@ -59,7 +57,7 @@ class ExportToExcel{
     workbook.dispose();
 
     //Get the storage folder location using path_provider package.
-    final Directory? directory = await getExternalStorageDirectory();
+    final Directory? directory = await getTemporaryDirectory();
 //Get the directory path
     final String? path = directory?.path;
 //Create an empty file to write the Excel data

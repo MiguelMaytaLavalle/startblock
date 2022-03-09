@@ -1,19 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
-import 'package:open_file/open_file.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:startblock/helper/excel.dart';
-import 'package:startblock/model/history.dart';
 import 'package:startblock/model/history_card.dart';
-import 'package:startblock/model/history_wrapper.dart';
-import 'package:startblock/model/livedata.dart';
 import 'package:startblock/view_model/send_email_view_model.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart' as xlsio;
 import 'dart:io';
 import 'package:open_file/open_file.dart' as open_file;
 import 'package:path_provider/path_provider.dart' as path_provider;
-import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 
 class EmailScreen extends StatefulWidget {
   const EmailScreen({Key? key, required this.hCardModel}) : super(key: key);

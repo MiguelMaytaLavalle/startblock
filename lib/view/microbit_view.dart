@@ -58,7 +58,7 @@ class _MicrobitState extends State<MicrobitScreen> {
       connectionText = "Start Scanning";
     });
     scanSubScription = flutterBlue.scan().listen((scanResult) async{
-      if (scanResult.device.name == Constants.TARGET_DEVICE_NAME) {
+      if (scanResult.device.name == Constants.TARGET_DEVICE_NAME_TIZEZ) {
         print("Found device");
         setState(() {
           connectionText = "Found Target Device";
@@ -123,9 +123,9 @@ class _MicrobitState extends State<MicrobitScreen> {
               readDataTest(event);
             });
             setState(() {
-              sensorPageVM.setIsReady(true);
+              //sensorPageVM.setIsReady(true);
               connectionText = "All Ready with ${targetDevice?.name}";
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(connectionText)));
+              //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(connectionText)));
             });
           }
         }
@@ -191,7 +191,11 @@ class _MicrobitState extends State<MicrobitScreen> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: _onWillPop,
-      child: Scaffold(
+      child: !sensorPageVM.getIsReady() ? const Scaffold(
+        body: Center(
+          child: Text("Connecting...", style: TextStyle(fontSize: 24, color: Colors.blue),),
+        )
+        ): Scaffold(
         appBar: AppBar(
           title:Text('${targetDevice?.name}'),
         ),
@@ -199,9 +203,7 @@ class _MicrobitState extends State<MicrobitScreen> {
           children: [
             SizedBox(
                 height: 500,
-                child: !sensorPageVM.getIsReady() ? const Center(
-                  child: Text("Connecting...", style: TextStyle(fontSize: 24, color: Colors.blue),),
-                ) : StreamBuilder<BluetoothDeviceState>(
+                child:  StreamBuilder<BluetoothDeviceState>(
                   stream: targetDevice?.state,
                   builder: (BuildContext context, snapshot) {
                     if (snapshot.hasError) return Text('Error: ${snapshot.error}');
@@ -508,6 +510,12 @@ class _MicrobitState extends State<MicrobitScreen> {
     }
     else if(_krilleCounter == Constants.LIST_LEN)
     {
+      if(sensorPageVM.getIsReady() == false){
+        setState((){
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(connectionText)));
+          sensorPageVM.setIsReady(true);
+        });
+      }
       calculateKrilles();
       _krilleCounter = 0;
     }
