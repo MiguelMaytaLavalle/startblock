@@ -57,7 +57,7 @@ class ExportToExcel{
     workbook.dispose();
 
     //Get the storage folder location using path_provider package.
-    final Directory? directory = await getTemporaryDirectory();
+    final Directory? directory = await getTemporaryDirectory() ;
 //Get the directory path
     final String? path = directory?.path;
 //Create an empty file to write the Excel data
