@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'dart:convert' show jsonEncode, utf8;
 
 import 'package:flutter/material.dart';
@@ -19,13 +20,12 @@ class _MicrobitState extends State<MicrobitScreen> {
   var sensorPageVM = SensorPageViewModel();
   FlutterBlue flutterBlue = FlutterBlue.instance;
   late StreamSubscription<ScanResult> scanSubScription;
+  late StreamSubscription<List<int>>? streamSubscription;
   late List<BluetoothService> services;
 
   late BluetoothDevice? targetDevice = null;
   late BluetoothCharacteristic receiveChar;
   late BluetoothCharacteristic writeChar;
-
-  late Stream<List<int>> stream;
 
   late ChartSeriesController _chartSeriesRightController;
   late ChartSeriesController _chartSeriesLeftController;
@@ -33,34 +33,47 @@ class _MicrobitState extends State<MicrobitScreen> {
   String connectionText = "";
   String name = '';
   bool isNotStarted = true;
-
+  List <int> time = <int>[];
+  late List<int> serverTime = <int>[];
+  late List<int> clientSendTime = <int>[];
+  late List<int> clientRecieveTime = <int>[];
+  late List<num> listSyncedTime = <num>[];
+  late List<num> listRTT = <num>[];
+  late List<num> tMaxList = <num>[];
+  late List<num> tMinList = <num>[];
+  late List<num> krilleOffsets = <num>[];
+  late num timeSend, timeServer, timeRecieve, syncedTime, RTT, RTT_mean,latestMeasure, timeOffset,offsetMean;
+  int _krilleCounter = 0;
+  double _sampleFrequency = 100;
+  late Timer _krilleTimer;
   @override
   void initState() {
     super.initState();
     startScan();
   }
 
-  startScan() {
+  startScan() async{
     controller = TextEditingController();
     setState(() {
       connectionText = "Start Scanning";
     });
-
-    scanSubScription = flutterBlue.scan().listen((scanResult) {
+    scanSubScription = flutterBlue.scan().listen((scanResult) async{
       if (scanResult.device.name == Constants.TARGET_DEVICE_NAME) {
-        stopScan();
+        print("Found device");
         setState(() {
           connectionText = "Found Target Device";
         });
-
         targetDevice = scanResult.device;
-        connectToDevice();
+        await stopScan();
       }
-    }, onDone: () => stopScan());
+    });
   }
 
-  stopScan() {
+  stopScan(){
+    print("Stopping subscription");
     flutterBlue.stopScan();
+    scanSubScription.cancel();
+    connectToDevice();
   }
 
   connectToDevice() async {
@@ -82,17 +95,18 @@ class _MicrobitState extends State<MicrobitScreen> {
     discoverServices();
   }
 
-  disconnectFromDevice() {
+  disconnectFromDevice() async {
     if (targetDevice == null) {
       _pop();
       return;
     }
-
-    targetDevice?.disconnect();
-
+    _krilleTimer.cancel();
+    streamSubscription?.cancel();
+    await targetDevice?.disconnect();
     setState(() {
       connectionText = "Device Disconnected";
     });
+    print("Disconnected");
   }
 
   discoverServices() async {
@@ -105,10 +119,9 @@ class _MicrobitState extends State<MicrobitScreen> {
         for (var c in service.characteristics) {
           if (c.uuid.toString() == Constants.CHARACTERISTIC_UART_RECIEVE) {
             await c.setNotifyValue(!c.isNotifying);
-            c.value.listen((event) {
+            streamSubscription = c.value.listen((event) {
               readDataTest(event);
             });
-            stream = c.value;
             setState(() {
               sensorPageVM.setIsReady(true);
               connectionText = "All Ready with ${targetDevice?.name}";
@@ -127,6 +140,10 @@ class _MicrobitState extends State<MicrobitScreen> {
             //characteristic.setNotifyValue(!characteristic.isNotifying);
             writeChar = c;
             //writeData("Hi there, CircuitPython");
+            sendKrille(); //As soon as device is connected to micro:bit - Time Sync immediately
+            _krilleTimer = Timer.periodic(Duration(minutes: 10), (timer) {
+                sendKrille();
+            });
           }
         }
       }
@@ -184,9 +201,9 @@ class _MicrobitState extends State<MicrobitScreen> {
                 height: 500,
                 child: !sensorPageVM.getIsReady() ? const Center(
                   child: Text("Connecting...", style: TextStyle(fontSize: 24, color: Colors.blue),),
-                ) : StreamBuilder<List<int>>(
-                  stream: stream,
-                  builder: (BuildContext context, AsyncSnapshot<List<int>> snapshot) {
+                ) : StreamBuilder<BluetoothDeviceState>(
+                  stream: targetDevice?.state,
+                  builder: (BuildContext context, snapshot) {
                     if (snapshot.hasError) return Text('Error: ${snapshot.error}');
                     if (snapshot.connectionState == ConnectionState.active) {
                       return SafeArea(
@@ -202,7 +219,7 @@ class _MicrobitState extends State<MicrobitScreen> {
                                 ),
                                 majorGridLines: const MajorGridLines(width: 0),
                                 edgeLabelPlacement: EdgeLabelPlacement.shift,
-                                interval: 3,
+                                interval: 1000, //1000ms between two timestamps equals a second
                                 title: AxisTitle(text: 'Time [S]')
                             ),
 
@@ -216,7 +233,6 @@ class _MicrobitState extends State<MicrobitScreen> {
                                 majorTickLines: const MajorTickLines(size: 0),
                                 title: AxisTitle(text: 'Force [N]')
                             ),
-
                           ),
                         ),
                       );
@@ -258,8 +274,8 @@ class _MicrobitState extends State<MicrobitScreen> {
             Container(
                 margin:const EdgeInsets.all(10),
                 child: ElevatedButton(
-                  onPressed: isNotStarted ? startScan: null,
-                  child: const Text('RECONNECT'),
+                  onPressed: isNotStarted ? sendKrille: null,
+                  child: const Text('Krille'),
                 )
             ),
 
@@ -355,7 +371,7 @@ class _MicrobitState extends State<MicrobitScreen> {
     for(int i = 0; i < sensorPageVM.getLeftFootArray().length; i++){
       print("Left: ${sensorPageVM.getLeftFootArray()[i]}");
       tmpLeftList.add(LiveData(
-          time: i,
+          time: time[i],
           force: sensorPageVM.getLeftFootArray()[i]));
       print("Index: $i");
       print("-----------");
@@ -368,7 +384,7 @@ class _MicrobitState extends State<MicrobitScreen> {
     for(int i = 0; i < sensorPageVM.getRightFootArray().length; i++){
       print("Right: ${sensorPageVM.getRightFootArray()[i]}");
       tmpRightList.add(LiveData(
-          time: i,
+          time: time[i],
           force: sensorPageVM.getRightFootArray()[i]));
       print("Index: $i");
       print("-----------");
@@ -407,6 +423,13 @@ class _MicrobitState extends State<MicrobitScreen> {
     //receiveChar = null;
     sensorPageVM.flushData();
     sensorPageVM.getTimes().clear();
+    _krilleCounter = 0;
+    offsetMean = 0;
+    listRTT.clear();
+    krilleOffsets.clear();
+    serverTime.clear();
+    clientSendTime.clear();
+    clientRecieveTime.clear();
   }
 
 
@@ -418,7 +441,7 @@ class _MicrobitState extends State<MicrobitScreen> {
       isNotStarted = false;
     });
     flushData();
-    String test = '\n';
+    String test = 'Start\n';
     List<int> bytes = utf8.encode(test);
     try{
       await writeChar.write(bytes);
@@ -445,8 +468,29 @@ class _MicrobitState extends State<MicrobitScreen> {
         sensorPageVM.getLeftFootArray().add(tmpDoubleL);
       }
       break;
+      case 'T':{
+        time.add(int.parse(tag[1]));
+      }
+      break;
       case 'D' :{
-        testUpdateSetState();
+        //testUpdateSetState();
+
+        print(tag[1]);
+        /*
+        setState(() {
+          isNotStarted = true;
+        });
+         */
+      }
+      break;
+      case 'S' :{
+        clientRecieveTime.add(DateTime.now().millisecondsSinceEpoch);
+        krillesMetod(int.parse(tag[1]));
+      }
+      break;
+      case "Frequency" :{
+        _sampleFrequency = double.parse(tag[1]);
+        print("Freq : $_sampleFrequency");
       }
       break;
       default:{
@@ -455,6 +499,121 @@ class _MicrobitState extends State<MicrobitScreen> {
       break;
     }
   }
+  void krillesMetod(int data){
+    serverTime.add(data);
+    _krilleCounter++;
+    if(_krilleCounter < Constants.LIST_LEN)
+    {
+      sendKrille();
+    }
+    else if(_krilleCounter == Constants.LIST_LEN)
+    {
+      calculateKrilles();
+      _krilleCounter = 0;
+    }
+  }
+  void sendKrille() async
+  {
+    print('Time to send');
+    String test = "TS\n";
+    List<int> bytes = utf8.encode(test);
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
+    clientSendTime.add(currentTime);
+    try{
+      await writeChar.write(bytes);
+    }catch(error){
+      //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Error synchronizing time.")));
+    }
+  }
+  void calculateKrilles(){
+    /**
+     * Calculate Cristian's RTT Value
+     */
+    for(int i = 0; i < Constants.LIST_LEN; i++)
+    {
+      timeSend = clientSendTime[i];
+      timeServer = serverTime[i];
+      timeRecieve = clientRecieveTime[i];
+      RTT = (timeRecieve-timeSend);
+      listRTT.add(RTT);
+      syncedTime = (timeServer+(timeRecieve-timeSend)/2);
+      listSyncedTime.add(syncedTime);
+      //timeError = (timeSend - timeServer) + ((timeRecieve - timeServer)/2);
+    }
+    /**
+     * Calculate Cristian's RTT-mean value
+     */
+    num sum = 0;
+    for(int i = 0; i < listRTT.length; i++)
+    {
+      sum += listRTT[i];
+    }
+    /**
+     * Caluclate Cristian's offset Value
+     */
+    print("------------Krille Offsets------------");
+    for(int i = 0; i < Constants.LIST_LEN; i++)
+    {
+      timeOffset = (clientSendTime[i] - serverTime[i]) + ((clientRecieveTime[i] - clientSendTime[i])/2);
+      krilleOffsets.add(timeOffset);
+      print("Offset: ${timeOffset}");
+      //print(currentTime - (clientSendTime[i] - serverTime[i]));
+    }
+    num sum2 = 0;
+    for(int i = 0; i < krilleOffsets.length; i++)
+    {
+      sum2 += krilleOffsets[i];
+    }
+    RTT_mean = sum/listRTT.length;
+    offsetMean = sum2/krilleOffsets.length;
+    latestMeasure = syncedTime;
+    //print("RTT Mean: $RTT_mean");
+    print("Offset mean: $offsetMean");
+    /*
+    print("-----------Krille RTT-----------");
+    for(int i = 0; i < listRTT.length; i++)
+    {
+      print(listRTT[i]);
+    }
+     */
+    /**
+     * Calculate offset with Marzullo's Algorithm
+     */
+    /*
+    for(int i = 0; i < Constants.LIST_LEN; i++)
+    {
+      tMaxList.add(clientSendTime[i] - serverTime[i]);
+      tMinList.add(clientRecieveTime[i] - serverTime [i]);
+    }
+    print("----------Marzullo T1 - T2------------");
+    for(int i = 0; i < tMaxList.length;  i++)
+    {
+      print(tMaxList[i]);
+    }
+    print("----------Marzullo T3 - T2------------");
+    for(int i = 0; i < tMinList.length;  i++)
+    {
+      print(tMinList[i]);
+    }
+    num maxVal = tMaxList.reduce((current, next) => current < next ? current : next);
+    num minVal = tMinList.reduce((current, next) => current > next ? current : next);
+    num timeOffset2 = (maxVal + minVal)/2;
+     */
+    //print("Offset $timeOffset2");
 
-
+    flushData();
+  }
+  void sendConfigRequest() async
+  {
+    print('Config request');
+    String test = "Conf\n";
+    List<int> bytes = utf8.encode(test);
+    try{
+      await writeChar.write(bytes);
+    }catch(error){
+      //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Error getting configs.")));
+    }
+  }
 }
