@@ -20,13 +20,12 @@ class _MicrobitState extends State<MicrobitScreen> {
   var sensorPageVM = SensorPageViewModel();
   FlutterBlue flutterBlue = FlutterBlue.instance;
   late StreamSubscription<ScanResult> scanSubScription;
+  late StreamSubscription<List<int>>? streamSubscription;
   late List<BluetoothService> services;
 
   late BluetoothDevice? targetDevice = null;
   late BluetoothCharacteristic receiveChar;
   late BluetoothCharacteristic writeChar;
-
-  late Stream<List<int>> stream;
 
   late ChartSeriesController _chartSeriesRightController;
   late ChartSeriesController _chartSeriesLeftController;
@@ -53,27 +52,28 @@ class _MicrobitState extends State<MicrobitScreen> {
     startScan();
   }
 
-  startScan() {
+  startScan() async{
     controller = TextEditingController();
     setState(() {
       connectionText = "Start Scanning";
     });
-
-    scanSubScription = flutterBlue.scan().listen((scanResult) {
+    scanSubScription = flutterBlue.scan().listen((scanResult) async{
       if (scanResult.device.name == Constants.TARGET_DEVICE_NAME) {
-        stopScan();
+        print("Found device");
         setState(() {
           connectionText = "Found Target Device";
         });
-
         targetDevice = scanResult.device;
-        connectToDevice();
+        await stopScan();
       }
-    }, onDone: () => stopScan());
+    });
   }
 
-  stopScan() {
+  stopScan(){
+    print("Stopping subscription");
     flutterBlue.stopScan();
+    scanSubScription.cancel();
+    connectToDevice();
   }
 
   connectToDevice() async {
@@ -95,17 +95,18 @@ class _MicrobitState extends State<MicrobitScreen> {
     discoverServices();
   }
 
-  disconnectFromDevice() {
+  disconnectFromDevice() async {
     if (targetDevice == null) {
       _pop();
       return;
     }
     _krilleTimer.cancel();
-    targetDevice?.disconnect();
-
+    streamSubscription?.cancel();
+    await targetDevice?.disconnect();
     setState(() {
       connectionText = "Device Disconnected";
     });
+    print("Disconnected");
   }
 
   discoverServices() async {
@@ -118,10 +119,9 @@ class _MicrobitState extends State<MicrobitScreen> {
         for (var c in service.characteristics) {
           if (c.uuid.toString() == Constants.CHARACTERISTIC_UART_RECIEVE) {
             await c.setNotifyValue(!c.isNotifying);
-            c.value.listen((event) {
+            streamSubscription = c.value.listen((event) {
               readDataTest(event);
             });
-            stream = c.value;
             setState(() {
               sensorPageVM.setIsReady(true);
               connectionText = "All Ready with ${targetDevice?.name}";
@@ -201,9 +201,9 @@ class _MicrobitState extends State<MicrobitScreen> {
                 height: 500,
                 child: !sensorPageVM.getIsReady() ? const Center(
                   child: Text("Connecting...", style: TextStyle(fontSize: 24, color: Colors.blue),),
-                ) : StreamBuilder<List<int>>(
-                  stream: stream,
-                  builder: (BuildContext context, AsyncSnapshot<List<int>> snapshot) {
+                ) : StreamBuilder<BluetoothDeviceState>(
+                  stream: targetDevice?.state,
+                  builder: (BuildContext context, snapshot) {
                     if (snapshot.hasError) return Text('Error: ${snapshot.error}');
                     if (snapshot.connectionState == ConnectionState.active) {
                       return SafeArea(
@@ -473,7 +473,14 @@ class _MicrobitState extends State<MicrobitScreen> {
       }
       break;
       case 'D' :{
-        testUpdateSetState();
+        //testUpdateSetState();
+
+        print(tag[1]);
+        /*
+        setState(() {
+          isNotStarted = true;
+        });
+         */
       }
       break;
       case 'S' :{
