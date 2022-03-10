@@ -4,7 +4,9 @@ import 'dart:convert';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:startblock/constant/constants.dart';
 import 'package:startblock/model/livedata.dart';
+import 'package:startblock/view_model/sensor_page_view_model.dart';
 class BLEController{
+  var sensorPageVM = SensorPageViewModel();
   FlutterBlue flutterBlue = FlutterBlue.instance;
   late StreamSubscription<ScanResult> scanSubScription;
   late StreamSubscription<List<int>>? streamSubscription;
@@ -183,14 +185,10 @@ class BLEController{
     }
     else if(_krilleCounter == Constants.LIST_LEN)
     {
-      /*
       if(sensorPageVM.getIsReady() == false){
-        setState((){
-          //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(connectionText)));
-          sensorPageVM.setIsReady(true);
-        });
+        sensorPageVM.setIsReady(true);
+        print("Fucker");
       }
-       */
       calculateKrilles();
       _krilleCounter = 0;
     }

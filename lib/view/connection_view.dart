@@ -12,6 +12,7 @@ import 'package:startblock/view/microbit_view.dart';
 import 'package:startblock/view_model/sensor_page_view_model.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
+import '../helper/BLEController.dart';
 import 'data_view.dart';
 
 class ConnectionView extends StatefulWidget {
@@ -21,6 +22,7 @@ class ConnectionView extends StatefulWidget {
 
 class _ConnectionState extends State<ConnectionView> {
   var sensorPageVM = SensorPageViewModel();
+  var bleController = BLEController();
   FlutterBlue flutterBlue = FlutterBlue.instance;
   late StreamSubscription<ScanResult> scanSubScription;
   late StreamSubscription<List<int>>? streamSubscription;
@@ -57,9 +59,9 @@ class _ConnectionState extends State<ConnectionView> {
   @override
   void initState() {
     super.initState();
-    startScan();
+    bleController.startScan();
   }
-
+/*
   startScan() async{
     controller = TextEditingController();
     setState(() {
@@ -157,7 +159,7 @@ class _ConnectionState extends State<ConnectionView> {
       }
     }
   }
-
+*/
   writeData(String data) {
     if (receiveChar == null) return;
 
@@ -178,7 +180,7 @@ class _ConnectionState extends State<ConnectionView> {
                     child: const Text('No')),
                 TextButton(
                     onPressed: () {
-                      disconnectFromDevice();
+                      bleController.disconnectFromDevice();
                       Navigator.of(context).pop(true);
                     },
                     child: const Text('Yes')),
