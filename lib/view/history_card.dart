@@ -5,12 +5,10 @@ import 'package:intl/intl.dart';
 import 'package:startblock/db/database_helper.dart';
 import 'package:startblock/helper/excel.dart';
 import 'package:startblock/model/livedata.dart';
-import 'package:startblock/view/send_email_view.dart';
 import 'package:startblock/view_model/history_card_view_model.dart';
 import 'package:startblock/view_model/send_email_view_model.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:startblock/helper/excel.dart';
 
 class HistoryCard extends StatefulWidget {
   final int historyId;
@@ -38,18 +36,15 @@ class _HistoryCardState extends State<HistoryCard> {
     controller = TextEditingController();
     super.initState();
     refreshHistory();
-    //_attachExcel();
   }
 
   Future refreshHistory() async {
     setState(() => hCardVM.setIsLoading(true));
     hCardVM.setHistory(await HistoryDatabase.instance.read(widget.historyId));
     hCardVM.setRightHistory((json.decode(hCardVM.getHistory().rightData) as List)
-    //hCardVM.setRightHistory((json.decode(hCardVM.getRightLiveData()) as List)
         .map((e) => LiveData.fromJson(e))
         .toList());
     hCardVM.setLeftHistory((json.decode(hCardVM.getHistory().leftData) as List)
-    //hCardVM.setLeftHistory((json.decode(hCardVM.getLeftLiveData()) as List)
         .map((e) => LiveData.fromJson(e))
         .toList());
     setState(() => hCardVM.setIsLoading(false));
@@ -69,7 +64,6 @@ class _HistoryCardState extends State<HistoryCard> {
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   children: [
                     Text(
-                      //'${hCardVM.getHistory().id.toString()}. ${hCardVM.getHistory().name}',
                       '${hCardVM.getHistoryId().toString()}. ${hCardVM.getHistoryName()}',
                       style: const TextStyle(
                         color: Colors.blue,
@@ -79,17 +73,13 @@ class _HistoryCardState extends State<HistoryCard> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      //DateFormat.yMMMMEEEEd().format(hCardVM.getHistory().dateTime),
                       DateFormat.yMMMMEEEEd().format(hCardVM.getDateTime()),
                       style: const TextStyle(color: Colors.blue),
                     ),
                     Container(
                       height: 400,
                       child: SfCartesianChart(
-                        //title: ChartTitle(text: "Startblock"),
-                        //crosshairBehavior: _crosshairBehavior,
                         legend: Legend(isVisible: true),
-                        //zoomPanBehavior: _zoomPanBehavior,
                         series: _getUpdateSeries(),
                         primaryXAxis: NumericAxis(
                             interactiveTooltip: const InteractiveTooltip(
