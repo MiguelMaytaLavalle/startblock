@@ -8,20 +8,19 @@ import 'package:startblock/constant/constants.dart';
 import 'package:startblock/db/database_helper.dart';
 import 'package:startblock/model/history.dart';
 import 'package:startblock/model/livedata.dart';
+import 'package:startblock/view/microbit_view.dart';
 import 'package:startblock/view_model/sensor_page_view_model.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-import 'connection_view.dart';
 import 'data_view.dart';
 
-class MicrobitScreen extends StatefulWidget {
+class ConnectionView extends StatefulWidget {
   @override
-  _MicrobitState createState() => _MicrobitState();
+  _ConnectionState createState() => _ConnectionState();
 }
 
-class _MicrobitState extends State<MicrobitScreen> {
+class _ConnectionState extends State<ConnectionView> {
   var sensorPageVM = SensorPageViewModel();
-  var conView = ConnectionView();
   FlutterBlue flutterBlue = FlutterBlue.instance;
   late StreamSubscription<ScanResult> scanSubScription;
   late StreamSubscription<List<int>>? streamSubscription;
@@ -58,7 +57,7 @@ class _MicrobitState extends State<MicrobitScreen> {
   @override
   void initState() {
     super.initState();
-    //startScan();
+    startScan();
   }
 
   startScan() async{
@@ -536,7 +535,7 @@ class _MicrobitState extends State<MicrobitScreen> {
     _krilleCounter++;
     if(_krilleCounter < Constants.LIST_LEN)
     {
-      //sendKrille();
+      sendKrille();
     }
     else if(_krilleCounter == Constants.LIST_LEN)
     {
@@ -546,7 +545,7 @@ class _MicrobitState extends State<MicrobitScreen> {
           sensorPageVM.setIsReady(true);
         });
       }
-      //calculateKrilles();
+      calculateKrilles();
       _krilleCounter = 0;
     }
   }

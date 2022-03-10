@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:startblock/view/connection_view.dart';
 import 'package:startblock/view/find_device_view.dart';
 import 'package:startblock/view/history_list_view.dart';
 import 'package:startblock/view/microbit_view.dart';
@@ -44,7 +45,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => MicrobitScreen()),
+                MaterialPageRoute(builder: (context) => ConnectionView()),
               );
             },
             child: const Text('Connect'),
