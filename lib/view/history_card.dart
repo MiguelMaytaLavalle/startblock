@@ -5,9 +5,10 @@ import 'package:intl/intl.dart';
 import 'package:startblock/db/database_helper.dart';
 import 'package:startblock/helper/excel.dart';
 import 'package:startblock/model/livedata.dart';
-import 'package:startblock/view/send_email_view.dart';
 import 'package:startblock/view_model/history_card_view_model.dart';
+import 'package:startblock/view_model/send_email_view_model.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:share_plus/share_plus.dart';
 
 class HistoryCard extends StatefulWidget {
   final int historyId;
@@ -22,8 +23,9 @@ class HistoryCard extends StatefulWidget {
 }
 
 class _HistoryCardState extends State<HistoryCard> {
-  var hCardVM = HistoryCardViewModel();
-  final ExportToExcel excel = ExportToExcel();
+  HistoryCardViewModel hCardVM = HistoryCardViewModel();
+  SendEmailViewModel sendEmailVM = SendEmailViewModel();
+  ExportToExcel exportExcel = ExportToExcel();
   late SfCartesianChart chart;
   late TooltipBehavior _tooltipBehavior;
   late TextEditingController controller;
@@ -40,14 +42,13 @@ class _HistoryCardState extends State<HistoryCard> {
     setState(() => hCardVM.setIsLoading(true));
     hCardVM.setHistory(await HistoryDatabase.instance.read(widget.historyId));
     hCardVM.setRightHistory((json.decode(hCardVM.getHistory().rightData) as List)
-    //hCardVM.setRightHistory((json.decode(hCardVM.getRightLiveData()) as List)
         .map((e) => LiveData.fromJson(e))
         .toList());
     hCardVM.setLeftHistory((json.decode(hCardVM.getHistory().leftData) as List)
-    //hCardVM.setLeftHistory((json.decode(hCardVM.getLeftLiveData()) as List)
         .map((e) => LiveData.fromJson(e))
         .toList());
     setState(() => hCardVM.setIsLoading(false));
+    _attachExcel();
   }
 
   @override
@@ -63,7 +64,6 @@ class _HistoryCardState extends State<HistoryCard> {
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   children: [
                     Text(
-                      //'${hCardVM.getHistory().id.toString()}. ${hCardVM.getHistory().name}',
                       '${hCardVM.getHistoryId().toString()}. ${hCardVM.getHistoryName()}',
                       style: const TextStyle(
                         color: Colors.blue,
@@ -73,17 +73,13 @@ class _HistoryCardState extends State<HistoryCard> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      //DateFormat.yMMMMEEEEd().format(hCardVM.getHistory().dateTime),
                       DateFormat.yMMMMEEEEd().format(hCardVM.getDateTime()),
                       style: const TextStyle(color: Colors.blue),
                     ),
                     Container(
                       height: 400,
                       child: SfCartesianChart(
-                        //title: ChartTitle(text: "Startblock"),
-                        //crosshairBehavior: _crosshairBehavior,
                         legend: Legend(isVisible: true),
-                        //zoomPanBehavior: _zoomPanBehavior,
                         series: _getUpdateSeries(),
                         primaryXAxis: NumericAxis(
                             interactiveTooltip: const InteractiveTooltip(
@@ -123,14 +119,9 @@ class _HistoryCardState extends State<HistoryCard> {
         Container(
             margin: EdgeInsets.all(10),
             child: ElevatedButton(
-              onPressed: () => {
-                Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => EmailScreen(hCardModel: hCardVM.getHCardModel(),)),
-                )
-                //excel.exportToExcel(hCardVM.getLeftLiveData(), hCardVM.getRightLiveData())
-                //excel.exportToExcel(hCardVM.getHistory().leftData, hCardVM.getHistory().rightData)
-              },
+              onPressed: () {
+                Share.shareFiles([sendEmailVM.getAttachments()[0]]);
+                },
               child: const Icon(Icons.email),
             )
         ),
@@ -179,6 +170,19 @@ class _HistoryCardState extends State<HistoryCard> {
     await HistoryDatabase.instance.delete(widget.historyId);
     Navigator.of(context).pop();
   }
+
+  _attachExcel() async {
+    try{
+      String tmp = await exportExcel.attachExcel(hCardVM.getHCardModel());
+      sendEmailVM.addAttachment(tmp);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Exported excel file succesfully')));
+    }catch(error){
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("NO ${error.toString()}")));
+    }
+
+  }
+
+
 
 }
 
