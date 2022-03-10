@@ -7,7 +7,10 @@ import 'package:startblock/helper/excel.dart';
 import 'package:startblock/model/livedata.dart';
 import 'package:startblock/view/send_email_view.dart';
 import 'package:startblock/view_model/history_card_view_model.dart';
+import 'package:startblock/view_model/send_email_view_model.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:startblock/helper/excel.dart';
 
 class HistoryCard extends StatefulWidget {
   final int historyId;
@@ -22,8 +25,9 @@ class HistoryCard extends StatefulWidget {
 }
 
 class _HistoryCardState extends State<HistoryCard> {
-  var hCardVM = HistoryCardViewModel();
-  final ExportToExcel excel = ExportToExcel();
+  HistoryCardViewModel hCardVM = HistoryCardViewModel();
+  SendEmailViewModel sendEmailVM = SendEmailViewModel();
+  ExportToExcel exportExcel = ExportToExcel();
   late SfCartesianChart chart;
   late TooltipBehavior _tooltipBehavior;
   late TextEditingController controller;
@@ -34,6 +38,7 @@ class _HistoryCardState extends State<HistoryCard> {
     controller = TextEditingController();
     super.initState();
     refreshHistory();
+    //_attachExcel();
   }
 
   Future refreshHistory() async {
@@ -48,6 +53,7 @@ class _HistoryCardState extends State<HistoryCard> {
         .map((e) => LiveData.fromJson(e))
         .toList());
     setState(() => hCardVM.setIsLoading(false));
+    _attachExcel();
   }
 
   @override
@@ -123,14 +129,9 @@ class _HistoryCardState extends State<HistoryCard> {
         Container(
             margin: EdgeInsets.all(10),
             child: ElevatedButton(
-              onPressed: () => {
-                Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => EmailScreen(hCardModel: hCardVM.getHCardModel(),)),
-                )
-                //excel.exportToExcel(hCardVM.getLeftLiveData(), hCardVM.getRightLiveData())
-                //excel.exportToExcel(hCardVM.getHistory().leftData, hCardVM.getHistory().rightData)
-              },
+              onPressed: () {
+                Share.shareFiles([sendEmailVM.getAttachments()[0]]);
+                },
               child: const Icon(Icons.email),
             )
         ),
@@ -179,6 +180,19 @@ class _HistoryCardState extends State<HistoryCard> {
     await HistoryDatabase.instance.delete(widget.historyId);
     Navigator.of(context).pop();
   }
+
+  _attachExcel() async {
+    try{
+      String tmp = await exportExcel.attachExcel(hCardVM.getHCardModel());
+      sendEmailVM.addAttachment(tmp);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Exported excel file succesfully')));
+    }catch(error){
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("NO ${error.toString()}")));
+    }
+
+  }
+
+
 
 }
 

@@ -4,10 +4,6 @@ import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:startblock/helper/excel.dart';
 import 'package:startblock/model/history_card.dart';
 import 'package:startblock/view_model/send_email_view_model.dart';
-import 'package:syncfusion_flutter_xlsio/xlsio.dart' as xlsio;
-import 'dart:io';
-import 'package:open_file/open_file.dart' as open_file;
-import 'package:path_provider/path_provider.dart' as path_provider;
 
 class EmailScreen extends StatefulWidget {
   const EmailScreen({Key? key, required this.hCardModel}) : super(key: key);
@@ -22,6 +18,12 @@ class _EmailScreenState extends State<EmailScreen> {
   ExportToExcel exportExcel = ExportToExcel();
 
   //HistoryWrapper histWrapper = HistoryWrapper(leftData, widget.rightData);
+
+  @override
+  void initState(){
+    super.initState();
+    _attachExcel();
+  }
 
   Future<void> send() async {
     final Email email = Email(
@@ -47,7 +49,6 @@ class _EmailScreenState extends State<EmailScreen> {
       ),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +105,7 @@ class _EmailScreenState extends State<EmailScreen> {
                 ),
               ),
             ),
-            CheckboxListTile(
+            /*CheckboxListTile(
               contentPadding:
               const EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
               title: const Text('HTML'),
@@ -118,8 +119,8 @@ class _EmailScreenState extends State<EmailScreen> {
               },
               //value: isHTML,
               value: sendEmailVM.getIsHTML(),
-            ),
-            Padding(
+            ),*/
+            /*Padding(
               padding: EdgeInsets.all(8.0),
               child: Column(
                 children: <Widget>[
@@ -155,7 +156,7 @@ class _EmailScreenState extends State<EmailScreen> {
                   ),
                 ],
               ),
-            ),
+            ),*/
           ],
         ),
       ),
@@ -167,6 +168,17 @@ class _EmailScreenState extends State<EmailScreen> {
       //attachments.removeAt(index);
       sendEmailVM.removeAttachment(index);
     });
+  }
+
+  void _attachExcel()async{
+    try{
+      String tmp = await exportExcel.attachExcel(widget.hCardModel);
+      sendEmailVM.addAttachment(tmp);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Exported excel file succesfully')));
+    }catch(error){
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+    }
+
   }
 
 

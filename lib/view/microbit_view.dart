@@ -10,6 +10,7 @@ import 'package:startblock/model/history.dart';
 import 'package:startblock/model/livedata.dart';
 import 'package:startblock/view_model/sensor_page_view_model.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+//import 'package:camera/camera.dart';
 
 import 'connection_view.dart';
 import 'data_view.dart';
