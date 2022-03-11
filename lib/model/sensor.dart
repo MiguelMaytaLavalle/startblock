@@ -14,4 +14,5 @@ class SensorModel{
   late Timer timer;
   int time = 0;
   late bool isReady = false;
+  late bool isLoading = true;
 }

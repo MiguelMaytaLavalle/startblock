@@ -20,6 +20,14 @@ class SensorPageViewModel{
     sensorPageModel.isReady = set;
   }
 
+  getIsLoading(){
+    return sensorPageModel.isLoading;
+  }
+
+  setIsLoading(bool set){
+    sensorPageModel.isLoading = set;
+  }
+
   getRightFootArray(){
     return sensorPageModel.rightFootArray;
   }

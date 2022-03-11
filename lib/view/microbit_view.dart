@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:convert' show jsonEncode, utf8;
 
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:startblock/constant/constants.dart';
@@ -10,6 +11,8 @@ import 'package:startblock/model/history.dart';
 import 'package:startblock/model/livedata.dart';
 import 'package:startblock/view_model/sensor_page_view_model.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:gallery_saver/gallery_saver.dart';
+
 
 class MicrobitScreen extends StatefulWidget {
   @override
@@ -46,10 +49,50 @@ class _MicrobitState extends State<MicrobitScreen> {
   int _krilleCounter = 0;
   double _sampleFrequency = 100;
   late Timer _krilleTimer;
+
+  bool _isLoading = true;
+  bool _isRecording = false;
+  late CameraController _cameraController;
+
   @override
   void initState() {
     super.initState();
+    _initCamera();
     startScan();
+  }
+
+  @override
+  void dispose(){
+    _cameraController.dispose();
+    disconnectFromDevice();
+    super.dispose();
+  }
+
+
+  _initCamera() async {
+    final cameras = await availableCameras();
+    final front = cameras.firstWhere((camera) => camera.lensDirection == CameraLensDirection.back);
+    _cameraController = CameraController(front, ResolutionPreset.max);
+    await _cameraController.initialize();
+    //setState(() => _isLoading = false);
+    //setState(() => sensorPageVM.setIsLoading(false));
+  }
+
+  _recordVideo() async {
+    if (_isRecording) {
+      final file = await _cameraController.stopVideoRecording();
+      setState(() => _isRecording = false);
+      await GallerySaver.saveVideo(file.path);
+/*      final route = MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (_) => VideoPage(filePath: file.path),
+      );*/
+      //Navigator.push(context, route);
+    } else {
+      await _cameraController.prepareForVideoRecording();
+      await _cameraController.startVideoRecording();
+      setState(() => _isRecording = true);
+    }
   }
 
   startScan() async{
@@ -103,9 +146,6 @@ class _MicrobitState extends State<MicrobitScreen> {
     _krilleTimer.cancel();
     streamSubscription?.cancel();
     await targetDevice?.disconnect();
-    setState(() {
-      connectionText = "Device Disconnected";
-    });
     print("Disconnected");
   }
 
@@ -189,129 +229,62 @@ class _MicrobitState extends State<MicrobitScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return WillPopScope(
       onWillPop: _onWillPop,
-      child: !sensorPageVM.getIsReady() ? const Scaffold(
-        body: Center(
-          child: Text("Connecting...", style: TextStyle(fontSize: 24, color: Colors.blue),),
-        )
-        ): Scaffold(
-        appBar: AppBar(
-          title:Text('${targetDevice?.name}'),
+      //child: _isLoading ? Container(
+      child: sensorPageVM.getIsLoading() ? Container(
+        color: Colors.white,
+        child: const Center(
+          child: CircularProgressIndicator(),
+
         ),
-        body: Column(
+      ):Center(
+        child: Stack(
+          alignment: Alignment.bottomCenter,
           children: [
-            SizedBox(
-                height: 500,
-                child:  StreamBuilder<BluetoothDeviceState>(
-                  stream: targetDevice?.state,
-                  builder: (BuildContext context, snapshot) {
-                    if (snapshot.hasError) return Text('Error: ${snapshot.error}');
-                    if (snapshot.connectionState == ConnectionState.active) {
-                      return SafeArea(
-                        child: Scaffold(
-                          body: SfCartesianChart(
-                            //crosshairBehavior: _crosshairBehavior,
-                            legend: Legend(isVisible: true),
-                            //zoomPanBehavior: _zoomPanBehavior,
-                            series: _getUpdateSeries(),
-                            primaryXAxis: NumericAxis(
-                                interactiveTooltip: const InteractiveTooltip(
-                                  enable: true,
-                                ),
-                                majorGridLines: const MajorGridLines(width: 0),
-                                edgeLabelPlacement: EdgeLabelPlacement.shift,
-                                interval: 1000, //1000ms between two timestamps equals a second
-                                title: AxisTitle(text: 'Time [S]')
-                            ),
-
-                            primaryYAxis: NumericAxis(
-                                minimum: 0,
-                                //maximum: 800,
-                                interactiveTooltip: const InteractiveTooltip(
-                                  enable: true,
-                                ),
-                                axisLine: const AxisLine(width: 0),
-                                majorTickLines: const MajorTickLines(size: 0),
-                                title: AxisTitle(text: 'Force [N]')
-                            ),
-                          ),
-                        ),
-                      );
-                    } else { return const Text('Check the stream'); }
-                  },
-                )
-            ),
-            Wrap(
-              direction: Axis.vertical,
-              children: const <Widget>[
-                Material(
-                  //margin:const EdgeInsets.all(10),
-                    child: Text('Rate of force (RFD): 0'
-                    )
-                ),
-                Material(
-                  //margin:const EdgeInsets.all(10),
-                    child: Text('Time to peak (TTP): 0'
-                    )
-                ),
-                Material(
-                  //margin:const EdgeInsets.all(10),
-                    child: Text('Force impulse: 0'
-                    )
-                ),
-                Material(
-                  //margin:const EdgeInsets.all(10),
-                    child: Text('Peak force: 0'
-                    )
-                ),
-              ],
+            CameraPreview(_cameraController),
+            Padding(
+              padding: const EdgeInsets.all(25),
+              child: FloatingActionButton(
+                backgroundColor: Colors.red,
+                child: Icon(_isRecording ? Icons.stop : Icons.circle),
+                //onPressed: () => _recordVideo(),
+                onPressed: () => initGo(),
+              ),
             ),
           ],
         ),
-
-        floatingActionButton:Wrap(
-          direction: Axis.horizontal,
-          children: <Widget>[
-            Container(
-                margin:const EdgeInsets.all(10),
-                child: ElevatedButton(
-                  onPressed: isNotStarted ? sendKrille: null,
-                  child: const Text('Krille'),
-                )
-            ),
-
-            Container(
-                margin:const EdgeInsets.all(10),
-                child: ElevatedButton(
-                  onPressed: () async {
-
-                    if(sensorPageVM.getLeftChartData().length == 0 &&
-                        sensorPageVM.getRightChartData().length == 0){
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please start a run")));
-                    }else{
-                      final name = await openDialog();
-                      if(name == null || name.isEmpty) return;
-                      setState(() => this.name = name);
-                      addHistory();
-                    }
-
-                  },
-                  child: const Icon(Icons.save_alt),
-                )
-            ),
-            Container(
-                margin:const EdgeInsets.all(10),
-                child: ElevatedButton(
-                  onPressed: isNotStarted ? initGo: null,
-                  child: const Text('START'),
-                )
-            ),
-          ],
-        ),
-
       ),
     );
+
+
+    if (_isLoading) {
+      return Container(
+        color: Colors.white,
+        child: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    } else {
+      return Center(
+        child: Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            CameraPreview(_cameraController),
+            Padding(
+              padding: const EdgeInsets.all(25),
+              child: FloatingActionButton(
+                backgroundColor: Colors.red,
+                child: Icon(_isRecording ? Icons.stop : Icons.circle),
+                onPressed: () => _recordVideo(),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
   }
 
   Future<String?> openDialog() => showDialog<String>(
@@ -447,6 +420,7 @@ class _MicrobitState extends State<MicrobitScreen> {
     List<int> bytes = utf8.encode(test);
     try{
       await writeChar.write(bytes);
+      _recordVideo();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Start")));
     }catch(error){
       //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
@@ -514,6 +488,7 @@ class _MicrobitState extends State<MicrobitScreen> {
         setState((){
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(connectionText)));
           sensorPageVM.setIsReady(true);
+          sensorPageVM.setIsLoading(false);
         });
       }
       calculateKrilles();
@@ -625,3 +600,123 @@ class _MicrobitState extends State<MicrobitScreen> {
     }
   }
 }
+
+
+
+/*Scaffold(
+        appBar: AppBar(
+          title:Text('${targetDevice?.name}'),
+        ),
+        body:
+        Column(
+          children: [
+            SizedBox(
+                height: 500,
+                child:  StreamBuilder<BluetoothDeviceState>(
+                  stream: targetDevice?.state,
+                  builder: (BuildContext context, snapshot) {
+                    if (snapshot.hasError) return Text('Error: ${snapshot.error}');
+                    if (snapshot.connectionState == ConnectionState.active) {
+                      return SafeArea(
+                        child: Scaffold(
+                          body: SfCartesianChart(
+                            //crosshairBehavior: _crosshairBehavior,
+                            legend: Legend(isVisible: true),
+                            //zoomPanBehavior: _zoomPanBehavior,
+                            series: _getUpdateSeries(),
+                            primaryXAxis: NumericAxis(
+                                interactiveTooltip: const InteractiveTooltip(
+                                  enable: true,
+                                ),
+                                majorGridLines: const MajorGridLines(width: 0),
+                                edgeLabelPlacement: EdgeLabelPlacement.shift,
+                                interval: 1000, //1000ms between two timestamps equals a second
+                                title: AxisTitle(text: 'Time [S]')
+                            ),
+
+                            primaryYAxis: NumericAxis(
+                                minimum: 0,
+                                //maximum: 800,
+                                interactiveTooltip: const InteractiveTooltip(
+                                  enable: true,
+                                ),
+                                axisLine: const AxisLine(width: 0),
+                                majorTickLines: const MajorTickLines(size: 0),
+                                title: AxisTitle(text: 'Force [N]')
+                            ),
+                          ),
+                        ),
+                      );
+                    } else { return const Text('Check the stream'); }
+                  },
+                )
+            ),
+            Wrap(
+              direction: Axis.vertical,
+              children: const <Widget>[
+                Material(
+                  //margin:const EdgeInsets.all(10),
+                    child: Text('Rate of force (RFD): 0'
+                    )
+                ),
+                Material(
+                  //margin:const EdgeInsets.all(10),
+                    child: Text('Time to peak (TTP): 0'
+                    )
+                ),
+                Material(
+                  //margin:const EdgeInsets.all(10),
+                    child: Text('Force impulse: 0'
+                    )
+                ),
+                Material(
+                  //margin:const EdgeInsets.all(10),
+                    child: Text('Peak force: 0'
+                    )
+                ),
+              ],
+            ),
+          ],
+        ),
+
+        floatingActionButton:Wrap(
+          direction: Axis.horizontal,
+          children: <Widget>[
+            Container(
+                margin:const EdgeInsets.all(10),
+                child: ElevatedButton(
+                  onPressed: isNotStarted ? sendKrille: null,
+                  child: const Text('Krille'),
+                )
+            ),
+
+            Container(
+                margin:const EdgeInsets.all(10),
+                child: ElevatedButton(
+                  onPressed: () async {
+
+                    if(sensorPageVM.getLeftChartData().length == 0 &&
+                        sensorPageVM.getRightChartData().length == 0){
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please start a run")));
+                    }else{
+                      final name = await openDialog();
+                      if(name == null || name.isEmpty) return;
+                      setState(() => this.name = name);
+                      addHistory();
+                    }
+
+                  },
+                  child: const Icon(Icons.save_alt),
+                )
+            ),
+            Container(
+                margin:const EdgeInsets.all(10),
+                child: ElevatedButton(
+                  onPressed: isNotStarted ? initGo: null,
+                  child: const Text('START'),
+                )
+            ),
+          ],
+        ),
+      ),*/
+
