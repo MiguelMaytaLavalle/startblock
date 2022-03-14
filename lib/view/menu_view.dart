@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:startblock/view/connection_view.dart';
 import 'package:startblock/view/find_device_view.dart';
 import 'package:startblock/view/history_list_view.dart';
-import 'package:startblock/view/microbit_view.dart';
+import 'package:startblock/view/recording_view.dart';
 import 'package:startblock/view/tmp_view.dart';
 import 'package:startblock/view_model/menu_view_model.dart';
 

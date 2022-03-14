@@ -13,6 +13,7 @@ class BLEController{
   late List<BluetoothService> services;
 
   bool isNotStarted = true;
+  bool isReady = false;
   List <int> time = <int>[];
   late BluetoothDevice? targetDevice = null;
   late BluetoothCharacteristic receiveChar;
@@ -98,10 +99,16 @@ class BLEController{
       }
     }
   }
+  writeData(String data) {
+    if (receiveChar == null) return;
+
+    List<int> bytes = utf8.encode(data);
+    receiveChar.write(bytes);
+  }
   void flushData() async
   {
-    //sensorPageVM.flushData();
-    //sensorPageVM.getTimes().clear();
+    sensorPageVM.flushData();
+    sensorPageVM.getTimes().clear();
     _krilleCounter = 0;
     offsetMean = 0;
     listRTT.clear();
@@ -185,9 +192,9 @@ class BLEController{
     }
     else if(_krilleCounter == Constants.LIST_LEN)
     {
-      if(sensorPageVM.getIsReady() == false){
+      if(isReady == false){
         sensorPageVM.setIsReady(true);
-        print("Fucker");
+        print(isReady);
       }
       calculateKrilles();
       _krilleCounter = 0;
