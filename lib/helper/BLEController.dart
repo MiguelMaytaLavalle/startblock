@@ -220,18 +220,17 @@ class BLEController{
       //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
     }
   }
-  void calculateKrilles(){
+  void calculateKrilles() {
     /**
      * Calculate Cristian's RTT Value
      */
-    for(int i = 0; i < Constants.LIST_LEN; i++)
-    {
+    for (int i = 0; i < Constants.LIST_LEN; i++) {
       timeSend = clientSendTime[i];
       timeServer = serverTime[i];
       timeRecieve = clientRecieveTime[i];
-      RTT = (timeRecieve-timeSend);
+      RTT = (timeRecieve - timeSend);
       listRTT.add(RTT);
-      syncedTime = (timeServer+(timeRecieve-timeSend)/2);
+      syncedTime = (timeServer + (timeRecieve - timeSend) / 2);
       listSyncedTime.add(syncedTime);
       //timeError = (timeSend - timeServer) + ((timeRecieve - timeServer)/2);
     }
@@ -239,28 +238,26 @@ class BLEController{
      * Calculate Cristian's RTT-mean value
      */
     num sum = 0;
-    for(int i = 0; i < listRTT.length; i++)
-    {
+    for (int i = 0; i < listRTT.length; i++) {
       sum += listRTT[i];
     }
     /**
      * Caluclate Cristian's offset Value
      */
     print("------------Krille Offsets------------");
-    for(int i = 0; i < Constants.LIST_LEN; i++)
-    {
-      timeOffset = (clientSendTime[i] - serverTime[i]) + ((clientRecieveTime[i] - clientSendTime[i])/2);
+    for (int i = 0; i < Constants.LIST_LEN; i++) {
+      timeOffset = (clientSendTime[i] - serverTime[i]) +
+          ((clientRecieveTime[i] - clientSendTime[i]) / 2);
       krilleOffsets.add(timeOffset);
       print("Offset: ${timeOffset}");
       //print(currentTime - (clientSendTime[i] - serverTime[i]));
     }
     num sum2 = 0;
-    for(int i = 0; i < krilleOffsets.length; i++)
-    {
+    for (int i = 0; i < krilleOffsets.length; i++) {
       sum2 += krilleOffsets[i];
     }
-    RTT_mean = sum/listRTT.length;
-    offsetMean = sum2/krilleOffsets.length;
+    RTT_mean = sum / listRTT.length;
+    offsetMean = sum2 / krilleOffsets.length;
     latestMeasure = syncedTime;
     //print("RTT Mean: $RTT_mean");
     print("Offset mean: $offsetMean");
@@ -297,16 +294,5 @@ class BLEController{
     //print("Offset $timeOffset2");
 
     flushData();
-  }
-  void sendConfigRequest() async
-  {
-    print('Config request');
-    String test = "Conf\n";
-    List<int> bytes = utf8.encode(test);
-    try{
-      await writeChar.write(bytes);
-    }catch(error){
-      print("${error.toString()}");
-    }
   }
 }
