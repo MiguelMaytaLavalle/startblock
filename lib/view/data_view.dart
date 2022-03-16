@@ -19,6 +19,14 @@ class _DataState extends State<DataScreen> {
   String name = '';
   late ChartSeriesController _chartSeriesRightController;
   late ChartSeriesController _chartSeriesLeftController;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    controller = TextEditingController();
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -129,7 +137,19 @@ class _DataState extends State<DataScreen> {
                 ),
               ],
             ),
-            TextButton(onPressed: submit, child: const Icon(Icons.save)),
+            TextButton(
+                onPressed: () async {
+                  if(sensorPageVM.getLeftChartData().length == 0 &&
+                      sensorPageVM.getRightChartData().length == 0){
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please start a run")));
+                  }else{
+                    final name = await openDialog();
+                    if(name == null || name.isEmpty) return;
+                    setState(() => this.name = name);
+                    addHistory();
+                  }
+                },
+                child: const Icon(Icons.save)),
           ],
         ),
       ),
@@ -169,9 +189,11 @@ class _DataState extends State<DataScreen> {
         leftData: jsonEncode(leftList),
         rightData: jsonEncode(rightList),
       );
+      print('SUCCESS');
       await HistoryDatabase.instance.create(history);
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Saved Successfully!")));
     }catch(error){
+      print('Fail');
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
     }
   }
