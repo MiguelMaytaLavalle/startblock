@@ -22,8 +22,8 @@ class MicrobitScreen extends StatefulWidget {
 
 class _MicrobitState extends State<MicrobitScreen> {
   var sensorPageVM = SensorPageViewModel();
-  var bleController = BLEController();
-  var conView = ConnectionView();
+  BLEController bleController = BLEController();
+  //var conView = ConnectionView();
   FlutterBlue flutterBlue = FlutterBlue.instance;
   late StreamSubscription<ScanResult> scanSubScription;
   late StreamSubscription<List<int>>? streamSubscription;
@@ -71,6 +71,7 @@ class _MicrobitState extends State<MicrobitScreen> {
                     child: const Text('No')),
                 TextButton(
                     onPressed: () {
+                      bleController.disconnectFromDevice();
                       Navigator.of(context).pop(true);
                     },
                     child: const Text('Yes')),
@@ -89,11 +90,13 @@ class _MicrobitState extends State<MicrobitScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title:Text('${bleController.targetDevice?.name}'),
-        ),
-    /*Column(
+    return WillPopScope( onWillPop: _onWillPop,
+        child:
+        Scaffold(
+          appBar: AppBar(
+            /*title:Text('${bleController.targetDevice?.name}'),*/
+          ),
+          /*Column(
           children: [
             SizedBox(
                 height: 500,
@@ -163,46 +166,47 @@ class _MicrobitState extends State<MicrobitScreen> {
             ),
           ],
         ),*/
-        floatingActionButton:Wrap(
-          direction: Axis.horizontal,
-          children: <Widget>[
-            Container(
-                margin:const EdgeInsets.all(10),
-                child: ElevatedButton(
-                  onPressed: bleController.isNotStarted ? bleController.sendKrille: null,
-                  child: const Text('Krille'),
-                )
-            ),
+          floatingActionButton:Wrap(
+            direction: Axis.horizontal,
+            children: <Widget>[
+              Container(
+                  margin:const EdgeInsets.all(10),
+                  child: ElevatedButton(
+                    onPressed: bleController.isNotStarted ? bleController.sendKrille: null,
+                    child: const Text('Krille'),
+                  )
+              ),
 
-            Container(
-                margin:const EdgeInsets.all(10),
-                child: ElevatedButton(
-                  onPressed: () async {
+              Container(
+                  margin:const EdgeInsets.all(10),
+                  child: ElevatedButton(
+                    onPressed: () async {
 
-                    if(sensorPageVM.getLeftChartData().length == 0 &&
-                        sensorPageVM.getRightChartData().length == 0){
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please start a run")));
-                    }else{
-                      final name = await openDialog();
-                      if(name == null || name.isEmpty) return;
-                      setState(() => this.name = name);
-                      addHistory();
-                    }
+                      if(sensorPageVM.getLeftChartData().length == 0 &&
+                          sensorPageVM.getRightChartData().length == 0){
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please start a run")));
+                      }else{
+                        final name = await openDialog();
+                        if(name == null || name.isEmpty) return;
+                        setState(() => this.name = name);
+                        addHistory();
+                      }
 
-                  },
-                  child: const Icon(Icons.save_alt),
-                )
-            ),
-            Container(
-                margin:const EdgeInsets.all(10),
-                child: ElevatedButton(
-                  onPressed: bleController.isNotStarted ? bleController.initGo: null,
-                  child: const Text('START'),
-                )
-            ),
-          ],
-        ),
-      );
+                    },
+                    child: const Icon(Icons.save_alt),
+                  )
+              ),
+              Container(
+                  margin:const EdgeInsets.all(10),
+                  child: ElevatedButton(
+                    onPressed: bleController.isNotStarted ? bleController.initGo: null,
+                    child: const Text('START'),
+                  )
+              ),
+            ],
+          ),
+        )
+    );
   }
 
   Future<String?> openDialog() => showDialog<String>(

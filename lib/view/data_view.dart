@@ -12,35 +12,119 @@ class _DataState extends State<DataScreen> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return SafeArea(
-      child: Scaffold(
-        body: SfCartesianChart(
-          //crosshairBehavior: _crosshairBehavior,
-          legend: Legend(isVisible: true),
-          //zoomPanBehavior: _zoomPanBehavior,
-          //series: _getUpdateSeries(),
-          primaryXAxis: NumericAxis(
-              interactiveTooltip: const InteractiveTooltip(
-                enable: true,
+    return Scaffold(
+      body:SafeArea(child:
+      SingleChildScrollView(
+        child:Column(
+          children: [
+            SfCartesianChart(
+              //crosshairBehavior: _crosshairBehavior,
+              legend: Legend(isVisible: true),
+              //zoomPanBehavior: _zoomPanBehavior,
+              //series: _getUpdateSeries(),
+              primaryXAxis: NumericAxis(
+                  interactiveTooltip: const InteractiveTooltip(
+                    enable: true,
+                  ),
+                  majorGridLines: const MajorGridLines(width: 0),
+                  edgeLabelPlacement: EdgeLabelPlacement.shift,
+                  interval: 1000, //1000ms between two timestamps equals a second
+                  title: AxisTitle(text: 'Time [S]')
               ),
-              majorGridLines: const MajorGridLines(width: 0),
-              edgeLabelPlacement: EdgeLabelPlacement.shift,
-              interval: 1000, //1000ms between two timestamps equals a second
-              title: AxisTitle(text: 'Time [S]')
-          ),
 
-          primaryYAxis: NumericAxis(
-              minimum: 0,
-              //maximum: 800,
-              interactiveTooltip: const InteractiveTooltip(
-                enable: true,
+              primaryYAxis: NumericAxis(
+                  minimum: 0,
+                  //maximum: 800,
+                  interactiveTooltip: const InteractiveTooltip(
+                    enable: true,
+                  ),
+                  axisLine: const AxisLine(width: 0),
+                  majorTickLines: const MajorTickLines(size: 0),
+                  title: AxisTitle(text: 'Force [N]')
               ),
-              axisLine: const AxisLine(width: 0),
-              majorTickLines: const MajorTickLines(size: 0),
-              title: AxisTitle(text: 'Force [N]')
-          ),
+            ),
+            Wrap(
+              direction: Axis.vertical,
+              children: const <Widget>[
+                Material(
+                  //margin:const EdgeInsets.all(10),
+                    child: Text('Rate of force (RFD): 0'
+                    )
+                ),
+                Material(
+                  //margin:const EdgeInsets.all(10),
+                    child: Text('Time to peak (TTP): 0'
+                    )
+                ),
+                Material(
+                  //margin:const EdgeInsets.all(10),
+                    child: Text('Force impulse: 0'
+                    )
+                ),
+                Material(
+                  //margin:const EdgeInsets.all(10),
+                    child: Text('Peak force: 0'
+                    )
+                ),
+              ],
+            ),
+            SfCartesianChart(
+              //crosshairBehavior: _crosshairBehavior,
+              legend: Legend(isVisible: true),
+              //zoomPanBehavior: _zoomPanBehavior,
+              //series: _getUpdateSeries(),
+              primaryXAxis: NumericAxis(
+                  interactiveTooltip: const InteractiveTooltip(
+                    enable: true,
+                  ),
+                  majorGridLines: const MajorGridLines(width: 0),
+                  edgeLabelPlacement: EdgeLabelPlacement.shift,
+                  interval: 1000, //1000ms between two timestamps equals a second
+                  title: AxisTitle(text: 'Time [S]')
+              ),
+
+              primaryYAxis: NumericAxis(
+                  minimum: 0,
+                  //maximum: 800,
+                  interactiveTooltip: const InteractiveTooltip(
+                    enable: true,
+                  ),
+                  axisLine: const AxisLine(width: 0),
+                  majorTickLines: const MajorTickLines(size: 0),
+                  title: AxisTitle(text: 'Force [N]')
+              ),
+            ),
+            Wrap(
+              direction: Axis.vertical,
+              children: const <Widget>[
+                Material(
+                  //margin:const EdgeInsets.all(10),
+                    child: Text('Rate of force (RFD): 0'
+                    )
+                ),
+                Material(
+                  //margin:const EdgeInsets.all(10),
+                    child: Text('Time to peak (TTP): 0'
+                    )
+                ),
+                Material(
+                  //margin:const EdgeInsets.all(10),
+                    child: Text('Force impulse: 0'
+                    )
+                ),
+                Material(
+                  //margin:const EdgeInsets.all(10),
+                    child: Text('Peak force: 0'
+                    )
+                ),
+              ],
+            ),
+          ],
         ),
       ),
+      ),
     );
+
+
   }
 }

@@ -21,13 +21,14 @@ class ConnectionView extends StatefulWidget {
 }
 
 class _ConnectionState extends State<ConnectionView> {
+  BLEController bleController = BLEController();
   var sensorPageVM = SensorPageViewModel();
-  var bleController = BLEController();
   late TextEditingController controller;
   String connectionText = "";
   String name = '';
   int _selectedIndex = 0;
-  final screens=[
+
+  List<Widget> screens=<Widget>[
     MicrobitScreen(), //Index 0
     DataScreen() //Index 1
   ];
@@ -36,31 +37,7 @@ class _ConnectionState extends State<ConnectionView> {
     super.initState();
     bleController.startScan();
   }
-  Future<bool> _onWillPop() async {
-    return showDialog(
-        context: context,
-        builder: (BuildContext context) =>
-            AlertDialog(
-              title: const Text('Are you sure?'),
-              content: const Text('Do you want to disconnect device and go back?'),
-              actions: <Widget>[
-                TextButton(
-                    onPressed: () => Navigator.of(context).pop(false),
-                    child: const Text('No')),
-                TextButton(
-                    onPressed: () {
-                      bleController.disconnectFromDevice();
-                      Navigator.of(context).pop(true);
-                    },
-                    child: const Text('Yes')),
-              ],
-            )
-    ).then((value) => value ?? false);
-  }
 
-  _pop() {
-    Navigator.of(context).pop(true);
-  }
 
   String _dataParser(List<int> dataFromDevice) {
     return utf8.decode(dataFromDevice);
@@ -68,13 +45,8 @@ class _ConnectionState extends State<ConnectionView> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
-      child: !sensorPageVM.getIsReady() ? const Scaffold(
-        body: Center(
-          child: Text("Connecting...", style: TextStyle(fontSize: 24, color: Colors.blue),),
-        )
-        ):Scaffold(
+    return Scaffold(
+
         body: IndexedStack(
           index: _selectedIndex,
           children: screens,
@@ -164,48 +136,7 @@ class _ConnectionState extends State<ConnectionView> {
           selectedItemColor: Colors.amber[800],
           onTap: _onItemTapped,
         ),
-        floatingActionButton:Wrap(
-          direction: Axis.horizontal,
-          children: <Widget>[
-            Container(
-                margin:const EdgeInsets.all(10),
-                child: ElevatedButton(
-                  onPressed: bleController.isNotStarted ? bleController.sendKrille: null,
-                  child: const Text('Krille'),
-                )
-            ),
-
-            Container(
-                margin:const EdgeInsets.all(10),
-                child: ElevatedButton(
-                  onPressed: () async {
-
-                    if(sensorPageVM.getLeftChartData().length == 0 &&
-                        sensorPageVM.getRightChartData().length == 0){
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please start a run")));
-                    }else{
-                      final name = await openDialog();
-                      if(name == null || name.isEmpty) return;
-                      setState(() => this.name = name);
-                      addHistory();
-                    }
-
-                  },
-                  child: const Icon(Icons.save_alt),
-                )
-            ),
-            Container(
-                margin:const EdgeInsets.all(10),
-                child: ElevatedButton(
-                  onPressed: bleController.isNotStarted ? bleController.initGo: null,
-                  child: const Text('START'),
-                )
-            ),
-          ],
-        ),
-      ),
-
-    );
+      );
   }
 
   Future<String?> openDialog() => showDialog<String>(
@@ -231,6 +162,12 @@ class _ConnectionState extends State<ConnectionView> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      /*
+      switch(index){
+        case 0:Navigator.of(context).push(MaterialPageRoute<Null>(builder: (BuildContext context) {
+          return MicrobitScreen();
+        }));
+      }*/
     });
   }
   void submit(){

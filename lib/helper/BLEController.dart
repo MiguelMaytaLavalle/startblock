@@ -6,6 +6,13 @@ import 'package:startblock/constant/constants.dart';
 import 'package:startblock/model/livedata.dart';
 import 'package:startblock/view_model/sensor_page_view_model.dart';
 class BLEController{
+  static final _instance = BLEController._internal();
+  factory BLEController()
+  {
+    return _instance;
+  }
+  BLEController._internal();
+
   var sensorPageVM = SensorPageViewModel();
   FlutterBlue flutterBlue = FlutterBlue.instance;
   late StreamSubscription<ScanResult> scanSubScription;
