@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:startblock/view_model/sensor_page_view_model.dart';
-import 'package:startblock/model/livedata.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 class DataScreen extends StatefulWidget {
   @override
   _DataState createState() => _DataState();
@@ -13,10 +12,10 @@ class _DataState extends State<DataScreen> {
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
-      body:SafeArea(child:
-      SingleChildScrollView(
+      body:SafeArea(
+        child: SingleChildScrollView(
         child:Column(
-          children: [
+          children:[
             SfCartesianChart(
               //crosshairBehavior: _crosshairBehavior,
               legend: Legend(isVisible: true),
@@ -43,6 +42,7 @@ class _DataState extends State<DataScreen> {
                   title: AxisTitle(text: 'Force [N]')
               ),
             ),
+
             Wrap(
               direction: Axis.vertical,
               children: const <Widget>[
@@ -68,6 +68,7 @@ class _DataState extends State<DataScreen> {
                 ),
               ],
             ),
+
             SfCartesianChart(
               //crosshairBehavior: _crosshairBehavior,
               legend: Legend(isVisible: true),
@@ -82,7 +83,6 @@ class _DataState extends State<DataScreen> {
                   interval: 1000, //1000ms between two timestamps equals a second
                   title: AxisTitle(text: 'Time [S]')
               ),
-
               primaryYAxis: NumericAxis(
                   minimum: 0,
                   //maximum: 800,
@@ -94,6 +94,7 @@ class _DataState extends State<DataScreen> {
                   title: AxisTitle(text: 'Force [N]')
               ),
             ),
+
             Wrap(
               direction: Axis.vertical,
               children: const <Widget>[
@@ -118,13 +119,19 @@ class _DataState extends State<DataScreen> {
                     )
                 ),
               ],
+            ),
+
+            TextButton(
+              onPressed: () {  },
+              child: const Icon(Icons.save),
             ),
           ],
+
+
         ),
+
       ),
       ),
     );
-
-
   }
 }

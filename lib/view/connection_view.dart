@@ -170,6 +170,7 @@ class _ConnectionState extends State<ConnectionView> {
       }*/
     });
   }
+
   void submit(){
     Navigator.of(context).pop(controller.text );
     controller.clear();
