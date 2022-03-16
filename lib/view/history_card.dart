@@ -122,7 +122,7 @@ class _HistoryCardState extends State<HistoryCard> {
               onPressed: () {
                 Share.shareFiles([sendEmailVM.getAttachments()[0]]);
                 },
-              child: const Icon(Icons.email),
+              child: const Icon(Icons.share),
             )
         ),
       ],
