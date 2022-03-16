@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:html';
-
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:startblock/view_model/sensor_page_view_model.dart';
@@ -131,6 +129,7 @@ class _DataState extends State<DataScreen> {
                 ),
               ],
             ),
+            TextButton(onPressed: submit, child: const Icon(Icons.save)),
           ],
         ),
       ),
