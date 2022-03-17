@@ -63,6 +63,16 @@ class SensorPageViewModel{
     print(sensorPageModel.rightFootArray.length);
     print(sensorPageModel.leftFootArray.length);
   }
+  ///Converts micro:bit runtime to user friendly time
+  convertRuntime(List<int> time)
+  {
+    var diff = time[0];
+    List<int> temp = [];
+    for(int i = 0; i < time.length; i++)
+      {
+        temp.add(time[i]-diff);
+      }
+  }
   ///Calculates the time to peak based on the array data since the
   ///ratio between sampled data array and time array is 1:1
   calcTimeToPeakForce(List<double> footArray, List<int> time)
