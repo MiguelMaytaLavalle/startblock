@@ -43,18 +43,15 @@ class SensorPageViewModel{
   getRightChartData() {
     return sensorPageModel.rightChartData;
   }
-
   setRightChartData(List<LiveData> rightList){
     sensorPageModel.rightChartData = rightList;
   }
-
-
+  ///Returns an array with timestamps
   getTimes()
   {
     return sensorPageModel.times;
   }
-
-
+  ///Clears arrays that contains data.
   flushData()
   {
     sensorPageModel.rightFootArray.clear();
@@ -65,5 +62,43 @@ class SensorPageViewModel{
 
     print(sensorPageModel.rightFootArray.length);
     print(sensorPageModel.leftFootArray.length);
+  }
+  ///Converts micro:bit runtime to user friendly time
+  convertRuntime(List<int> time)
+  {
+    var diff = time[0];
+    List<int> temp = [];
+    for(int i = 0; i < time.length; i++)
+      {
+        temp.add(time[i]-diff);
+      }
+  }
+  ///Calculates the time to peak based on the array data since the
+  ///ratio between sampled data array and time array is 1:1
+  calcTimeToPeakForce(List<double> footArray, List<int> time)
+  {
+    double tempVal = 0;
+    int tempTime = 0;
+    for(int i = 0; i < footArray.length; i++)
+      {
+        if(footArray[i] > tempVal)
+          {
+            tempVal = footArray[i];
+            tempTime = time[i];
+          }
+      }
+    return tempTime;
+  }
+  ///Calculates the highest value in the array, AKA peak force
+  calcPeakForce(List<double> footArray)
+  {
+    double tempVal = 0;
+    for(int i = 0; i < footArray.length; i++)
+    {
+      if(footArray[i] > tempVal)
+      {
+        tempVal = footArray[i];
+      }
+    }
   }
 }
