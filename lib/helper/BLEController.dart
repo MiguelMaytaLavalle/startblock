@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:startblock/constant/constants.dart';
 import 'package:startblock/model/livedata.dart';
 import 'package:startblock/view_model/sensor_page_view_model.dart';
-class BLEController{
+class BLEController extends ChangeNotifier{
   static final _instance = BLEController._internal();
   factory BLEController()
   {
@@ -39,7 +40,7 @@ class BLEController{
   late Timer _krilleTimer;
   startScan() async{
     scanSubScription = flutterBlue.scan().listen((scanResult) async{
-      if (scanResult.device.name == Constants.TARGET_DEVICE_NAME_ZIVIT) {
+      if (scanResult.device.name == Constants.TARGET_DEVICE_NAME_TIZEZ) {
         print("Found device");
         targetDevice = scanResult.device;
         await stopScan();
@@ -68,7 +69,9 @@ class BLEController{
     }
     _krilleTimer.cancel();
     streamSubscription?.cancel();
+    isReady = false;
     await targetDevice?.disconnect();
+    notifyListeners();
     print("Disconnected");
   }
 
@@ -201,7 +204,8 @@ class BLEController{
     {
       if(isReady == false){
         sensorPageVM.setIsReady(true);
-        print(isReady);
+        isReady = true;
+        notifyListeners();
       }
       calculateKrilles();
       _krilleCounter = 0;

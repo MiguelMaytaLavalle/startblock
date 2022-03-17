@@ -21,8 +21,23 @@ class _RecordingState extends State<RecordingScreen> {
   @override
   void initState() {
     super.initState();
+    bleController.addListener(updateDetails);
     _initCamera();
   }
+
+  void updateDetails(){
+    if(this.mounted){
+      setState((){});
+    }
+  }
+
+/*
+  @override
+  dispose(){
+    _cameraController.dispose();
+    super.dispose();
+  }
+*/
 
   _initCamera() async {
     final cameras = await availableCameras();
@@ -78,20 +93,22 @@ class _RecordingState extends State<RecordingScreen> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: _onWillPop,
-      child: _isLoading ? Container(
+      child: !bleController.isReady ? Container(
+      //child: _isLoading ? Container(
       //child: sensorPageVM.getIsLoading() ? Container(
         color: Colors.white,
         child: const Center(
           child: CircularProgressIndicator(),
-
         ),
       ):Center(
         child: Stack(
           alignment: Alignment.bottomCenter,
-          children: [
+          children: <Widget>[
+
             CameraPreview(_cameraController),
+
             Padding(
-              padding: const EdgeInsets.all(25),
+              padding: const EdgeInsets.all(100),
               child: FloatingActionButton(
                 backgroundColor: Colors.red,
                 child: Icon(_isRecording ? Icons.stop : Icons.circle),
@@ -99,8 +116,23 @@ class _RecordingState extends State<RecordingScreen> {
                 //onPressed: () => initGo(),
               ),
             ),
+
+            Padding(
+              padding: const EdgeInsets.all(30),
+              child: TextButton(
+                onPressed: (){},
+                child: const Text('Start'),
+                style: TextButton.styleFrom(
+                    primary: Colors.white,
+                    backgroundColor:
+                    Colors.blue),
+              ),
+            ),
+
           ],
+
         ),
+
       ),
     );
 
