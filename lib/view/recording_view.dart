@@ -25,7 +25,7 @@ class _RecordingState extends State<RecordingScreen> {
   }
 
   void updateDetails(){
-    if(this.mounted){
+    if(mounted){
       setState((){});
     }
   }
