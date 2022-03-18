@@ -11,7 +11,6 @@ class RecordingScreen extends StatefulWidget {
 }
 
 class _RecordingState extends State<RecordingScreen> {
-  var sensorPageVM = SensorPageViewModel();
   BLEController bleController = BLEController();
 
   bool _isLoading = true;

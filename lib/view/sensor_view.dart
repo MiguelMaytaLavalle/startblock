@@ -9,7 +9,7 @@ import 'package:startblock/model/history.dart';
 import 'package:startblock/model/livedata.dart';
 import 'package:startblock/view_model/sensor_page_view_model.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-
+/*
 class SensorScreen extends StatefulWidget {
   const SensorScreen({Key? key, required this.device}) : super(key: key);
   final BluetoothDevice device;
@@ -67,7 +67,7 @@ class _SensorScreenState extends State<SensorScreen> {
             characteristic.setNotifyValue(!characteristic.isNotifying);
             stream = characteristic.value;
             setState(() {
-              sensorPageVM.setIsReady(true);
+              //sensorPageVM.setIsReady(true);
             });
           }
         }
@@ -90,7 +90,7 @@ class _SensorScreenState extends State<SensorScreen> {
       _Pop();
       return;
     }
-
+/*
     Timer(const Duration(seconds: 15), () {
       //if (!isReady) {
       if(!sensorPageVM.getIsReady()){
@@ -98,7 +98,7 @@ class _SensorScreenState extends State<SensorScreen> {
         _Pop();
       }
     });
-
+*/
     await widget.device.connect();
     discoverServices();
   }
@@ -129,7 +129,7 @@ class _SensorScreenState extends State<SensorScreen> {
             characteristic.setNotifyValue(!characteristic.isNotifying);
             stream = characteristic.value;
             setState(() {
-              sensorPageVM.setIsReady(true);
+              //sensorPageVM.setIsReady(true);
             });
           }
         }
@@ -148,11 +148,11 @@ class _SensorScreenState extends State<SensorScreen> {
         }
       }
     }
-
+    /*
     if (!sensorPageVM.getIsReady()){
       _Pop();
     }
-
+*/
   }
 
   Future<bool> _onWillPop() {
@@ -197,7 +197,7 @@ class _SensorScreenState extends State<SensorScreen> {
           children: [
             SizedBox(
                 height: 450,
-                child: !sensorPageVM.getIsReady() ? const Center(
+                child: false ? const Center(
                   child: Text("Connecting...", style: TextStyle(fontSize: 24, color: Colors.blue),),
                 ) : StreamBuilder<List<int>>(
                   stream: stream,
@@ -657,4 +657,5 @@ class _SensorScreenState extends State<SensorScreen> {
     }*/
   }
 }
+ */
 

@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:startblock/constant/constants.dart';
 import 'package:startblock/model/livedata.dart';
-import 'package:startblock/view_model/sensor_page_view_model.dart';
+import 'package:startblock/model/sensor.dart';
 class BLEController extends ChangeNotifier{
   static final _instance = BLEController._internal();
   factory BLEController()
@@ -14,7 +14,8 @@ class BLEController extends ChangeNotifier{
   }
   BLEController._internal();
 
-  var sensorPageVM = SensorPageViewModel();
+  List<Data> leftFoot = [];
+  List<Data> rightFoot = [];
   FlutterBlue flutterBlue = FlutterBlue.instance;
   late StreamSubscription<ScanResult> scanSubScription;
   late StreamSubscription<List<int>>? streamSubscription;
@@ -38,9 +39,10 @@ class BLEController extends ChangeNotifier{
   int _krilleCounter = 0;
   double _sampleFrequency = 100;
   late Timer _krilleTimer;
+  int _counter = 0;
   startScan() async{
     scanSubScription = flutterBlue.scan().listen((scanResult) async{
-      if (scanResult.device.name == Constants.TARGET_DEVICE_NAME_TIZEZ) {
+      if (scanResult.device.name == Constants.TARGET_DEVICE_NAME_ZIVIT) {
         print("Found device");
         targetDevice = scanResult.device;
         await stopScan();
@@ -117,8 +119,11 @@ class BLEController extends ChangeNotifier{
   }
   void flushData() async
   {
-    sensorPageVM.flushData();
-    sensorPageVM.getTimes().clear();
+    //sensorPageVM.flushData();
+    //sensorPageVM.getTimes().clear();
+    leftFoot.clear();
+    rightFoot.clear();
+    _counter = 0;
     _krilleCounter = 0;
     offsetMean = 0;
     listRTT.clear();
@@ -154,21 +159,24 @@ class BLEController extends ChangeNotifier{
     switch(tag[0]){
       case 'RF': {
         double tmpDoubleR = double.parse(tag[1]);
-        //sensorPageVM.getRightFootArray().add(tmpDoubleR);
+        rightFoot.add(Data(0,tmpDoubleR));
       }
       break;
       case 'LF': {
         double tmpDoubleL = double.parse(tag[1]);
-        //sensorPageVM.getLeftFootArray().add(tmpDoubleL);
+        leftFoot.add(Data(0,tmpDoubleL));
       }
       break;
       case 'T':{
-        time.add(int.parse(tag[1]));
+        leftFoot[_counter].setTime(int.parse(tag[1]));
+        rightFoot[_counter].setTime(int.parse(tag[1]));
+        _counter++;
+        //sensorPageModel.setTime(int.parse(tag[1]));
       }
       break;
       case 'D' :{
         //testUpdateSetState();
-
+        _counter = 0;
         print(tag[1]);
         /*
         setState(() {
@@ -203,7 +211,6 @@ class BLEController extends ChangeNotifier{
     else if(_krilleCounter == Constants.LIST_LEN)
     {
       if(isReady == false){
-        sensorPageVM.setIsReady(true);
         isReady = true;
         notifyListeners();
       }
