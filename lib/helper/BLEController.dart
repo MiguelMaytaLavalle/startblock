@@ -40,9 +40,10 @@ class BLEController extends ChangeNotifier{
   double _sampleFrequency = 100;
   late Timer _krilleTimer;
   int _counter = 0;
+
   startScan() async{
     scanSubScription = flutterBlue.scan().listen((scanResult) async{
-      if (scanResult.device.name == Constants.TARGET_DEVICE_NAME_ZIVIT) {
+      if (scanResult.device.name == Constants.TARGET_DEVICE_NAME_TIZEZ) {
         print("Found device");
         targetDevice = scanResult.device;
         await stopScan();
@@ -159,11 +160,13 @@ class BLEController extends ChangeNotifier{
     switch(tag[0]){
       case 'RF': {
         double tmpDoubleR = double.parse(tag[1]);
+        print('RF ${tmpDoubleR.toString()}');
         rightFoot.add(Data(0,tmpDoubleR));
       }
       break;
       case 'LF': {
         double tmpDoubleL = double.parse(tag[1]);
+        print('LF ${tmpDoubleL.toString()}');
         leftFoot.add(Data(0,tmpDoubleL));
       }
       break;
@@ -176,8 +179,10 @@ class BLEController extends ChangeNotifier{
       break;
       case 'D' :{
         //testUpdateSetState();
+        print('DONE');
         _counter = 0;
         print(tag[1]);
+        notifyListeners();
         /*
         setState(() {
           isNotStarted = true;

@@ -2,25 +2,27 @@ import 'dart:async';
 import 'livedata.dart';
 
 class Data{
-  int _time = 0;
-  double _force = 0;
+  int timestamp = 0;
+  double mForce = 0;
 
-  Data(int time, double force);
+  Data(int time, double force, {timestamp, mForce});
 
   void setTime(int time)
   {
-    _time = time;
+    timestamp = time;
   }
   void setForce(double force)
   {
-    _force = force;
+    mForce = force;
   }
   getTime()
   {
-    return _time;
+    return timestamp;
   }
   getForce()
   {
-    return _force;
+    return mForce;
   }
+
+
 }

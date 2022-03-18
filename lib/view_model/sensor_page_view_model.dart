@@ -1,4 +1,3 @@
-import 'dart:html';
 
 import 'package:flutter/cupertino.dart';
 import 'package:startblock/helper/BLEController.dart';
@@ -50,39 +49,48 @@ class SensorPageViewModel extends ChangeNotifier{
       }
     }
   }
-  /*
-  List<LiveData> _getChartDataLeft (){
+
+  List<LiveData> getChartDataLeft (){
     List<LiveData> tmpLeftList = <LiveData>[];
-    for(int i = 0; i < sensorPageVM.getLeftFootArray().length; i++){
-      print("Left: ${sensorPageVM.getLeftFootArray()[i]}");
+    //for(int i = 0; i < sensorPageVM.getLeftFootArray().length; i++){
+    for(int i = 0; i < bleController.leftFoot.length; i++){
+      print("Left: ${bleController.leftFoot[i]}");
       tmpLeftList.add(LiveData(
-          time: time[i],
-          force: sensorPageVM.getLeftFootArray()[i]));
+          //time: time[i],
+          time: bleController.leftFoot[i].timestamp,
+          //force: sensorPageVM.getLeftFootArray()[i]
+        force: bleController.leftFoot[i].mForce
+      ));
       print("Index: $i");
       print("-----------");
     }
     return tmpLeftList;
   }
 
-  List<LiveData> _getChartDataRight (){
+  List<LiveData> getChartDataRight (){
     List<LiveData> tmpRightList = <LiveData>[];
-    for(int i = 0; i < sensorPageVM.getRightFootArray().length; i++){
-      print("Right: ${sensorPageVM.getRightFootArray()[i]}");
+    //for(int i = 0; i < sensorPageVM.getRightFootArray().length; i++){
+    for(int i = 0; i < bleController.rightFoot.length; i++){
+      //print("Right: ${sensorPageVM.getRightFootArray()[i]}");
+      print("Left: ${bleController.rightFoot[i]}");
       tmpRightList.add(LiveData(
-          time: time[i],
-          force: sensorPageVM.getRightFootArray()[i]));
+          //time: time[i],
+          time: bleController.rightFoot[i].timestamp,
+          //force: sensorPageVM.getRightFootArray()[i]
+          force: bleController.leftFoot[i].mForce
+      ));
       print("Index: $i");
       print("-----------");
     }
     return tmpRightList;
   }
-*/
+
   /// Updates the chart
   List<SplineSeries<Data, int>> getDataLeft() {
     notifyListeners();
     return <SplineSeries<Data, int>>[
       SplineSeries<Data, int>(
-        dataSource: bleController.leftFoot!,
+        dataSource: bleController.leftFoot,
         width: 2,
         name: 'Left foot',
         onRendererCreated: (ChartSeriesController controller) {
@@ -93,11 +101,12 @@ class SensorPageViewModel extends ChangeNotifier{
       ),
     ];
   }
+
   List<SplineSeries<Data, int>> getDataRight(){
     notifyListeners();
     return<SplineSeries<Data, int>>[
       SplineSeries<Data, int>(
-        dataSource: bleController.rightFoot!,
+        dataSource: bleController.rightFoot,
         width: 2,
         name: 'Right foot',
         onRendererCreated: (ChartSeriesController controller) {

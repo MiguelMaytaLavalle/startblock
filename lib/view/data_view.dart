@@ -30,14 +30,12 @@ class _DataState extends State<DataScreen> {
     bleController.addListener(updateDetails);
   }
   void updateDetails(){
-    /*
-    if(this.mounted){
-      setState((){});
-    }*/
-    setState(() {
 
-    });
+    if(mounted){
+      setState((){});
+    }
   }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -72,6 +70,7 @@ class _DataState extends State<DataScreen> {
                   title: AxisTitle(text: 'Force [N]')
               ),
             ),
+
             Wrap(
               direction: Axis.vertical,
               children: const <Widget>[
@@ -148,6 +147,7 @@ class _DataState extends State<DataScreen> {
                 ),
               ],
             ),
+
             TextButton(
                 onPressed: () async {
                   if(bleController.leftFoot.isEmpty &&
@@ -161,6 +161,7 @@ class _DataState extends State<DataScreen> {
                   }
                 },
                 child: const Icon(Icons.save)),
+
           ],
         ),
       ),
@@ -192,11 +193,11 @@ class _DataState extends State<DataScreen> {
 
   Future addHistory() async {
     try{
-      List<Data> leftList = bleController.leftFoot;
-      List<Data> rightList = bleController.rightFoot;
+      List<LiveData> leftList = sensorPageVM.getChartDataLeft();
+      List<LiveData> rightList = sensorPageVM.getChartDataRight();
       final history =  History(
         dateTime: DateTime.now(),
-        name: this.name,
+        name: name,
         leftData: jsonEncode(leftList),
         rightData: jsonEncode(rightList),
       );
@@ -209,83 +210,4 @@ class _DataState extends State<DataScreen> {
     }
   }
 
-/*
-  void testUpdateSetState() {
-
-    List<LiveData> tmpLeft = _getChartDataLeft();
-    sensorPageVM.setLeftChartData(_getChartDataLeft());
-    sensorPageVM.setRightChartData(_getChartDataRight());
-    setState(() {
-      bleController.isNotStarted = true;
-    });
-    print('Left length: ${sensorPageVM.getLeftChartData().length}');
-    print('Right length: ${sensorPageVM.getRightChartData().length}');
-
-  }
-
-  List<LiveData> _getChartDataLeft (){
-    List<LiveData> tmpLeftList = <LiveData>[];
-    for(int i = 0; i < sensorPageVM.getLeftFootArray().length; i++){
-      print("Left: ${sensorPageVM.getLeftFootArray()[i]}");
-      tmpLeftList.add(LiveData(
-          time: time[i],
-          force: sensorPageVM.getLeftFootArray()[i]));
-      print("Index: $i");
-      print("-----------");
-    }
-    return tmpLeftList;
-  }
-
-  List<LiveData> _getChartDataRight (){
-    List<LiveData> tmpRightList = <LiveData>[];
-    for(int i = 0; i < sensorPageVM.getRightFootArray().length; i++){
-      print("Right: ${sensorPageVM.getRightFootArray()[i]}");
-      tmpRightList.add(LiveData(
-          time: time[i],
-          force: sensorPageVM.getRightFootArray()[i]));
-      print("Index: $i");
-      print("-----------");
-    }
-    return tmpRightList;
-  }
-
-  /// Updates the chart
-  List<SplineSeries<LiveData, int>> _getUpdateSeries() {
-    return <SplineSeries<LiveData, int>>[
-      SplineSeries<LiveData, int>(
-        dataSource: sensorPageVM.getLeftChartData()!,
-        width: 2,
-        name: 'Left foot',
-        onRendererCreated: (ChartSeriesController controller) {
-          _chartSeriesLeftController = controller; //Updates the chart live
-        },
-        xValueMapper: (LiveData livedata, _) => livedata.time,
-        yValueMapper: (LiveData livedata, _) => livedata.force,
-      ),
-      SplineSeries<LiveData, int>(
-        dataSource: sensorPageVM.getRightChartData()!,
-        width: 2,
-        name: 'Right foot',
-        onRendererCreated: (ChartSeriesController controller) {
-          _chartSeriesRightController = controller; //Updates the chart live
-        },
-        xValueMapper: (LiveData livedata, _) => livedata.time,
-        yValueMapper: (LiveData livedata, _) => livedata.force,
-      ),
-    ];
-  }
-
-  void testUpdateSetState() {
-
-    List<LiveData> tmpLeft = _getChartDataLeft();
-    sensorPageVM.setLeftChartData(_getChartDataLeft());
-    sensorPageVM.setRightChartData(_getChartDataRight());
-    /*setState(() {
-      isNotStarted = true;
-    });*/
-    print('Left length: ${sensorPageVM.getLeftChartData().length}');
-    print('Right length: ${sensorPageVM.getRightChartData().length}');
-
-  }
-*/
 }
