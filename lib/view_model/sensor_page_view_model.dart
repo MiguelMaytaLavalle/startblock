@@ -1,5 +1,6 @@
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:startblock/helper/BLEController.dart';
 import 'package:startblock/model/livedata.dart';
 import 'package:startblock/model/sensor.dart';
@@ -77,7 +78,7 @@ class SensorPageViewModel extends ChangeNotifier{
           //time: time[i],
           time: bleController.rightFoot[i].timestamp,
           //force: sensorPageVM.getRightFootArray()[i]
-          force: bleController.leftFoot[i].mForce
+          force: bleController.rightFoot[i].mForce
       ));
       print("Index: $i");
       print("-----------");
@@ -86,10 +87,11 @@ class SensorPageViewModel extends ChangeNotifier{
   }
 
   /// Updates the chart
-  List<SplineSeries<Data, int>> getDataLeft() {
-    notifyListeners();
-    return <SplineSeries<Data, int>>[
-      SplineSeries<Data, int>(
+  List<SplineSeries<Data, double>> getDataLeft(){
+    //notifyListeners();
+    return<SplineSeries<Data, double>>[
+      SplineSeries<Data, double>(
+        color: Colors.blue,
         dataSource: bleController.leftFoot,
         width: 2,
         name: 'Left foot',
@@ -102,10 +104,11 @@ class SensorPageViewModel extends ChangeNotifier{
     ];
   }
 
-  List<SplineSeries<Data, int>> getDataRight(){
-    notifyListeners();
-    return<SplineSeries<Data, int>>[
-      SplineSeries<Data, int>(
+  List<SplineSeries<Data, double>> getDataRight(){
+    //notifyListeners();
+    return<SplineSeries<Data, double>>[
+      SplineSeries<Data, double>(
+        color: Colors.red,
         dataSource: bleController.rightFoot,
         width: 2,
         name: 'Right foot',
@@ -117,4 +120,5 @@ class SensorPageViewModel extends ChangeNotifier{
       ),
     ];
   }
+
 }

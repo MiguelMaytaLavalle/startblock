@@ -2,10 +2,11 @@ import 'dart:async';
 import 'livedata.dart';
 
 class Data{
-  int timestamp = 0;
-  double mForce = 0;
+  int timestamp;
+  double mForce;
 
-  Data(int time, double force, {timestamp, mForce});
+  Data(this.timestamp, this.mForce);
+
 
   void setTime(int time)
   {
@@ -15,11 +16,11 @@ class Data{
   {
     mForce = force;
   }
-  getTime()
+  double getTime()
   {
-    return timestamp;
+    return timestamp.toDouble();
   }
-  getForce()
+  double getForce()
   {
     return mForce;
   }

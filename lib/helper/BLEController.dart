@@ -14,8 +14,8 @@ class BLEController extends ChangeNotifier{
   }
   BLEController._internal();
 
-  List<Data> leftFoot = [];
-  List<Data> rightFoot = [];
+  List<Data> leftFoot = <Data>[];
+  List<Data> rightFoot = <Data>[];
   FlutterBlue flutterBlue = FlutterBlue.instance;
   late StreamSubscription<ScanResult> scanSubScription;
   late StreamSubscription<List<int>>? streamSubscription;
@@ -182,6 +182,16 @@ class BLEController extends ChangeNotifier{
         print('DONE');
         _counter = 0;
         print(tag[1]);
+
+        leftFoot.forEach((element) {
+          print('${element.mForce}');
+        });
+
+        print('---------------------------------');
+
+        rightFoot.forEach((element) {
+          print('${element.mForce}');
+        });
         notifyListeners();
         /*
         setState(() {
