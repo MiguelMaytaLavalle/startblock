@@ -7,6 +7,7 @@ import 'package:startblock/db/database_helper.dart';
 import 'package:startblock/model/history.dart';
 import 'package:startblock/model/livedata.dart';
 import 'package:startblock/view/recording_view.dart';
+import 'package:startblock/view/setting_view.dart';
 import 'package:startblock/view_model/sensor_page_view_model.dart';
 
 import '../helper/BLEController.dart';
@@ -27,7 +28,8 @@ class _ConnectionState extends State<ConnectionView> {
 
   List<Widget> screens=<Widget>[
     RecordingScreen(), //Index 0
-    DataScreen() //Index 1
+    SettingScreen(),//Index1
+    DataScreen() //Index 2
   ];
   @override
   void initState() {
