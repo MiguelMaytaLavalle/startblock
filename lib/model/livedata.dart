@@ -10,12 +10,12 @@ class LiveData {
 
   Map<String, Object?> toJson() => {
     'time': time,
-    'speed': force,
+    'force': force,
   };
 
   factory LiveData.fromJson(Map<String, dynamic> json) => LiveData(
     time: json['time'],
-    force: json['speed'],
+    force: json['force'],
   );
 
 }

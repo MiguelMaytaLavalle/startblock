@@ -20,6 +20,20 @@ class ExportToExcel{
     return excelDataRows;
   }
 
+  Future<List<ExcelDataRow>> mapExcelData(String colName,List<LiveData> list) async {
+    List<ExcelDataRow> excelDataRows = <ExcelDataRow>[];
+    final Future<List<LiveData>> reports = _getCustomersImageHyperlink(list);
+    List<LiveData> reports_1 = await Future.value(reports);
+    excelDataRows = reports_1.map<ExcelDataRow>((LiveData dataRow) {
+      return ExcelDataRow(cells: <ExcelDataCell>[
+        ExcelDataCell(columnHeader: 'Time', value: dataRow.time),
+        ExcelDataCell(columnHeader: 'Force', value: dataRow.force)
+      ]);
+    }).toList();
+    return excelDataRows;
+  }
+
+
   /// rename function
   Future<List<LiveData>> _getCustomersImageHyperlink(List<LiveData> list) async {
     final List<LiveData> reports = list;
@@ -41,6 +55,14 @@ class ExportToExcel{
     final Future<List<ExcelDataRow>> dataRowsRight = _buildCustomersDataRowsIH(history.rightData);
     List<ExcelDataRow> dataRows_Left = await Future.value(dataRowsLeft);
     List<ExcelDataRow> dataRows_Right = await Future.value(dataRowsRight);
+
+/*
+    final Future<List<ExcelDataRow>> dataRowsLeft = mapExcelData('Left',history.leftData);
+    final Future<List<ExcelDataRow>> dataRowsRight = mapExcelData('Right',history.rightData);
+    final Future<List<ExcelDataRow>> dataRowsRight = mapExcelData('Time',history.rightData);
+    */
+    /*List<ExcelDataRow> dataRows_Left = await Future.value(dataRowsLeft);
+    List<ExcelDataRow> dataRows_Right = await Future.value(dataRowsRight);*/
 
     //Import the list to Sheet.
     sheet.importData(dataRows_Left, 1, 1);

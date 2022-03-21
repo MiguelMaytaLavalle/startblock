@@ -40,8 +40,8 @@ class _DataState extends State<DataScreen> {
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
-      body:SafeArea(child:
-      SingleChildScrollView(
+      body:SafeArea(
+        child: SingleChildScrollView(
         child:Column(
           children: [
             SfCartesianChart(
