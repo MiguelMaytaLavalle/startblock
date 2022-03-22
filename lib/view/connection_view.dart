@@ -28,18 +28,27 @@ class _ConnectionState extends State<ConnectionView> {
 
   List<Widget> screens=<Widget>[
     RecordingScreen(), //Index 0
-    SettingScreen(),//Index1
-    DataScreen() //Index 2
+    DataScreen(), //Index 1
+    SettingScreen(),//Index 2
   ];
   @override
   void initState() {
     super.initState();
+    bleController.addListener(updateDetails);
     bleController.startScan();
+  }
+  void updateDetails(){
+
+    if(mounted){
+      setState((){});
+    }
   }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
+      appBar: AppBar(
+        title: Text("${bleController.targetDevice?.name}"),
+      ),
         body: IndexedStack(
           index: _selectedIndex,
           children: screens,
@@ -123,6 +132,10 @@ class _ConnectionState extends State<ConnectionView> {
             BottomNavigationBarItem(
               icon: Icon(Icons.auto_graph_rounded),
               label: 'View Data',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.settings),
+              label: 'Settings',
             ),
           ],
           currentIndex: _selectedIndex,

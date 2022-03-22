@@ -6,9 +6,7 @@ import 'package:startblock/view_model/sensor_page_view_model.dart';
 import 'package:startblock/model/livedata.dart';
 import 'package:startblock/db/database_helper.dart';
 import 'package:startblock/model/history.dart';
-import 'package:startblock/model/livedata.dart';
 
-import '../model/sensor.dart';
 class DataScreen extends StatefulWidget {
   @override
   _DataState createState() => _DataState();
@@ -161,7 +159,6 @@ class _DataState extends State<DataScreen> {
                   }
                 },
                 child: const Icon(Icons.save)),
-
           ],
         ),
       ),

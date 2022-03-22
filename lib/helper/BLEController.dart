@@ -321,4 +321,18 @@ class BLEController extends ChangeNotifier{
 
     flushData();
   }
+  ///Send method to set threshold value to the micro:bit
+  void sendSetThresh(String val) async
+  {
+    print("Setting Thresh");
+    String test = "T$val\n";
+    List<int> bytes = utf8.encode(test);
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
+    clientSendTime.add(currentTime);
+    try{
+      await writeChar.write(bytes);
+    }catch(error){
+      //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+    }
+  }
 }
