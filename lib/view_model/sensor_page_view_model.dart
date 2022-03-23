@@ -6,6 +6,8 @@ import 'package:startblock/model/livedata.dart';
 import 'package:startblock/model/sensor.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
+import '../model/timestamp.dart';
+
 class SensorPageViewModel extends ChangeNotifier{
 
   late ChartSeriesController _chartSeriesRightController;
@@ -53,13 +55,9 @@ class SensorPageViewModel extends ChangeNotifier{
 
   List<LiveData> getChartDataLeft (){
     List<LiveData> tmpLeftList = <LiveData>[];
-    //for(int i = 0; i < sensorPageVM.getLeftFootArray().length; i++){
     for(int i = 0; i < bleController.leftFoot.length; i++){
       print("Left: ${bleController.leftFoot[i]}");
       tmpLeftList.add(LiveData(
-          //time: time[i],
-          time: bleController.leftFoot[i].timestamp,
-          //force: sensorPageVM.getLeftFootArray()[i]
         force: bleController.leftFoot[i].mForce
       ));
       print("Index: $i");
@@ -70,14 +68,9 @@ class SensorPageViewModel extends ChangeNotifier{
 
   List<LiveData> getChartDataRight (){
     List<LiveData> tmpRightList = <LiveData>[];
-    //for(int i = 0; i < sensorPageVM.getRightFootArray().length; i++){
     for(int i = 0; i < bleController.rightFoot.length; i++){
-      //print("Right: ${sensorPageVM.getRightFootArray()[i]}");
       print("Left: ${bleController.rightFoot[i]}");
       tmpRightList.add(LiveData(
-          //time: time[i],
-          time: bleController.rightFoot[i].timestamp,
-          //force: sensorPageVM.getRightFootArray()[i]
           force: bleController.rightFoot[i].mForce
       ));
       print("Index: $i");
@@ -86,11 +79,24 @@ class SensorPageViewModel extends ChangeNotifier{
     return tmpRightList;
   }
 
+  List<Timestamp> getChartDataTimestamps(){
+    List<Timestamp> tmpList = <Timestamp>[];
+    for(int i = 0; i < bleController.timestamps.length; i++){
+      print("Left: ${bleController.timestamps[i]}");
+      tmpList.add(Timestamp(
+          time: bleController.timestamps[i].time
+      ));
+      print("Index: $i");
+      print("-----------");
+    }
+    return tmpList;
+  }
+
   /// Updates the chart
-  List<SplineSeries<Data, double>> getDataLeft(){
+  List<SplineSeries<Data, int>> getDataLeft(){
     //notifyListeners();
-    return<SplineSeries<Data, double>>[
-      SplineSeries<Data, double>(
+    return<SplineSeries<Data, int>>[
+      SplineSeries<Data, int>(
         color: Colors.blue,
         dataSource: bleController.leftFoot,
         width: 2,
@@ -98,16 +104,16 @@ class SensorPageViewModel extends ChangeNotifier{
         onRendererCreated: (ChartSeriesController controller) {
           _chartSeriesLeftController = controller; //Updates the chart live
         },
-        xValueMapper: (Data data, _) => data.getTime(),
+        xValueMapper: (Data data, _) => data.timestamp,
         yValueMapper: (Data data, _) => data.getForce(),
       ),
     ];
   }
 
-  List<SplineSeries<Data, double>> getDataRight(){
+  List<SplineSeries<Data, int>> getDataRight(){
     //notifyListeners();
-    return<SplineSeries<Data, double>>[
-      SplineSeries<Data, double>(
+    return<SplineSeries<Data, int>>[
+      SplineSeries<Data, int>(
         color: Colors.red,
         dataSource: bleController.rightFoot,
         width: 2,
@@ -115,10 +121,14 @@ class SensorPageViewModel extends ChangeNotifier{
         onRendererCreated: (ChartSeriesController controller) {
           _chartSeriesRightController = controller; //Updates the chart live
         },
-        xValueMapper: (Data data, _) => data.getTime(),
-        yValueMapper: (Data data, _) => data.getForce(),
+        xValueMapper: (Data data, _) => data.timestamp,
+        yValueMapper: (Data data, _) => data.mForce,
       ),
     ];
+  }
+
+  num getMarzullo() {
+    return bleController.marzullo;
   }
 
 }

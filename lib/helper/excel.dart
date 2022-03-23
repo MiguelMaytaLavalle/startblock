@@ -4,39 +4,47 @@ import 'package:startblock/model/history_card.dart';
 import 'package:startblock/model/livedata.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 
+import '../model/timestamp.dart';
+
 class ExportToExcel{
 
-  /// Rename function
-  Future<List<ExcelDataRow>> _buildCustomersDataRowsIH(List<LiveData> list) async {
+  Future<List<ExcelDataRow>> _mapExcelData(String colName,List<LiveData> list) async {
     List<ExcelDataRow> excelDataRows = <ExcelDataRow>[];
-    final Future<List<LiveData>> reports = _getCustomersImageHyperlink(list);
+    final Future<List<LiveData>> reports = _getLivedata(list);
     List<LiveData> reports_1 = await Future.value(reports);
     excelDataRows = reports_1.map<ExcelDataRow>((LiveData dataRow) {
       return ExcelDataRow(cells: <ExcelDataCell>[
-        ExcelDataCell(columnHeader: 'Time', value: dataRow.time),
-        ExcelDataCell(columnHeader: 'Force', value: dataRow.force)
+        ExcelDataCell(columnHeader: colName, value: dataRow.force)
       ]);
     }).toList();
     return excelDataRows;
   }
 
-  Future<List<ExcelDataRow>> mapExcelData(String colName,List<LiveData> list) async {
+  Future<List<ExcelDataRow>> _mapExcelTimestamps(String colName,List<Timestamp> list) async {
     List<ExcelDataRow> excelDataRows = <ExcelDataRow>[];
-    final Future<List<LiveData>> reports = _getCustomersImageHyperlink(list);
-    List<LiveData> reports_1 = await Future.value(reports);
-    excelDataRows = reports_1.map<ExcelDataRow>((LiveData dataRow) {
+    final Future<List<Timestamp>> reports = _getTimestamps(list);
+    List<Timestamp> reports_1 = await Future.value(reports);
+    excelDataRows = reports_1.map<ExcelDataRow>((Timestamp dataRow) {
       return ExcelDataRow(cells: <ExcelDataCell>[
-        ExcelDataCell(columnHeader: 'Time', value: dataRow.time),
-        ExcelDataCell(columnHeader: 'Force', value: dataRow.force)
+        ExcelDataCell(columnHeader: colName, value: dataRow.time),
       ]);
     }).toList();
     return excelDataRows;
   }
-
 
   /// rename function
-  Future<List<LiveData>> _getCustomersImageHyperlink(List<LiveData> list) async {
+  Future<List<LiveData>> _getLivedata(List<LiveData> list) async {
     final List<LiveData> reports = list;
+    return reports;
+  }
+
+  Future<List<Timestamp>> _getTimestamps(List<Timestamp> list) async {
+    final List<Timestamp> reports = list;
+    return reports;
+  }
+
+  Future<num> _getMarzullo(num list) async {
+    final num reports = list;
     return reports;
   }
 
@@ -51,22 +59,24 @@ class ExportToExcel{
     final Worksheet sheet = workbook.worksheets[0];
 
     //List of data to import data.
-    final Future<List<ExcelDataRow>> dataRowsLeft = _buildCustomersDataRowsIH(history.leftData);
-    final Future<List<ExcelDataRow>> dataRowsRight = _buildCustomersDataRowsIH(history.rightData);
-    List<ExcelDataRow> dataRows_Left = await Future.value(dataRowsLeft);
-    List<ExcelDataRow> dataRows_Right = await Future.value(dataRowsRight);
+    final Future<List<ExcelDataRow>> dataRowsLeft = _mapExcelData('Left',history.leftData);
+    final Future<List<ExcelDataRow>> dataRowsRight = _mapExcelData('Right',history.rightData);
+    final Future<List<ExcelDataRow>> dataRowsTimestamp = _mapExcelTimestamps('Time',history.timestamps);
+    //final Future<List<ExcelDataRow>> dataRowsMarzullo = _mapExcelMarzullo('Marzullo',history.marzullo);
+    List<ExcelDataRow> _dataRowsLeft = await Future.value(dataRowsLeft);
+    List<ExcelDataRow> _dataRowsRight = await Future.value(dataRowsRight);
+    List<ExcelDataRow> _dataRowTimetamps = await Future.value(dataRowsTimestamp);
 
-/*
-    final Future<List<ExcelDataRow>> dataRowsLeft = mapExcelData('Left',history.leftData);
-    final Future<List<ExcelDataRow>> dataRowsRight = mapExcelData('Right',history.rightData);
-    final Future<List<ExcelDataRow>> dataRowsRight = mapExcelData('Time',history.rightData);
-    */
-    /*List<ExcelDataRow> dataRows_Left = await Future.value(dataRowsLeft);
-    List<ExcelDataRow> dataRows_Right = await Future.value(dataRowsRight);*/
+    print('Marzullo ${history.marzullo}');
+
 
     //Import the list to Sheet.
-    sheet.importData(dataRows_Left, 1, 1);
-    sheet.importData(dataRows_Right, 1, 4);
+    sheet.importData(_dataRowsLeft, 1, 1);
+    sheet.importData(_dataRowsRight, 1, 2);
+    sheet.importData(_dataRowTimetamps, 1, 3);
+    sheet.getRangeByIndex(1, 4).setText('Marzullo Micro:Bit Offset');
+    sheet.getRangeByIndex(2, 4).setText(history.marzullo.toString());
+
 
     //Auto-Fit columns.
     sheet.getRangeByName('A1:B1').autoFitColumns();
@@ -93,13 +103,7 @@ class ExportToExcel{
   }
 
  Future<String> attachExcel(HistoryCardModel hCardModel) async {
-   //final Workbook workbook = Workbook();
     String tmp = await exportToExcel(hCardModel);
-   //final List<int> bytes = workbook.saveAsStream();
-   //Dispose the document.
-   //workbook.dispose();
-   //String tmp = await getExcelPath(bytes);
-   //String tmp2 = tmp.toString();
    return tmp;
   }
 

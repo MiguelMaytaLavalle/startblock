@@ -9,6 +9,7 @@ import 'package:startblock/model/history.dart';
 import 'package:startblock/model/livedata.dart';
 
 import '../model/sensor.dart';
+import '../model/timestamp.dart';
 class DataScreen extends StatefulWidget {
   @override
   _DataState createState() => _DataState();
@@ -195,11 +196,15 @@ class _DataState extends State<DataScreen> {
     try{
       List<LiveData> leftList = sensorPageVM.getChartDataLeft();
       List<LiveData> rightList = sensorPageVM.getChartDataRight();
+      List<Timestamp> timestamps = sensorPageVM.getChartDataTimestamps();
+      num marzullo = sensorPageVM.getMarzullo();
       final history =  History(
         dateTime: DateTime.now(),
         name: name,
         leftData: jsonEncode(leftList),
         rightData: jsonEncode(rightList),
+        timestamps: jsonEncode(timestamps),
+        marzullo: marzullo,
       );
       print('SUCCESS');
       await HistoryDatabase.instance.create(history);
