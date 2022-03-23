@@ -27,6 +27,7 @@ class _ConnectionState extends State<ConnectionView> {
     DataScreen(),
     SettingScreen(),
   ];
+
   @override
   void initState() {
     super.initState();

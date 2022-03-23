@@ -1,4 +1,5 @@
 import 'package:startblock/model/history.dart';
+import 'package:startblock/model/timestamp.dart';
 
 import 'livedata.dart';
 
@@ -6,7 +7,9 @@ class HistoryCardModel{
   late String _excelPath;
   late List<LiveData> _rightData = [];
   late List<LiveData> _leftData = [];
+  late List<Timestamp> timestamps = <Timestamp>[];
   bool _isLoading = false;
+  late num marzullo;
   set excelPath(String value) {
     _excelPath = value;
   }

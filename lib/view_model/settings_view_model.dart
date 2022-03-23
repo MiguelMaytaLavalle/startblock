@@ -9,3 +9,4 @@ class SettingsViewModel{
     _bleController.sendSetThresh(val);
   }
 }
+

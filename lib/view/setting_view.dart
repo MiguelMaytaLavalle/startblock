@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:startblock/helper/BLEController.dart';
 import 'package:startblock/view_model/settings_view_model.dart';
-
 import '../model/sensor.dart';
+
 class SettingScreen extends StatefulWidget {
   @override
   _SettingState createState() => _SettingState();

@@ -1,6 +1,3 @@
-import 'dart:async';
-import 'livedata.dart';
-
 class Data{
   int timestamp;
   double mForce;
@@ -16,9 +13,9 @@ class Data{
   {
     mForce = force;
   }
-  double getTime()
+  int getTime()
   {
-    return timestamp.toDouble();
+    return timestamp;
   }
   double getForce()
   {

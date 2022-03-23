@@ -6,6 +6,8 @@ import 'package:flutter_blue/flutter_blue.dart';
 import 'package:startblock/constant/constants.dart';
 import 'package:startblock/model/livedata.dart';
 import 'package:startblock/model/sensor.dart';
+
+import '../model/timestamp.dart';
 class BLEController extends ChangeNotifier{
   static final _instance = BLEController._internal();
   factory BLEController()
@@ -16,6 +18,8 @@ class BLEController extends ChangeNotifier{
 
   List<Data> leftFoot = <Data>[];
   List<Data> rightFoot = <Data>[];
+  List<Timestamp> timestamps = <Timestamp>[];
+
   FlutterBlue flutterBlue = FlutterBlue.instance;
   late StreamSubscription<ScanResult> scanSubScription;
   late StreamSubscription<List<int>>? streamSubscription;
@@ -35,7 +39,7 @@ class BLEController extends ChangeNotifier{
   late List<num> tMaxList = <num>[];
   late List<num> tMinList = <num>[];
   late List<num> krilleOffsets = <num>[];
-  late num timeSend, timeServer, timeRecieve, syncedTime, RTT, RTT_mean,latestMeasure, timeOffset,offsetMean;
+  late num timeSend, timeServer, timeRecieve, syncedTime, RTT, RTT_mean,latestMeasure, timeOffset,offsetMean, marzullo;
   int _krilleCounter = 0;
   double _sampleFrequency = 100;
   late Timer _krilleTimer;
@@ -176,6 +180,9 @@ class BLEController extends ChangeNotifier{
       case 'T':{
         leftFoot[_counter].setTime(int.parse(tag[1]));
         rightFoot[_counter].setTime(int.parse(tag[1]));
+        timestamps.add(Timestamp(
+          time: int.parse(tag[1])
+        ));
         _counter++;
         //sensorPageModel.setTime(int.parse(tag[1]));
       }
@@ -300,7 +307,7 @@ class BLEController extends ChangeNotifier{
     /**
      * Calculate offset with Marzullo's Algorithm
      */
-    /*
+
     for(int i = 0; i < Constants.LIST_LEN; i++)
     {
       tMaxList.add(clientSendTime[i] - serverTime[i]);
@@ -319,12 +326,13 @@ class BLEController extends ChangeNotifier{
     num maxVal = tMaxList.reduce((current, next) => current < next ? current : next);
     num minVal = tMinList.reduce((current, next) => current > next ? current : next);
     num timeOffset2 = (maxVal + minVal)/2;
-     */
-    //print("Offset $timeOffset2");
 
+    print("Offset marzullo: $timeOffset2");
+    marzullo = timeOffset2;
     flushData();
   }
   ///Send method to set threshold value to the micro:bit
+  ///
   void sendSetThresh(String val) async
   {
     print("Setting Thresh");
