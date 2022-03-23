@@ -63,6 +63,13 @@ class HistoryCardViewModel{
     return hCardModel;
   }
 
+  getAttachments(){
+    return hCardModel.excelPath;
+  }
+
+  addAttachment(String path){
+    hCardModel.excelPath = path;
+  }
   /// Updates the chart
   List<SplineSeries<LiveData, int>> leftSplineSeries(){
     //notifyListeners();

@@ -6,7 +6,7 @@ import 'package:startblock/model/livedata.dart';
 import 'package:startblock/model/sensor.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-class SensorPageViewModel extends ChangeNotifier{
+class DataViewViewMode extends ChangeNotifier{
 
   late ChartSeriesController _chartSeriesRightController;
   late ChartSeriesController _chartSeriesLeftController;
@@ -26,6 +26,7 @@ class SensorPageViewModel extends ChangeNotifier{
   ///ratio between sampled data array and time array is 1:1
   calcTimeToPeakForce(List<double> footArray, List<int> time)
   {
+    notifyListeners();
     double tempVal = 0;
     int tempTime = 0;
     for(int i = 0; i < footArray.length; i++)
@@ -41,6 +42,7 @@ class SensorPageViewModel extends ChangeNotifier{
   ///Calculates the highest value in the array, AKA peak force
   calcPeakForce(List<double> footArray)
   {
+    notifyListeners();
     double tempVal = 0;
     for(int i = 0; i < footArray.length; i++)
     {
@@ -49,6 +51,7 @@ class SensorPageViewModel extends ChangeNotifier{
         tempVal = footArray[i];
       }
     }
+    return tempVal;
   }
 
   List<LiveData> getChartDataLeft (){

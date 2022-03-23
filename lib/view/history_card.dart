@@ -6,7 +6,6 @@ import 'package:startblock/db/database_helper.dart';
 import 'package:startblock/helper/excel.dart';
 import 'package:startblock/model/livedata.dart';
 import 'package:startblock/view_model/history_card_view_model.dart';
-import 'package:startblock/view_model/send_email_view_model.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -24,7 +23,7 @@ class HistoryCard extends StatefulWidget {
 
 class _HistoryCardState extends State<HistoryCard> {
   HistoryCardViewModel hCardVM = HistoryCardViewModel();
-  SendEmailViewModel sendEmailVM = SendEmailViewModel();
+  //SendEmailViewModel sendEmailVM = SendEmailViewModel();
   ExportToExcel exportExcel = ExportToExcel();
   late SfCartesianChart chart;
   late TooltipBehavior _tooltipBehavior;
@@ -235,7 +234,7 @@ class _HistoryCardState extends State<HistoryCard> {
             margin: EdgeInsets.all(10),
             child: ElevatedButton(
               onPressed: () {
-                Share.shareFiles([sendEmailVM.getAttachments()[0]]);
+                Share.shareFiles([hCardVM.getAttachments()]);
                 },
               child: const Icon(Icons.share),
             )
@@ -289,7 +288,7 @@ class _HistoryCardState extends State<HistoryCard> {
   _attachExcel() async {
     try{
       String tmp = await exportExcel.attachExcel(hCardVM.getHCardModel());
-      sendEmailVM.addAttachment(tmp);
+      hCardVM.addAttachment(tmp);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Exported excel file succesfully')));
     }catch(error){
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("NO ${error.toString()}")));

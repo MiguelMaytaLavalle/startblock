@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:startblock/view_model/sensor_page_view_model.dart';
+import 'package:startblock/view_model/data_view_view_model.dart';
 import 'package:camera/camera.dart';
 import '../helper/BLEController.dart';
 import 'package:gallery_saver/gallery_saver.dart';
@@ -63,9 +63,6 @@ class _RecordingState extends State<RecordingScreen> {
       setState(() => _isRecording = true);
     }
   }
-
-
-
   Future<bool> _onWillPop() {
     return showDialog(
         context: context,
@@ -103,9 +100,7 @@ class _RecordingState extends State<RecordingScreen> {
         child: Stack(
           alignment: Alignment.bottomCenter,
           children: <Widget>[
-
             CameraPreview(_cameraController),
-
             Padding(
               padding: const EdgeInsets.all(100),
               child: FloatingActionButton(
@@ -115,11 +110,10 @@ class _RecordingState extends State<RecordingScreen> {
                 //onPressed: () => initGo(),
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.all(30),
               child: TextButton(
-                onPressed: () => bleController.initGo(),
+                onPressed: !bleController.isNotStarted ? null: ()=>bleController.initGo(),
                 child: const Text('Start'),
                 style: TextButton.styleFrom(
                     primary: Colors.white,
@@ -127,14 +121,9 @@ class _RecordingState extends State<RecordingScreen> {
                     Colors.blue),
               ),
             ),
-
           ],
-
         ),
-
       ),
     );
-
   }
-
 }

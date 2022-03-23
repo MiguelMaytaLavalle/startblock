@@ -62,8 +62,8 @@ class _SettingState extends State<SettingScreen> {
                 ),
               ],
             ),
-          )
-        )
+          ),
+        ),
     );
   }
 }

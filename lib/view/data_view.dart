@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:startblock/helper/BLEController.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:startblock/view_model/sensor_page_view_model.dart';
+import 'package:startblock/view_model/data_view_view_model.dart';
 import 'package:startblock/model/livedata.dart';
 import 'package:startblock/db/database_helper.dart';
 import 'package:startblock/model/history.dart';
@@ -14,7 +14,7 @@ class DataScreen extends StatefulWidget {
 
 class _DataState extends State<DataScreen> {
   BLEController bleController = BLEController();
-  SensorPageViewModel sensorPageVM = SensorPageViewModel();
+  DataViewViewMode sensorPageVM = DataViewViewMode();
   late TextEditingController controller;
   List <int> time = <int>[];
   String connectionText = "";

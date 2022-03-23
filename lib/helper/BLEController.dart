@@ -21,7 +21,7 @@ class BLEController extends ChangeNotifier{
   late StreamSubscription<List<int>>? streamSubscription;
   late List<BluetoothService> services;
 
-  bool isNotStarted = true;
+  bool isNotStarted = false;
   bool isReady = false;
   List <int> time = <int>[];
   late BluetoothDevice? targetDevice = null;
@@ -105,6 +105,8 @@ class BLEController extends ChangeNotifier{
             writeChar = c;
             sendKrille(); //As soon as device is connected to micro:bit - Time Sync immediately
             _krilleTimer = Timer.periodic(Duration(minutes: 10), (timer) {
+              isNotStarted = false;
+              notifyListeners();
               sendKrille();
             });
           }
@@ -140,6 +142,7 @@ class BLEController extends ChangeNotifier{
     /// Send a GO signal to the Micro:Bit
 
     isNotStarted = false;
+    notifyListeners();
     flushData();
     String test = 'Start\n';
     List<int> bytes = utf8.encode(test);
@@ -192,6 +195,7 @@ class BLEController extends ChangeNotifier{
         rightFoot.forEach((element) {
           print('${element.mForce}');
         });
+        isNotStarted = true;
         notifyListeners();
         /*
         setState(() {
@@ -203,11 +207,6 @@ class BLEController extends ChangeNotifier{
       case 'S' :{
         clientRecieveTime.add(DateTime.now().millisecondsSinceEpoch);
         krillesMetod(int.parse(tag[1]));
-      }
-      break;
-      case "Frequency" :{
-        _sampleFrequency = double.parse(tag[1]);
-        print("Freq : $_sampleFrequency");
       }
       break;
       default:{
@@ -229,6 +228,10 @@ class BLEController extends ChangeNotifier{
         isReady = true;
         notifyListeners();
       }
+      if(isNotStarted == false){
+          isNotStarted = true;
+          notifyListeners();
+        }
       calculateKrilles();
       _krilleCounter = 0;
     }
@@ -332,7 +335,7 @@ class BLEController extends ChangeNotifier{
     try{
       await writeChar.write(bytes);
     }catch(error){
-      //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+      print(error);
     }
   }
 }
