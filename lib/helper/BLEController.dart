@@ -47,7 +47,7 @@ class BLEController extends ChangeNotifier{
 
   startScan() async{
     scanSubScription = flutterBlue.scan().listen((scanResult) async{
-      if (scanResult.device.name == Constants.TARGET_DEVICE_NAME_TIZEZ) {
+      if (scanResult.device.name == Constants.TARGET_DEVICE_NAME_ZIVIT) {
         print("Found device");
         targetDevice = scanResult.device;
         await stopScan();
@@ -327,5 +327,19 @@ class BLEController extends ChangeNotifier{
     print("Offset marzullo: $timeOffset2");
     marzullo = timeOffset2;
     flushData();
+  }
+  ///Send method to set threshold value to the micro:bit
+  void sendSetThresh(String val) async
+  {
+    print("Setting Thresh");
+    String test = "T$val\n";
+    List<int> bytes = utf8.encode(test);
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
+    clientSendTime.add(currentTime);
+    try{
+      await writeChar.write(bytes);
+    }catch(error){
+      //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+    }
   }
 }
