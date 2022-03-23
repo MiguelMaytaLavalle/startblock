@@ -9,7 +9,8 @@ class HistoryCardModel{
   late List<LiveData> _leftData = [];
   late List<Timestamp> timestamps = <Timestamp>[];
   bool _isLoading = false;
-  late num marzullo;
+  late num _marzullo;
+
   set excelPath(String value) {
     _excelPath = value;
   }
@@ -34,4 +35,9 @@ class HistoryCardModel{
   List<LiveData> get rightData => _rightData;
 
   List<LiveData> get leftData => _leftData;
+  num get marzullo => _marzullo;
+
+  set marzullo(num value) {
+    _marzullo = value;
+  }
 }
