@@ -329,6 +329,7 @@ class BLEController extends ChangeNotifier{
     flushData();
   }
   ///Send method to set threshold value to the micro:bit
+  ///
   void sendSetThresh(String val) async
   {
     print("Setting Thresh");
