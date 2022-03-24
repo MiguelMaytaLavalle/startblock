@@ -5,8 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:startblock/db/database_helper.dart';
 import 'package:startblock/helper/excel.dart';
 import 'package:startblock/model/livedata.dart';
+import 'package:startblock/model/timestamp.dart';
 import 'package:startblock/view_model/history_card_view_model.dart';
-import 'package:startblock/view_model/send_email_view_model.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -24,7 +24,7 @@ class HistoryCard extends StatefulWidget {
 
 class _HistoryCardState extends State<HistoryCard> {
   HistoryCardViewModel hCardVM = HistoryCardViewModel();
-  SendEmailViewModel sendEmailVM = SendEmailViewModel();
+  //SendEmailViewModel sendEmailVM = SendEmailViewModel();
   ExportToExcel exportExcel = ExportToExcel();
   late SfCartesianChart chart;
   late TooltipBehavior _tooltipBehavior;
@@ -40,14 +40,38 @@ class _HistoryCardState extends State<HistoryCard> {
 
   Future refreshHistory() async {
     setState(() => hCardVM.setIsLoading(true));
+
     hCardVM.setHistory(await HistoryDatabase.instance.read(widget.historyId));
+
     hCardVM.setRightHistory((json.decode(hCardVM.getHistory().rightData) as List)
+        .map((e) => LiveData.fromJson(e))
+        .toList());
+
+    hCardVM.setLeftHistory((json.decode(hCardVM.getHistory().leftData) as List)
+        .map((e) => LiveData.fromJson(e))
+        .toList());
+
+    hCardVM.setTimestampsHistory((json.decode(hCardVM.getHistory().timestamps) as List)
+        .map((e) => Timestamp.fromJson(e))
+        .toList());
+
+    hCardVM.setMarzulloHistory(hCardVM.getMarzullo());
+
+    setState(() => hCardVM.setIsLoading(false));
+
+    //hCardVM.getHistory().timestamps;
+
+/*    hCardVM.setRightHistory((json.decode(hCardVM.getHistory().rightData) as List)
         .map((e) => LiveData.fromJson(e))
         .toList());
     hCardVM.setLeftHistory((json.decode(hCardVM.getHistory().leftData) as List)
         .map((e) => LiveData.fromJson(e))
         .toList());
-    setState(() => hCardVM.setIsLoading(false));
+    setState(() => hCardVM.setIsLoading(false));*/
+
+
+    hCardVM.setupLeftChartData();
+    hCardVM.setupRightChartData();
     _attachExcel();
   }
 
@@ -76,9 +100,153 @@ class _HistoryCardState extends State<HistoryCard> {
                       DateFormat.yMMMMEEEEd().format(hCardVM.getDateTime()),
                       style: const TextStyle(color: Colors.blue),
                     ),
+                    Text(
+                      'Marzullo: ${hCardVM.getMarzullo().toString()}',
+                      style: const TextStyle(color: Colors.blue),
+                    ),
                     Container(
-                      height: 400,
-                      child: SfCartesianChart(
+                      //height: 400,
+                      child: SingleChildScrollView(
+                        child:Column(
+                          children: [
+                            /*SfCartesianChart(
+                              //crosshairBehavior: _crosshairBehavior,
+                              legend: Legend(isVisible: true),
+                              //zoomPanBehavior: _zoomPanBehavior,
+                              //series: sensorPageVM.getDataLeft(),
+                              //series: hCardVM.getDataLeft(),
+                              series: hCardVM.leftSplineSeries(),
+                              primaryXAxis: NumericAxis(
+                                  interactiveTooltip: const InteractiveTooltip(
+                                    enable: true,
+                                  ),
+                                  majorGridLines: const MajorGridLines(width: 0),
+                                  edgeLabelPlacement: EdgeLabelPlacement.shift,
+                                  interval: 1000, //1000ms between two timestamps equals a second
+                                  title: AxisTitle(text: 'Time [S]')
+                              ),
+
+                              primaryYAxis: NumericAxis(
+                                  minimum: 0,
+                                  //maximum: 800,
+                                  interactiveTooltip: const InteractiveTooltip(
+                                    enable: true,
+                                  ),
+                                  axisLine: const AxisLine(width: 0),
+                                  majorTickLines: const MajorTickLines(size: 0),
+                                  title: AxisTitle(text: 'Force [N]')
+                              ),
+                            ),*/
+                            SfCartesianChart(
+                              //crosshairBehavior: _crosshairBehavior,
+                              legend: Legend(isVisible: true),
+                              //zoomPanBehavior: _zoomPanBehavior,
+                              //series: sensorPageVM.getDataRight(),
+                              series: hCardVM.leftSplineSeries(),
+                              primaryXAxis: NumericAxis(
+                                  interactiveTooltip: const InteractiveTooltip(
+                                    enable: true,
+                                  ),
+                                  majorGridLines: const MajorGridLines(width: 0),
+                                  edgeLabelPlacement: EdgeLabelPlacement.shift,
+                                  interval: 1000, //1000ms between two timestamps equals a second
+                                  title: AxisTitle(text: 'Time [S]')
+                              ),
+
+                              primaryYAxis: NumericAxis(
+                                  minimum: 0,
+                                  //maximum: 800,
+                                  interactiveTooltip: const InteractiveTooltip(
+                                    enable: true,
+                                  ),
+                                  axisLine: const AxisLine(width: 0),
+                                  majorTickLines: const MajorTickLines(size: 0),
+                                  title: AxisTitle(text: 'Force [N]')
+                              ),
+                            ),
+                            Wrap(
+                              direction: Axis.vertical,
+                              children: const <Widget>[
+                                Material(
+                                  //margin:const EdgeInsets.all(10),
+                                    child: Text('Rate of force (RFD): 0'
+                                    )
+                                ),
+                                Material(
+                                  //margin:const EdgeInsets.all(10),
+                                    child: Text('Time to peak (TTP): 0'
+                                    )
+                                ),
+                                Material(
+                                  //margin:const EdgeInsets.all(10),
+                                    child: Text('Force impulse: 0'
+                                    )
+                                ),
+                                Material(
+                                  //margin:const EdgeInsets.all(10),
+                                    child: Text('Peak force: 0'
+                                    )
+                                ),
+                              ],
+                            ),
+                            SfCartesianChart(
+                              //crosshairBehavior: _crosshairBehavior,
+                              legend: Legend(isVisible: true),
+                              //zoomPanBehavior: _zoomPanBehavior,
+                              //series: sensorPageVM.getDataRight(),
+                              series: hCardVM.rightSplineSeries(),
+                              primaryXAxis: NumericAxis(
+                                  interactiveTooltip: const InteractiveTooltip(
+                                    enable: true,
+                                  ),
+                                  majorGridLines: const MajorGridLines(width: 0),
+                                  edgeLabelPlacement: EdgeLabelPlacement.shift,
+                                  interval: 1000, //1000ms between two timestamps equals a second
+                                  title: AxisTitle(text: 'Time [S]')
+                              ),
+
+                              primaryYAxis: NumericAxis(
+                                  minimum: 0,
+                                  //maximum: 800,
+                                  interactiveTooltip: const InteractiveTooltip(
+                                    enable: true,
+                                  ),
+                                  axisLine: const AxisLine(width: 0),
+                                  majorTickLines: const MajorTickLines(size: 0),
+                                  title: AxisTitle(text: 'Force [N]')
+                              ),
+                            ),
+                            Wrap(
+                              direction: Axis.vertical,
+                              children: const <Widget>[
+                                Material(
+                                  //margin:const EdgeInsets.all(10),
+                                    child: Text('Rate of force (RFD): 0'
+                                    )
+                                ),
+                                Material(
+                                  //margin:const EdgeInsets.all(10),
+                                    child: Text('Time to peak (TTP): 0'
+                                    )
+                                ),
+                                Material(
+                                  //margin:const EdgeInsets.all(10),
+                                    child: Text('Force impulse: 0'
+                                    )
+                                ),
+                                Material(
+                                  //margin:const EdgeInsets.all(10),
+                                    child: Text('Peak force: 0'
+                                    )
+                                ),
+                              ],
+                            ),
+
+
+                          ],
+                        ),
+                      ),
+                      /*child: SfCartesianChart(
                         legend: Legend(isVisible: true),
                         series: _getUpdateSeries(),
                         primaryXAxis: NumericAxis(
@@ -100,7 +268,8 @@ class _HistoryCardState extends State<HistoryCard> {
                             majorTickLines: const MajorTickLines(size: 0),
                             title: AxisTitle(text: 'Force [N]')
                         ),
-                      ),
+                      ),*/
+
                     ),
                   ],
                 ),
@@ -120,7 +289,7 @@ class _HistoryCardState extends State<HistoryCard> {
             margin: EdgeInsets.all(10),
             child: ElevatedButton(
               onPressed: () {
-                Share.shareFiles([sendEmailVM.getAttachments()[0]]);
+                Share.shareFiles([hCardVM.getAttachments()]);
                 },
               child: const Icon(Icons.share),
             )
@@ -128,25 +297,6 @@ class _HistoryCardState extends State<HistoryCard> {
       ],
     ),
       );
-  /// Updates the chart
-  List<SplineSeries<LiveData, int>> _getUpdateSeries() {
-    return <SplineSeries<LiveData, int>>[
-      SplineSeries<LiveData, int>(
-        dataSource: hCardVM.getRightLiveData(),
-        width: 2,
-        name: 'Right foot',
-        xValueMapper: (LiveData livedata, _) => livedata.time,
-        yValueMapper: (LiveData livedata, _) => livedata.force,
-      ),
-      SplineSeries<LiveData, int>(
-        dataSource: hCardVM.getLeftLiveData(),
-        width: 2,
-        name: 'Left foot',
-        xValueMapper: (LiveData livedata, _) => livedata.time,
-        yValueMapper: (LiveData livedata, _) => livedata.force,
-      ),
-    ];
-  }
 
   Future<String?> openDialog() => showDialog<String>(
     context: context,
@@ -174,7 +324,7 @@ class _HistoryCardState extends State<HistoryCard> {
   _attachExcel() async {
     try{
       String tmp = await exportExcel.attachExcel(hCardVM.getHCardModel());
-      sendEmailVM.addAttachment(tmp);
+      hCardVM.addAttachment(tmp);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Exported excel file succesfully')));
     }catch(error){
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("NO ${error.toString()}")));

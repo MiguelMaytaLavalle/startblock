@@ -12,7 +12,7 @@ class HistoryDatabase{
   Future<Database> get database async{
     if(_database != null) return _database!;
 
-    _database = await  _initDB('test5.db');
+    _database = await  _initDB('test11.db');
     return _database!;
   }
 
@@ -28,6 +28,7 @@ class HistoryDatabase{
     const textType = 'TEXT NOT NULL';
     const boolType = 'BOOLEAN NOT NULL';
     final integerType = 'INTEGER NOT NULL';
+    final realType = 'REAL NOT NULL';
 
     await db.execute('''
 CREATE TABLE $tableHistory ( 
@@ -35,7 +36,10 @@ CREATE TABLE $tableHistory (
   ${HistoryFields.dateTime} $textType,
   ${HistoryFields.name} $textType,
   ${HistoryFields.rightData} $textType,
-  ${HistoryFields.leftData} $textType
+  ${HistoryFields.leftData} $textType,
+  ${HistoryFields.timestamps} $textType,
+  ${HistoryFields.marzullo} $realType
+  
   )
 ''');
   }

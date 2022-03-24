@@ -2,7 +2,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
-import 'package:startblock/view/sensor_view.dart';
 import 'package:startblock/view_model/home_view_model.dart';
 import 'dart:async';
 import 'package:startblock/view_model/widgets.dart';

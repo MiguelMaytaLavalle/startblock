@@ -1,45 +1,55 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:startblock/helper/BLEController.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:startblock/view_model/sensor_page_view_model.dart';
+import 'package:startblock/view_model/data_view_view_model.dart';
 import 'package:startblock/model/livedata.dart';
 import 'package:startblock/db/database_helper.dart';
 import 'package:startblock/model/history.dart';
 import 'package:startblock/model/livedata.dart';
+
+import '../model/sensor.dart';
+import '../model/timestamp.dart';
 class DataScreen extends StatefulWidget {
   @override
   _DataState createState() => _DataState();
 }
 
 class _DataState extends State<DataScreen> {
-  var sensorPageVM = SensorPageViewModel();
+  BLEController bleController = BLEController();
+  DataViewViewMode sensorPageVM = DataViewViewMode();
   late TextEditingController controller;
   List <int> time = <int>[];
   String connectionText = "";
   String name = '';
-  late ChartSeriesController _chartSeriesRightController;
-  late ChartSeriesController _chartSeriesLeftController;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     controller = TextEditingController();
+    bleController.addListener(updateDetails);
+  }
+  void updateDetails(){
+
+    if(mounted){
+      setState((){});
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
-      body:SafeArea(child:
-      SingleChildScrollView(
+      body:SafeArea(
+        child: SingleChildScrollView(
         child:Column(
           children: [
             SfCartesianChart(
               //crosshairBehavior: _crosshairBehavior,
               legend: Legend(isVisible: true),
               //zoomPanBehavior: _zoomPanBehavior,
-              //series: _getUpdateSeries(),
+              series: sensorPageVM.getDataLeft(),
               primaryXAxis: NumericAxis(
                   interactiveTooltip: const InteractiveTooltip(
                     enable: true,
@@ -61,6 +71,7 @@ class _DataState extends State<DataScreen> {
                   title: AxisTitle(text: 'Force [N]')
               ),
             ),
+
             Wrap(
               direction: Axis.vertical,
               children: const <Widget>[
@@ -90,7 +101,7 @@ class _DataState extends State<DataScreen> {
               //crosshairBehavior: _crosshairBehavior,
               legend: Legend(isVisible: true),
               //zoomPanBehavior: _zoomPanBehavior,
-              //series: _getUpdateSeries(),
+              series: sensorPageVM.getDataRight(),
               primaryXAxis: NumericAxis(
                   interactiveTooltip: const InteractiveTooltip(
                     enable: true,
@@ -137,10 +148,11 @@ class _DataState extends State<DataScreen> {
                 ),
               ],
             ),
+
             TextButton(
                 onPressed: () async {
-                  if(sensorPageVM.getLeftChartData().length == 0 &&
-                      sensorPageVM.getRightChartData().length == 0){
+                  if(bleController.leftFoot.isEmpty &&
+                      bleController.rightFoot.isEmpty){
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please start a run")));
                   }else{
                     final name = await openDialog();
@@ -181,13 +193,17 @@ class _DataState extends State<DataScreen> {
 
   Future addHistory() async {
     try{
-      List<LiveData> leftList = sensorPageVM.getLeftChartData();
-      List<LiveData> rightList = sensorPageVM.getRightChartData();
+      List<LiveData> leftList = sensorPageVM.getChartDataLeft();
+      List<LiveData> rightList = sensorPageVM.getChartDataRight();
+      List<Timestamp> timestamps = sensorPageVM.getChartDataTimestamps();
+      num marzullo = sensorPageVM.getMarzullo();
       final history =  History(
         dateTime: DateTime.now(),
-        name: this.name,
+        name: name,
         leftData: jsonEncode(leftList),
         rightData: jsonEncode(rightList),
+        timestamps: jsonEncode(timestamps),
+        marzullo: marzullo,
       );
       print('SUCCESS');
       await HistoryDatabase.instance.create(history);
@@ -197,134 +213,5 @@ class _DataState extends State<DataScreen> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
     }
   }
-/*
-  void testUpdateSetState() {
 
-    List<LiveData> tmpLeft = _getChartDataLeft();
-    sensorPageVM.setLeftChartData(_getChartDataLeft());
-    sensorPageVM.setRightChartData(_getChartDataRight());
-    setState(() {
-      bleController.isNotStarted = true;
-    });
-    print('Left length: ${sensorPageVM.getLeftChartData().length}');
-    print('Right length: ${sensorPageVM.getRightChartData().length}');
-
-  }
-
-  List<LiveData> _getChartDataLeft (){
-    List<LiveData> tmpLeftList = <LiveData>[];
-    for(int i = 0; i < sensorPageVM.getLeftFootArray().length; i++){
-      print("Left: ${sensorPageVM.getLeftFootArray()[i]}");
-      tmpLeftList.add(LiveData(
-          time: time[i],
-          force: sensorPageVM.getLeftFootArray()[i]));
-      print("Index: $i");
-      print("-----------");
-    }
-    return tmpLeftList;
-  }
-
-  List<LiveData> _getChartDataRight (){
-    List<LiveData> tmpRightList = <LiveData>[];
-    for(int i = 0; i < sensorPageVM.getRightFootArray().length; i++){
-      print("Right: ${sensorPageVM.getRightFootArray()[i]}");
-      tmpRightList.add(LiveData(
-          time: time[i],
-          force: sensorPageVM.getRightFootArray()[i]));
-      print("Index: $i");
-      print("-----------");
-    }
-    return tmpRightList;
-  }
-
-  /// Updates the chart
-  List<SplineSeries<LiveData, int>> _getUpdateSeries() {
-    return <SplineSeries<LiveData, int>>[
-      SplineSeries<LiveData, int>(
-        dataSource: sensorPageVM.getLeftChartData()!,
-        width: 2,
-        name: 'Left foot',
-        onRendererCreated: (ChartSeriesController controller) {
-          _chartSeriesLeftController = controller; //Updates the chart live
-        },
-        xValueMapper: (LiveData livedata, _) => livedata.time,
-        yValueMapper: (LiveData livedata, _) => livedata.force,
-      ),
-      SplineSeries<LiveData, int>(
-        dataSource: sensorPageVM.getRightChartData()!,
-        width: 2,
-        name: 'Right foot',
-        onRendererCreated: (ChartSeriesController controller) {
-          _chartSeriesRightController = controller; //Updates the chart live
-        },
-        xValueMapper: (LiveData livedata, _) => livedata.time,
-        yValueMapper: (LiveData livedata, _) => livedata.force,
-      ),
-    ];
-  }
- */
-  void testUpdateSetState() {
-
-    List<LiveData> tmpLeft = _getChartDataLeft();
-    sensorPageVM.setLeftChartData(_getChartDataLeft());
-    sensorPageVM.setRightChartData(_getChartDataRight());
-    /*setState(() {
-      isNotStarted = true;
-    });*/
-    print('Left length: ${sensorPageVM.getLeftChartData().length}');
-    print('Right length: ${sensorPageVM.getRightChartData().length}');
-
-  }
-
-  List<LiveData> _getChartDataLeft (){
-    List<LiveData> tmpLeftList = <LiveData>[];
-    for(int i = 0; i < sensorPageVM.getLeftFootArray().length; i++){
-      print("Left: ${sensorPageVM.getLeftFootArray()[i]}");
-      tmpLeftList.add(LiveData(
-          time: time[i],
-          force: sensorPageVM.getLeftFootArray()[i]));
-      print("Index: $i");
-      print("-----------");
-    }
-    return tmpLeftList;
-  }
-
-  List<LiveData> _getChartDataRight (){
-    List<LiveData> tmpRightList = <LiveData>[];
-    for(int i = 0; i < sensorPageVM.getRightFootArray().length; i++){
-      print("Right: ${sensorPageVM.getRightFootArray()[i]}");
-      tmpRightList.add(LiveData(
-          time: time[i],
-          force: sensorPageVM.getRightFootArray()[i]));
-      print("Index: $i");
-      print("-----------");
-    }
-    return tmpRightList;
-  }
-
-  /// Updates the chart
-  List<SplineSeries<LiveData, int>> _getUpdateSeries() {
-    return <SplineSeries<LiveData, int>>[
-      SplineSeries<LiveData, int>(
-        dataSource: sensorPageVM.getLeftChartData()!,
-        width: 2,
-        name: 'Left foot',
-        onRendererCreated: (ChartSeriesController controller) {
-          _chartSeriesLeftController = controller; //Updates the chart live
-        },
-        xValueMapper: (LiveData livedata, _) => livedata.time,
-        yValueMapper: (LiveData livedata, _) => livedata.force,
-      ),
-      SplineSeries<LiveData, int>(
-        dataSource: sensorPageVM.getRightChartData()!,
-        width: 2,
-        name: 'Right foot',
-        onRendererCreated: (ChartSeriesController controller) {
-          _chartSeriesRightController = controller; //Updates the chart live
-        },
-        xValueMapper: (LiveData livedata, _) => livedata.time,
-        yValueMapper: (LiveData livedata, _) => livedata.force,
-      ),
-    ];
-  }
 }

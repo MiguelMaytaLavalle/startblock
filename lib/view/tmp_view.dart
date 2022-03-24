@@ -7,6 +7,8 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'dart:async';
 import 'dart:math' as math;
 
+import '../model/timestamp.dart';
+
 class TestScreen extends StatelessWidget {
   // This widget is the root of your application.
   final History? history;
@@ -59,20 +61,30 @@ class TestPage extends StatefulWidget {
 
 class _TestPageState extends State<TestPage> {
   late List<LiveData> chartData;
+  late List<LiveData> leftChartData;
+  late List<LiveData> rightChartData;
   late ChartSeriesController _chartSeriesController;
 
   @override
   void initState() {
-    chartData = getChartData();
-    Timer.periodic(const Duration(seconds: 1), updateDataSource);
+    //chartData = getChartData();
+    //Timer.periodic(const Duration(seconds: 1), updateDataSource);
     super.initState();
   }
 
-  @override
+ @override
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
-            body: SfCartesianChart(
+            body: Center(
+              child: TextButton(
+                onPressed: addOrUpdateHistory,
+                child: const Text('Test Save'),
+
+              ),
+            )
+
+            /*SfCartesianChart(
                 series: <LineSeries<LiveData, int>>[
                   LineSeries<LiveData, int>(
                     onRendererCreated: (ChartSeriesController controller) {
@@ -80,8 +92,8 @@ class _TestPageState extends State<TestPage> {
                     },
                     dataSource: chartData,
                     color: const Color.fromRGBO(192, 108, 132, 1),
-                    xValueMapper: (LiveData sales, _) => sales.time,
-                    yValueMapper: (LiveData sales, _) => sales.force,
+                    //xValueMapper: (LiveData sales, _) => sales.time,
+                    //yValueMapper: (LiveData sales, _) => sales.force,
                   )
                 ],
                 primaryXAxis: NumericAxis(
@@ -95,8 +107,8 @@ class _TestPageState extends State<TestPage> {
                     title: AxisTitle(text: 'Internet speed (Mbps)'))
 
             ),
-
-          floatingActionButton:
+*/
+          /*floatingActionButton:
           Wrap(
           direction: Axis.horizontal,
           children: <Widget>[
@@ -108,7 +120,7 @@ class _TestPageState extends State<TestPage> {
                 )
             ),
           ],
-        ),
+        ),*/
 
         )
 
@@ -120,28 +132,46 @@ class _TestPageState extends State<TestPage> {
   }
 
   Future addHistory() async {
-    List<LiveData> test = getChartData();
+    /*List<LiveData> test = getChartData();
     List<LiveData> test1 = getChartData1();
+*/
 
-    final history =  History(
-      dateTime: DateTime.now(),
-      name: 'Ricardo',
-      rightData: jsonEncode(test),
-      leftData: jsonEncode(test1),
+    try{
+      List<LiveData> testRight = getRightData();
+      List<LiveData> testLeft = getLeftData();
+      List<Timestamp> timestamps = getTimestamps();
 
-      //liveData: getChartData(),
-    );
+      final history =  History(
+        dateTime: DateTime.now(),
+        name: 'Ricardo',
+        rightData: jsonEncode(testRight),
+        leftData: jsonEncode(testLeft),
+        timestamps: jsonEncode(timestamps),
+        marzullo: 1648054909673.0,
+        //liveData: getChartData(),
+      );
+
       await HistoryDatabase.instance.create(history);
-  }
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Saved Successfully!")));
 
+    }catch(error){
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+
+
+    }
+
+
+  }
+/*
   int time = 19;
-  void updateDataSource(Timer timer) {
+void updateDataSource(Timer timer) {
     chartData.add(LiveData(time: time++, force: (math.Random().nextInt(60) + 30)));
     chartData.removeAt(0);
     _chartSeriesController.updateDataSource(
         addedDataIndex: chartData.length - 1, removedDataIndex: 0);
   }
-  List<LiveData> getChartData() {
+  */
+  /*List<LiveData> getChartData() {
     return <LiveData>[
       LiveData(time: 0, force: 42),
       LiveData(time: 1, force: 47),
@@ -188,5 +218,74 @@ class _TestPageState extends State<TestPage> {
       LiveData(time: 18, force: 80)
 
     ];
+  }*/
+
+  List<LiveData> getLeftData() {return <LiveData>[
+    LiveData(force:23)
+    ,LiveData(force:54)
+    ,LiveData(force:45)
+    ,LiveData(force:67)
+    ,LiveData(force:87)
+    ,LiveData(force:89)
+    ,LiveData(force:91)
+    ,LiveData(force:59)
+    ,LiveData(force:98)
+    ,LiveData(force:100)
+    ,LiveData(force:106)
+    ,LiveData(force:123)
+    ,LiveData(force:150)
+    ,LiveData(force:154)
+    ,LiveData(force:130)
+    ,LiveData(force:100)
+    ,LiveData(force:70)
+    ,LiveData(force:60)
+  ];
   }
+
+  List<LiveData> getRightData() {return <LiveData>[
+    LiveData(force:54)
+    ,LiveData(force:64)
+    ,LiveData(force:67)
+    ,LiveData(force:70)
+    ,LiveData(force:100)
+    ,LiveData(force:123)
+    ,LiveData(force:124)
+    ,LiveData(force:145)
+    ,LiveData(force:160)
+    ,LiveData(force:130)
+    ,LiveData(force:132)
+    ,LiveData(force:110)
+    ,LiveData(force:90)
+    ,LiveData(force:89)
+    ,LiveData(force:86)
+    ,LiveData(force:50)
+    ,LiveData(force:40)
+    ,LiveData(force:35)
+  ];
+  }
+
+  List<Timestamp> getTimestamps() {
+    return <Timestamp>[
+      Timestamp(time:0)
+      ,Timestamp(time:1)
+      ,Timestamp(time:2)
+      ,Timestamp(time:3)
+      ,Timestamp(time:4)
+      ,Timestamp(time:5)
+      ,Timestamp(time:6)
+      ,Timestamp(time:7)
+      ,Timestamp(time:8)
+      ,Timestamp(time:9)
+      ,Timestamp(time:10)
+      ,Timestamp(time:11)
+      ,Timestamp(time:12)
+      ,Timestamp(time:13)
+      ,Timestamp(time:14)
+      ,Timestamp(time:15)
+      ,Timestamp(time:16)
+      ,Timestamp(time:17)
+    ];
+  }
+
+
 }

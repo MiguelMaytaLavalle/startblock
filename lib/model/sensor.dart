@@ -1,17 +1,26 @@
-import 'dart:async';
-import 'livedata.dart';
+class Data{
+  int timestamp;
+  double mForce;
 
-class SensorModel{
-  late List<LiveData> chartData = <LiveData>[];
-  late List<LiveData> rightChartData = <LiveData>[];
-  late List<LiveData> leftChartData = <LiveData>[];
-  late List<LiveData> timess = <LiveData>[];
+  Data(this.timestamp, this.mForce);
 
-  late List<double> rightFootArray = <double>[];
-  late List<double> leftFootArray = <double>[];
-  List<int> times = [];
 
-  late Timer timer;
-  int time = 0;
-  late bool isReady = false;
+  void setTime(int time)
+  {
+    timestamp = time;
+  }
+  void setForce(double force)
+  {
+    mForce = force;
+  }
+  int getTime()
+  {
+    return timestamp;
+  }
+  double getForce()
+  {
+    return mForce;
+  }
+
+
 }

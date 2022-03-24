@@ -7,9 +7,6 @@ import 'package:startblock/view/recording_view.dart';
 import 'package:startblock/view/tmp_view.dart';
 import 'package:startblock/view_model/menu_view_model.dart';
 
-
-import 'send_email_view.dart';
-
 class MenuScreen extends StatelessWidget {
 
   @override
@@ -72,7 +69,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
               );
             },
             child: const Text('Test'),
-
           ),
         ],
       ),

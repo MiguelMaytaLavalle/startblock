@@ -5,7 +5,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:startblock/constant/constants.dart';
 import 'package:startblock/model/livedata.dart';
-import 'package:startblock/view_model/sensor_page_view_model.dart';
+import 'package:startblock/model/sensor.dart';
+
+import '../model/timestamp.dart';
 class BLEController extends ChangeNotifier{
   static final _instance = BLEController._internal();
   factory BLEController()
@@ -14,13 +16,16 @@ class BLEController extends ChangeNotifier{
   }
   BLEController._internal();
 
-  var sensorPageVM = SensorPageViewModel();
+  List<Data> leftFoot = <Data>[];
+  List<Data> rightFoot = <Data>[];
+  List<Timestamp> timestamps = <Timestamp>[];
+
   FlutterBlue flutterBlue = FlutterBlue.instance;
   late StreamSubscription<ScanResult> scanSubScription;
   late StreamSubscription<List<int>>? streamSubscription;
   late List<BluetoothService> services;
 
-  bool isNotStarted = true;
+  bool isNotStarted = false;
   bool isReady = false;
   List <int> time = <int>[];
   late BluetoothDevice? targetDevice = null;
@@ -34,13 +39,15 @@ class BLEController extends ChangeNotifier{
   late List<num> tMaxList = <num>[];
   late List<num> tMinList = <num>[];
   late List<num> krilleOffsets = <num>[];
-  late num timeSend, timeServer, timeRecieve, syncedTime, RTT, RTT_mean,latestMeasure, timeOffset,offsetMean;
+  late num timeSend, timeServer, timeRecieve, syncedTime, RTT, RTT_mean,latestMeasure, timeOffset,offsetMean, marzullo;
   int _krilleCounter = 0;
   double _sampleFrequency = 100;
   late Timer _krilleTimer;
+  int _counter = 0;
+
   startScan() async{
     scanSubScription = flutterBlue.scan().listen((scanResult) async{
-      if (scanResult.device.name == Constants.TARGET_DEVICE_NAME_TIZEZ) {
+      if (scanResult.device.name == Constants.TARGET_DEVICE_NAME_ZIVIT) {
         print("Found device");
         targetDevice = scanResult.device;
         await stopScan();
@@ -102,6 +109,8 @@ class BLEController extends ChangeNotifier{
             writeChar = c;
             sendKrille(); //As soon as device is connected to micro:bit - Time Sync immediately
             _krilleTimer = Timer.periodic(Duration(minutes: 10), (timer) {
+              isNotStarted = false;
+              notifyListeners();
               sendKrille();
             });
           }
@@ -117,8 +126,11 @@ class BLEController extends ChangeNotifier{
   }
   void flushData() async
   {
-    sensorPageVM.flushData();
-    sensorPageVM.getTimes().clear();
+    //sensorPageVM.flushData();
+    //sensorPageVM.getTimes().clear();
+    leftFoot.clear();
+    rightFoot.clear();
+    _counter = 0;
     _krilleCounter = 0;
     offsetMean = 0;
     listRTT.clear();
@@ -134,6 +146,7 @@ class BLEController extends ChangeNotifier{
     /// Send a GO signal to the Micro:Bit
 
     isNotStarted = false;
+    notifyListeners();
     flushData();
     String test = 'Start\n';
     List<int> bytes = utf8.encode(test);
@@ -154,22 +167,43 @@ class BLEController extends ChangeNotifier{
     switch(tag[0]){
       case 'RF': {
         double tmpDoubleR = double.parse(tag[1]);
-        //sensorPageVM.getRightFootArray().add(tmpDoubleR);
+        print('RF ${tmpDoubleR.toString()}');
+        rightFoot.add(Data(0,tmpDoubleR));
       }
       break;
       case 'LF': {
         double tmpDoubleL = double.parse(tag[1]);
-        //sensorPageVM.getLeftFootArray().add(tmpDoubleL);
+        print('LF ${tmpDoubleL.toString()}');
+        leftFoot.add(Data(0,tmpDoubleL));
       }
       break;
       case 'T':{
-        time.add(int.parse(tag[1]));
+        leftFoot[_counter].setTime(int.parse(tag[1]));
+        rightFoot[_counter].setTime(int.parse(tag[1]));
+        timestamps.add(Timestamp(
+          time: int.parse(tag[1])
+        ));
+        _counter++;
+        //sensorPageModel.setTime(int.parse(tag[1]));
       }
       break;
       case 'D' :{
         //testUpdateSetState();
-
+        print('DONE');
+        _counter = 0;
         print(tag[1]);
+
+        leftFoot.forEach((element) {
+          print('${element.mForce}');
+        });
+
+        print('---------------------------------');
+
+        rightFoot.forEach((element) {
+          print('${element.mForce}');
+        });
+        isNotStarted = true;
+        notifyListeners();
         /*
         setState(() {
           isNotStarted = true;
@@ -180,11 +214,6 @@ class BLEController extends ChangeNotifier{
       case 'S' :{
         clientRecieveTime.add(DateTime.now().millisecondsSinceEpoch);
         krillesMetod(int.parse(tag[1]));
-      }
-      break;
-      case "Frequency" :{
-        _sampleFrequency = double.parse(tag[1]);
-        print("Freq : $_sampleFrequency");
       }
       break;
       default:{
@@ -203,10 +232,13 @@ class BLEController extends ChangeNotifier{
     else if(_krilleCounter == Constants.LIST_LEN)
     {
       if(isReady == false){
-        sensorPageVM.setIsReady(true);
         isReady = true;
         notifyListeners();
       }
+      if(isNotStarted == false){
+          isNotStarted = true;
+          notifyListeners();
+        }
       calculateKrilles();
       _krilleCounter = 0;
     }
@@ -275,7 +307,7 @@ class BLEController extends ChangeNotifier{
     /**
      * Calculate offset with Marzullo's Algorithm
      */
-    /*
+
     for(int i = 0; i < Constants.LIST_LEN; i++)
     {
       tMaxList.add(clientSendTime[i] - serverTime[i]);
@@ -294,9 +326,24 @@ class BLEController extends ChangeNotifier{
     num maxVal = tMaxList.reduce((current, next) => current < next ? current : next);
     num minVal = tMinList.reduce((current, next) => current > next ? current : next);
     num timeOffset2 = (maxVal + minVal)/2;
-     */
-    //print("Offset $timeOffset2");
 
+    print("Offset marzullo: $timeOffset2");
+    marzullo = timeOffset2;
     flushData();
+  }
+  ///Send method to set threshold value to the micro:bit
+  ///
+  void sendSetThresh(String val) async
+  {
+    print("Setting Thresh");
+    String test = "T$val\n";
+    List<int> bytes = utf8.encode(test);
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
+    clientSendTime.add(currentTime);
+    try{
+      await writeChar.write(bytes);
+    }catch(error){
+      print(error);
+    }
   }
 }
