@@ -210,9 +210,14 @@ class _DataState extends State<DataScreen> {
 
   Future addHistory() async {
     try{
-      List<LiveData> leftList = sensorPageVM.getChartDataLeft();
-      List<LiveData> rightList = sensorPageVM.getChartDataRight();
-      List<Timestamp> timestamps = sensorPageVM.getChartDataTimestamps();
+      List<LiveData> leftList = sensorPageVM.getLeftDataToSave();
+      List<LiveData> rightList = sensorPageVM.getRightDataToSave();
+      List<Timestamp> timestamps = sensorPageVM.getTimestampsToSave();
+
+     print('Left length: ${leftList.length}');
+      print('Right length: ${rightList.length}');
+      print('Timestamps length: ${timestamps.length}');
+
       num marzullo = sensorPageVM.getMarzullo();
       final history =  History(
         dateTime: DateTime.now(),

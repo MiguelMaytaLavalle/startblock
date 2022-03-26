@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:startblock/helper/BLEController.dart';
 import 'package:startblock/view_model/settings_view_model.dart';
 import '../model/sensor.dart';
+//import //'package:movesense_flutter/movesense_flutter.dart';
 
 class SettingScreen extends StatefulWidget {
   @override
@@ -60,6 +61,12 @@ class _SettingState extends State<SettingScreen> {
                     style: TextStyle(color: Colors.grey),
                   ),
                 ),
+               /* ElevatedButton(
+                    onPressed:(){
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Deez")));
+                    },
+                    child: Text("Connect Movesense")
+                ),*/
               ],
             ),
           ),
