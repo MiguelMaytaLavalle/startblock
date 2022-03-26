@@ -16,6 +16,8 @@ class Constants {
   static const TARGET_DEVICE_NAME_TIZEZ = 'BBC micro:bit [tizez]';
   static const TARGET_DEVICE_NAME_ZIVIT = 'BBC micro:bit [zivit]';
   static const LIST_LEN = 100;
+  static const ALPHA = 0.1;
+  static const MEAN_NOISE_THRESH = 68;
 }
 
 

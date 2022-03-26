@@ -166,15 +166,22 @@ class _HistoryCardState extends State<HistoryCard> {
                             ),
                             Wrap(
                               direction: Axis.vertical,
-                              children: const <Widget>[
+                              children: <Widget>[
                                 Material(
                                   //margin:const EdgeInsets.all(10),
-                                    child: Text('Rate of force (RFD): 0'
+                                    child: Text('Rate of force (RFD): ${hCardVM.getRFDLeft()
+                                    .toStringAsPrecision(2)}'
                                     )
                                 ),
                                 Material(
                                   //margin:const EdgeInsets.all(10),
-                                    child: Text('Time to peak (TTP): 0'
+                                    child: Text('Time to peak (TTP): ${hCardVM.getTimeToPeakForceLeft()}'
+                                    )
+                                ),
+                                Material(
+                                  //margin:const EdgeInsets.all(10),
+                                    child: Text('Average Force: ${hCardVM.getAverageForceLeft()
+                                        .toStringAsFixed(2)}'
                                     )
                                 ),
                                 Material(
@@ -184,7 +191,8 @@ class _HistoryCardState extends State<HistoryCard> {
                                 ),
                                 Material(
                                   //margin:const EdgeInsets.all(10),
-                                    child: Text('Peak force: 0'
+                                    child: Text('Peak force: ${hCardVM.getPeakForceLeft()
+                                    .toStringAsPrecision(2)}'
                                     )
                                 ),
                               ],
@@ -218,15 +226,22 @@ class _HistoryCardState extends State<HistoryCard> {
                             ),
                             Wrap(
                               direction: Axis.vertical,
-                              children: const <Widget>[
+                              children: <Widget>[
                                 Material(
                                   //margin:const EdgeInsets.all(10),
-                                    child: Text('Rate of force (RFD): 0'
+                                    child: Text('Rate of force (RFD): ${hCardVM.getRFDRight()
+                                    .toStringAsPrecision(2)}'
                                     )
                                 ),
                                 Material(
                                   //margin:const EdgeInsets.all(10),
-                                    child: Text('Time to peak (TTP): 0'
+                                    child: Text('Time to peak (TTP): ${hCardVM.getTimeToPeakForceRight()}'
+                                    )
+                                ),
+                                Material(
+                                  //margin:const EdgeInsets.all(10),
+                                    child: Text('Average Force: ${hCardVM.getAverageForceRight()
+                                        .toStringAsFixed(2)}'
                                     )
                                 ),
                                 Material(
@@ -236,7 +251,8 @@ class _HistoryCardState extends State<HistoryCard> {
                                 ),
                                 Material(
                                   //margin:const EdgeInsets.all(10),
-                                    child: Text('Peak force: 0'
+                                    child: Text('Peak force: ${hCardVM.getPeakForceRight()
+                                        .toStringAsPrecision(2)}'
                                     )
                                 ),
                               ],

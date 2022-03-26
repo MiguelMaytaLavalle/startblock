@@ -17,7 +17,7 @@ class DataScreen extends StatefulWidget {
 
 class _DataState extends State<DataScreen> {
   BLEController bleController = BLEController();
-  DataViewViewMode sensorPageVM = DataViewViewMode();
+  DataViewViewModel sensorPageVM = DataViewViewModel();
   late TextEditingController controller;
   List <int> time = <int>[];
   String connectionText = "";
@@ -74,10 +74,11 @@ class _DataState extends State<DataScreen> {
 
             Wrap(
               direction: Axis.vertical,
-              children: const <Widget>[
+              children: <Widget>[
                 Material(
                   //margin:const EdgeInsets.all(10),
-                    child: Text('Rate of force (RFD): 0'
+                    child: Text('Rate of force (RFD): ${sensorPageVM.getRFDLeft()
+                        .toStringAsFixed(2)}'
                     )
                 ),
                 Material(
@@ -87,12 +88,19 @@ class _DataState extends State<DataScreen> {
                 ),
                 Material(
                   //margin:const EdgeInsets.all(10),
+                    child: Text('Average Force: ${sensorPageVM.getAverageForceLeft()
+                        .toStringAsFixed(2)}'
+                    )
+                ),
+                Material(
+                  //margin:const EdgeInsets.all(10),
                     child: Text('Force impulse: 0'
                     )
                 ),
                 Material(
                   //margin:const EdgeInsets.all(10),
-                    child: Text('Peak force: 0'
+                    child: Text('Peak force: ${sensorPageVM.getPeakForceLeft()
+                        .toStringAsFixed(2)}'
                     )
                 ),
               ],
@@ -102,6 +110,7 @@ class _DataState extends State<DataScreen> {
               legend: Legend(isVisible: true),
               //zoomPanBehavior: _zoomPanBehavior,
               series: sensorPageVM.getDataRight(),
+
               primaryXAxis: NumericAxis(
                   interactiveTooltip: const InteractiveTooltip(
                     enable: true,
@@ -125,10 +134,11 @@ class _DataState extends State<DataScreen> {
             ),
             Wrap(
               direction: Axis.vertical,
-              children: const <Widget>[
+              children: <Widget>[
                 Material(
                   //margin:const EdgeInsets.all(10),
-                    child: Text('Rate of force (RFD): 0'
+                    child: Text('Rate of force (RFD): ${sensorPageVM.getRFDRight()
+                        .toStringAsFixed(2)}'
                     )
                 ),
                 Material(
@@ -138,12 +148,19 @@ class _DataState extends State<DataScreen> {
                 ),
                 Material(
                   //margin:const EdgeInsets.all(10),
+                    child: Text('Average Force: ${sensorPageVM.getAverageForceRight()
+                        .toStringAsFixed(2)}'
+                    )
+                ),
+                Material(
+                  //margin:const EdgeInsets.all(10),
                     child: Text('Force impulse: 0'
                     )
                 ),
                 Material(
                   //margin:const EdgeInsets.all(10),
-                    child: Text('Peak force: 0'
+                    child: Text('Peak force: ${sensorPageVM.getPeakForceRight()
+                        .toStringAsFixed(2)}'
                     )
                 ),
               ],

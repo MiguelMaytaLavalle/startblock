@@ -124,12 +124,8 @@ class BLEController extends ChangeNotifier{
     List<int> bytes = utf8.encode(data);
     receiveChar.write(bytes);
   }
-  void flushData() async
+  void flushKrille()
   {
-    //sensorPageVM.flushData();
-    //sensorPageVM.getTimes().clear();
-    leftFoot.clear();
-    rightFoot.clear();
     _counter = 0;
     _krilleCounter = 0;
     offsetMean = 0;
@@ -138,6 +134,13 @@ class BLEController extends ChangeNotifier{
     serverTime.clear();
     clientSendTime.clear();
     clientRecieveTime.clear();
+  }
+  void flushData() async
+  {
+    //sensorPageVM.flushData();
+    //sensorPageVM.getTimes().clear();
+    leftFoot.clear();
+    rightFoot.clear();
   }
 
 
@@ -329,7 +332,7 @@ class BLEController extends ChangeNotifier{
 
     print("Offset marzullo: $timeOffset2");
     marzullo = timeOffset2;
-    flushData();
+    flushKrille();
   }
   ///Send method to set threshold value to the micro:bit
   ///
