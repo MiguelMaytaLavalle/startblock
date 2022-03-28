@@ -35,7 +35,7 @@ class BLEController extends ChangeNotifier{
   List <int> time = <int>[];
   late BluetoothDevice? targetDevice = null, targetMovesenseDevice = null;
   late BluetoothCharacteristic receiveChar;
-  late BluetoothCharacteristic writeChar;
+  late BluetoothCharacteristic writeChar, testChar;
   late List<int> serverTime = <int>[];
   late List<int> clientSendTime = <int>[];
   late List<int> clientRecieveTime = <int>[];
@@ -127,12 +127,14 @@ class BLEController extends ChangeNotifier{
       }
     }
   }
+
   writeData(String data) {
     if (receiveChar == null) return;
 
     List<int> bytes = utf8.encode(data);
     receiveChar.write(bytes);
   }
+
   void flushKrille()
   {
     _counter = 0;
@@ -144,6 +146,7 @@ class BLEController extends ChangeNotifier{
     clientSendTime.clear();
     clientRecieveTime.clear();
   }
+
   void flushData() async
   {
     //sensorPageVM.flushData();
@@ -397,6 +400,7 @@ class BLEController extends ChangeNotifier{
     servicesMovesense = (await targetMovesenseDevice?.discoverServices())!;
 
     String test = '/Meas/Acc/52';
+    List<int> bytes = [1, 99, 47, 77, 101, 97, 115, 47, 65, 99, 99, 47, 53, 50];
     print('Look after movesense services');
     for (var service in servicesMovesense) {
       // do something with service
@@ -407,10 +411,11 @@ class BLEController extends ChangeNotifier{
           print('Char send: ${c.uuid.toString()}');
           if (c.uuid.toString() == Constants.MOVESENSE_SEND) {
             print('MOVESENSE SEND: ${c}');
+            testChar = c;
+            testMove();
             //List<int> bytes = utf8.encode(test);
-            List<int> bytes = [1, 99, 47, 77, 101, 97, 115, 47, 65, 99, 99, 47, 53, 50];
-            print('Bytes: ${bytes.toString()}');
-            c.write(bytes);
+            //print('Bytes: ${bytes.toString()}');
+            //c.write(bytes);
             //characteristic.setNotifyValue(!characteristic.isNotifying);
             /*writeChar = c;
             sendKrille(); //As soon as device is connected to micro:bit - Time Sync immediately
@@ -431,8 +436,8 @@ class BLEController extends ChangeNotifier{
           print('Receive char: ${c.uuid.toString()}');
           if (c.uuid.toString() == Constants.MOVESENSE_DATA) {
             print('Char: ${c.uuid.toString()}');
-            //await c.setNotifyValue(!c.isNotifying);
-            await c.setNotifyValue(true);
+            await c.setNotifyValue(!c.isNotifying);
+            //await c.setNotifyValue(true);
             streamSubMovesense = c.value.listen((event) {
               //readDataTest(event);
               print('Movesense event: ${event}');
@@ -444,5 +449,21 @@ class BLEController extends ChangeNotifier{
 
   }
 
+  void testMove() async
+  {
+    List<int> bytes = [1, 99, 47, 77, 101, 97, 115, 47, 65, 99, 99, 47, 53, 50];
+    print('Time to send');
+    String test = "TS\n";
+    //List<int> bytes = utf8.encode(test);
+    //int currentTime = DateTime.now().millisecondsSinceEpoch;
+    //clientSendTime.add(currentTime);
+    try{
+      await testChar.write(bytes);
+    }catch(error){
+      print('Can not send to movesense');
+      print(error.toString());
+      //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+    }
+  }
 
 }
