@@ -208,6 +208,7 @@ class HistoryCardViewModel{
     return tempTime;
   }
   ///Calculates the highest value in the array, AKA peak force
+  ///ratio between sampled data array and time array is 1:1
   double getPeakForceLeft()
   {
     _peakForceLeft = _calcPeakForce(leftChartData);
@@ -277,7 +278,7 @@ class HistoryCardViewModel{
         }
     }
     //notifyListeners();
-    return result/tempT2-tempT1;
+    return result/(tempT2-tempT1);
   }
   ///Calculates the slope of the plotted function. Slope value represents Rate of Force Development
   double getRFDLeft()

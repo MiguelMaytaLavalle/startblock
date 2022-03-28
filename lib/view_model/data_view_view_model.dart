@@ -8,6 +8,7 @@ import 'package:startblock/model/livedata.dart';
 import 'package:startblock/model/sensor.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
+import '../constant/constants.dart';
 import '../model/timestamp.dart';
 
 class DataViewViewModel extends ChangeNotifier{
@@ -25,12 +26,6 @@ class DataViewViewModel extends ChangeNotifier{
   double _RFDRight = 0;
   double _avgForceRight = 0;
   int _timeToPeakForceRight = 0;
-
-  double _alpha = 0.0;
-
-  set alpha(double value) {
-    _alpha = value;
-  }
 
   DataViewViewModel()
   {
@@ -67,6 +62,16 @@ class DataViewViewModel extends ChangeNotifier{
   }
   ///Calculates the time to peak based on the array data since the
   ///ratio between sampled data array and time array is 1:1
+  int getTimeToPeakForceLeft()
+  {
+    _timeToPeakForceLeft = _calcTimeToPeakForce(tempLeft);
+    return _timeToPeakForceLeft;
+  }
+  int getTimeToPeakForceRight()
+  {
+    _timeToPeakForceRight =_calcTimeToPeakForce(tempRight);
+    return _timeToPeakForceRight;
+  }
   int _calcTimeToPeakForce(List<Data> data)
   {
     double tempVal = 0;
@@ -109,32 +114,64 @@ class DataViewViewModel extends ChangeNotifier{
 
   double getAverageForceLeft()
   {
-    //var area = _calcGraphArea(tempLeft);
-    _avgForceLeft = _calcAverageForce(0);
-    return _avgForceLeft;
+    _avgForceLeft = _calcAverageForce(tempLeft);
+    if(_avgForceLeft.isNaN)
+      {
+        return  0;
+      }
+    else
+      {
+        return _avgForceLeft;
+      }
   }
   double getAverageForceRight()
   {
-    //var area = _calcGraphArea(tempRight);
-    _avgForceRight = _calcAverageForce(0);
-    return _avgForceRight;
-  }
-  double _calcAverageForce(double area)
-  {
-    return 0;
+    _avgForceRight = _calcAverageForce(tempRight);
+    if(_avgForceRight.isNaN)
+      {
+        return 0;
+      }
+    else
+    {
+      return _avgForceRight;
+    }
   }
   ///Calculates the area the for the dataset using Trapezoidal rule. AKA Integration
-  double _calcGraphArea(List<Data> data)
+  double _calcAverageForce(List<Data> data)
   {
-    var result = 0.0;
+    double result = 0.0;
+    var tempT1 = 0;
+    var tempT2 = 0;
+    //Get time where noise stops from the beginning of the list
+    for(int i = 0; i < data.length; i++)
+    {
+      if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
+      {
+        tempT1 = data[i].getTime();
+        break;
+      }
+    }
+    //Get time where noise stops from the end of the list
+    for(int i = data.length-1; i >= 0; i--)
+    {
+      if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
+      {
+        tempT2 = data[i].getTime();
+        break;
+      }
+    }
+    //Calculates the area the for the dataset using Trapezoidal rule. AKA numerical integration
     for(int i = 0; i < data.length-1; i++)
+    {
+      if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
       {
         var p = data[i].getTime();
         var q = data[i+1].getTime();
         result+=(q-p)/2*(data[i].getForce()+data[i+1].getForce());
       }
+    }
     notifyListeners();
-    return result;
+    return result/(tempT2-tempT1);
   }
   ///Calculates the slope of the plotted function. Slope value represents Rate of Force Development
   double getRFDLeft()
@@ -153,11 +190,11 @@ class DataViewViewModel extends ChangeNotifier{
     var tempVal = 0.0;
     for(int i = 0; i < data.length-1; i++)
     {
-      tempVal = sqrt((data[i].getForce()-data[i+1].getForce()).abs());
+      tempVal = data[i].getForce()-data[i+1].getForce();
       if(slope < tempVal)
-        {
-          slope = tempVal;
-        }
+      {
+        slope = tempVal;
+      }
     }
     notifyListeners();
     return slope;
