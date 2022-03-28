@@ -61,12 +61,13 @@ class _SettingState extends State<SettingScreen> {
                     style: TextStyle(color: Colors.grey),
                   ),
                 ),
-               /* ElevatedButton(
+               ElevatedButton(
                     onPressed:(){
+                      settingVM.connectToMovesense();
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Deez")));
                     },
                     child: Text("Connect Movesense")
-                ),*/
+                ),
               ],
             ),
           ),

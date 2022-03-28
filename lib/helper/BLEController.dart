@@ -21,14 +21,19 @@ class BLEController extends ChangeNotifier{
   List<Timestamp> timestamps = <Timestamp>[];
 
   FlutterBlue flutterBlue = FlutterBlue.instance;
+  FlutterBlue movesenseBlue = FlutterBlue.instance;
   late StreamSubscription<ScanResult> scanSubScription;
+  late StreamSubscription<ScanResult> scanSubMovesense;
   late StreamSubscription<List<int>>? streamSubscription;
+  late StreamSubscription<List<int>>? streamSubMovesense;
+
   late List<BluetoothService> services;
+  late List<BluetoothService> servicesMovesense;
 
   bool isNotStarted = false;
   bool isReady = false;
   List <int> time = <int>[];
-  late BluetoothDevice? targetDevice = null;
+  late BluetoothDevice? targetDevice = null, targetMovesenseDevice = null;
   late BluetoothCharacteristic receiveChar;
   late BluetoothCharacteristic writeChar;
   late List<int> serverTime = <int>[];
@@ -47,7 +52,7 @@ class BLEController extends ChangeNotifier{
 
   startScan() async{
     scanSubScription = flutterBlue.scan().listen((scanResult) async{
-      if (scanResult.device.name == Constants.TARGET_DEVICE_NAME_TIZEZ) {
+      if (scanResult.device.name == Constants.TARGET_DEVICE_NAME_ZIVIT) {
         print("Found device");
         targetDevice = scanResult.device;
         await stopScan();
@@ -76,8 +81,12 @@ class BLEController extends ChangeNotifier{
     }
     _krilleTimer.cancel();
     streamSubscription?.cancel();
-    isReady = false;
     await targetDevice?.disconnect();
+
+    isReady = false;
+
+    await targetMovesenseDevice?.disconnect();
+    streamSubMovesense?.cancel();
     notifyListeners();
     print("Disconnected");
   }
@@ -350,4 +359,90 @@ class BLEController extends ChangeNotifier{
       print(error);
     }
   }
+
+  void startScanMovesense() async{
+    scanSubScription = flutterBlue.scan().listen((scanResult) async{
+      print('Device: ${scanResult.device.name}');
+      if (scanResult.device.name == Constants.MOVESENSE_DEVICE_NAME) {
+        print("Found device");
+        targetMovesenseDevice = scanResult.device;
+        await stopScanMovesense();
+      }
+    });
+  }
+
+  stopScanMovesense(){
+    print("Stopping subscription");
+    flutterBlue.stopScan();
+    scanSubScription.cancel();
+    connectToMovesense();
+  }
+
+  connectToMovesense() async {
+    if(targetMovesenseDevice == null){
+      print('No movesense device');
+      return;
+    }
+    await targetMovesenseDevice?.connect();
+    print('DEVICE CONNECTED');
+    discoverMovesenseServices();
+  }
+
+  discoverMovesenseServices() async {
+    if (targetMovesenseDevice == null) {
+      print('No services');
+      return;
+    }
+
+    servicesMovesense = (await targetMovesenseDevice?.discoverServices())!;
+
+    String test = '/Meas/Acc/52';
+    print('Look after movesense services');
+    for (var service in servicesMovesense) {
+      // do something with service
+      print('Serivce: ${service.uuid.toString()}');
+      if (service.uuid.toString() == Constants.MOVESENSE_SERVICE) {
+        print('service send');
+        for (var c in service.characteristics) {
+          print('Char send: ${c.uuid.toString()}');
+          if (c.uuid.toString() == Constants.MOVESENSE_SEND) {
+            print('MOVESENSE SEND: ${c}');
+            //List<int> bytes = utf8.encode(test);
+            List<int> bytes = [1, 99, 47, 77, 101, 97, 115, 47, 65, 99, 99, 47, 53, 50];
+            print('Bytes: ${bytes.toString()}');
+            c.write(bytes);
+            //characteristic.setNotifyValue(!characteristic.isNotifying);
+            /*writeChar = c;
+            sendKrille(); //As soon as device is connected to micro:bit - Time Sync immediately
+            _krilleTimer = Timer.periodic(Duration(minutes: 10), (timer) {
+              isNotStarted = false;
+              notifyListeners();
+              sendKrille();
+            });*/
+          }
+        }
+      }
+    }
+
+    for (var service in servicesMovesense) {
+      // do something with service
+      if (service.uuid.toString() == Constants.MOVESENSE_SERVICE) {
+        for (var c in service.characteristics) {
+          print('Receive char: ${c.uuid.toString()}');
+          if (c.uuid.toString() == Constants.MOVESENSE_DATA) {
+            print('Char: ${c.uuid.toString()}');
+            //await c.setNotifyValue(!c.isNotifying);
+            await c.setNotifyValue(true);
+            streamSubMovesense = c.value.listen((event) {
+              //readDataTest(event);
+              print('Movesense event: ${event}');
+            });
+          }
+        }
+      }
+    }
+
+  }
+
+
 }

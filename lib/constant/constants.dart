@@ -19,7 +19,10 @@ class Constants {
   static const ALPHA = 0.1;
   static const MEAN_NOISE_THRESH = 68;
 
-  static const MOVESENSE_DEVICE_NAME = 'Movesense175130000971';
+  static const MOVESENSE_DEVICE_NAME = 'Movesense 175130000971';
+  static const MOVESENSE_SERVICE = "34802252-7185-4d5d-b431-630e7050e8f0";
+  static const MOVESENSE_SEND = "34800001-7185-4d5d-b431-630e7050e8f0";
+  static const MOVESENSE_DATA = "34800002-7185-4d5d-b431-630e7050e8f0";
 
 }
 

@@ -8,5 +8,10 @@ class SettingsViewModel{
   void setThreshHold(String val) async{
     _bleController.sendSetThresh(val);
   }
+
+  void connectToMovesense(){
+    _bleController.startScanMovesense();
+  }
+
 }
 
