@@ -199,7 +199,7 @@ class DataViewViewModel extends ChangeNotifier{
     notifyListeners();
     return slope;
   }
-  List<LiveData> getChartDataLeft (){
+  List<LiveData> getLeftDataToSave (){
     List<LiveData> tmpLeftList = <LiveData>[];
     for(int i = 0; i < bleController.leftFoot.length; i++){
       print("Left: ${bleController.leftFoot[i]}");
@@ -212,10 +212,10 @@ class DataViewViewModel extends ChangeNotifier{
     return tmpLeftList;
   }
 
-  List<LiveData> getChartDataRight (){
+  List<LiveData> getRightDataToSave (){
     List<LiveData> tmpRightList = <LiveData>[];
     for(int i = 0; i < bleController.rightFoot.length; i++){
-      print("Left: ${bleController.rightFoot[i]}");
+      print("Right: ${bleController.rightFoot[i]}");
       tmpRightList.add(LiveData(
           force: bleController.rightFoot[i].mForce
       ));
@@ -225,10 +225,10 @@ class DataViewViewModel extends ChangeNotifier{
     return tmpRightList;
   }
 
-  List<Timestamp> getChartDataTimestamps(){
+  List<Timestamp> getTimestampsToSave(){
     List<Timestamp> tmpList = <Timestamp>[];
     for(int i = 0; i < bleController.timestamps.length; i++){
-      print("Left: ${bleController.timestamps[i]}");
+      print("Timestamp: ${bleController.timestamps[i]}");
       tmpList.add(Timestamp(
           time: bleController.timestamps[i].time
       ));

@@ -47,7 +47,7 @@ class BLEController extends ChangeNotifier{
 
   startScan() async{
     scanSubScription = flutterBlue.scan().listen((scanResult) async{
-      if (scanResult.device.name == Constants.TARGET_DEVICE_NAME_ZIVIT) {
+      if (scanResult.device.name == Constants.TARGET_DEVICE_NAME_TIZEZ) {
         print("Found device");
         targetDevice = scanResult.device;
         await stopScan();
@@ -141,6 +141,7 @@ class BLEController extends ChangeNotifier{
     //sensorPageVM.getTimes().clear();
     leftFoot.clear();
     rightFoot.clear();
+    timestamps.clear();
   }
 
 
