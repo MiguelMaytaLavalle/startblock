@@ -18,6 +18,9 @@ class Constants {
   static const LIST_LEN = 100;
   static const ALPHA = 0.1;
   static const MEAN_NOISE_THRESH = 68;
+
+  static const MOVESENSE_DEVICE_NAME = 'Movesense175130000971';
+
 }
 
 
