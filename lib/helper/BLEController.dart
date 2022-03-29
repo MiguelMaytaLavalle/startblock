@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:startblock/constant/constants.dart';
 import 'package:startblock/model/livedata.dart';
+import 'package:startblock/model/movesense.dart';
 import 'package:startblock/model/sensor.dart';
 
 import '../model/timestamp.dart';
@@ -24,6 +26,7 @@ class BLEController extends ChangeNotifier {
   List<Data> rightFoot = <Data>[];
   List<Data> leftFootEWMA = <Data>[];
   List<Data> rightFootEWMA = <Data>[];
+  late List<Movesense> accData = <Movesense>[];
 
   /*late List<Data> leftFootEWMA;
   late List<Data> rightFootEWMA;*/
@@ -57,7 +60,7 @@ class BLEController extends ChangeNotifier {
   late num timeSend, timeServer, timeRecieve, syncedTime, RTT, RTT_mean,
       latestMeasure, timeOffset, offsetMean, marzullo;
   int _krilleCounter = 0;
-  double _sampleFrequency = 100;
+
   late Timer _krilleTimer;
   int _counter = 0;
 
@@ -168,6 +171,7 @@ class BLEController extends ChangeNotifier {
     timestamps.clear();
     leftFootEWMA.clear();
     rightFootEWMA.clear();
+    accData.clear();
   }
 
 
@@ -178,6 +182,7 @@ class BLEController extends ChangeNotifier {
     isNotStarted = false;
     notifyListeners();
     flushData();
+    startMovesenseSample();
     String test = 'Start\n';
     List<int> bytes = utf8.encode(test);
     try {
@@ -229,6 +234,7 @@ class BLEController extends ChangeNotifier {
 
           _EWMAFilter(leftFoot, leftFootEWMA);
           _EWMAFilter(rightFoot, rightFootEWMA);
+          stopMoveSenseSample();
 /*
           leftFoot.forEach((element) {
             print('${element.mForce}');
@@ -589,7 +595,8 @@ class BLEController extends ChangeNotifier {
       print(Xacc);
       print(Yacc);
       print(Zacc);
-
+      var acc = sqrt(pow(Xacc, 2) + pow(Yacc, 2) + pow(Zacc, 2));
+      accData.add(Movesense(timeStamp, acc));
     }
   }
 }
