@@ -12,6 +12,9 @@ class SettingsViewModel{
   void connectToMovesense(){
     _bleController.startScanMovesense();
   }
-
+  void sendMoveSense()
+  {
+    _bleController.startMovesenseSample();
+  }
 }
 

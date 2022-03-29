@@ -186,7 +186,8 @@ class _HistoryCardState extends State<HistoryCard> {
                                 ),
                                 Material(
                                   //margin:const EdgeInsets.all(10),
-                                    child: Text('Force impulse: 0'
+                                    child: Text('Force impulse: ${hCardVM.getForceImpulseLeft()
+                                    .toStringAsPrecision(2)}'
                                     )
                                 ),
                                 Material(
@@ -246,7 +247,8 @@ class _HistoryCardState extends State<HistoryCard> {
                                 ),
                                 Material(
                                   //margin:const EdgeInsets.all(10),
-                                    child: Text('Force impulse: 0'
+                                    child: Text('Force impulse: ${hCardVM.getForceImpulseRight()
+                                    .toStringAsPrecision(2)}'
                                     )
                                 ),
                                 Material(

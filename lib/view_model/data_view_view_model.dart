@@ -29,21 +29,15 @@ class DataViewViewModel extends ChangeNotifier{
 
   DataViewViewModel()
   {
-    //tempLeft = _EWMAFilter(bleController.leftFoot);
-    //tempRight = _EWMAFilter(bleController.rightFoot);
-    tempLeft = bleController.leftFoot;
-    tempRight = bleController.rightFoot;
-  }
-  void EWMAFilter(double alpha)
-  {
-    _EWMAFilter(bleController.leftFoot);
-    _EWMAFilter(bleController.rightFoot);
+    tempLeft = _EWMAFilter(bleController.leftFoot);
+    tempRight = _EWMAFilter(bleController.rightFoot);
     notifyListeners();
+    //tempLeft = bleController.leftFoot;
+    //tempRight = bleController.rightFoot;
   }
   List<Data>_EWMAFilter(List<Data> data)
   {
-    double alpha = 0.5;
-    List<Data> tempList = [];
+    List<Data> tempList = <Data>[];
     for(int i = 0; i < data.length-1; i++)
     {
       if(i == 0)
@@ -53,11 +47,10 @@ class DataViewViewModel extends ChangeNotifier{
       else
       {
         Data tempData = data[i];
-        tempData.mForce = alpha * data[i].getForce() + (1-alpha) * tempList[i-1].getForce();
+        tempData.mForce = Constants.ALPHA * data[i].getForce() + (1-Constants.ALPHA) * tempList[i-1].getForce();
         tempList.add(tempData);
       }
     }
-    notifyListeners();
     return tempList;
   }
   ///Calculates the time to peak based on the array data since the
@@ -276,5 +269,4 @@ class DataViewViewModel extends ChangeNotifier{
   num getMarzullo() {
     return bleController.marzullo;
   }
-
 }

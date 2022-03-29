@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ffi';
+import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_blue/flutter_blue.dart';
@@ -87,6 +89,7 @@ class BLEController extends ChangeNotifier{
 
     await targetMovesenseDevice?.disconnect();
     streamSubMovesense?.cancel();
+    stopMoveSenseSample();
     notifyListeners();
     print("Disconnected");
   }
@@ -400,7 +403,7 @@ class BLEController extends ChangeNotifier{
     servicesMovesense = (await targetMovesenseDevice?.discoverServices())!;
 
     String test = '/Meas/Acc/52';
-    List<int> bytes = [1, 99, 47, 77, 101, 97, 115, 47, 65, 99, 99, 47, 53, 50];
+    //List<int> bytes = [1, 99, 47, 77, 101, 97, 115, 47, 65, 99, 99, 47, 53, 50];
     print('Look after movesense services');
     for (var service in servicesMovesense) {
       // do something with service
@@ -412,7 +415,7 @@ class BLEController extends ChangeNotifier{
           if (c.uuid.toString() == Constants.MOVESENSE_SEND) {
             print('MOVESENSE SEND: ${c}');
             testChar = c;
-            testMove();
+            //testMove();
             //List<int> bytes = utf8.encode(test);
             //print('Bytes: ${bytes.toString()}');
             //c.write(bytes);
@@ -440,23 +443,18 @@ class BLEController extends ChangeNotifier{
             //await c.setNotifyValue(true);
             streamSubMovesense = c.value.listen((event) {
               //readDataTest(event);
-              print('Movesense event: ${event}');
+              //print('Movesense event: ${event}');
+              readMoveSenseData(event);
             });
           }
         }
       }
     }
-
   }
-
-  void testMove() async
+  void stopMoveSenseSample() async
   {
-    List<int> bytes = [1, 99, 47, 77, 101, 97, 115, 47, 65, 99, 99, 47, 53, 50];
-    print('Time to send');
-    String test = "TS\n";
-    //List<int> bytes = utf8.encode(test);
-    //int currentTime = DateTime.now().millisecondsSinceEpoch;
-    //clientSendTime.add(currentTime);
+    List<int> bytes = [2,99]; //Stopping subscription
+    print('Stopping subscription');
     try{
       await testChar.write(bytes);
     }catch(error){
@@ -465,5 +463,46 @@ class BLEController extends ChangeNotifier{
       //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
     }
   }
+  void startMovesenseSample() async
+  {
+    // 1, 99/Meas/Acc/208
+    List<int> bytes = [1, 99, 47, 77, 101, 97, 115, 47, 65, 99, 99, 47, 50, 48, 56]; //Starting subscription
 
+    print('Time to sample');
+    try{
+      await testChar.write(bytes);
+    }catch(error){
+      print('Can not send to movesense');
+      print(error.toString());
+      //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+    }
+  }
+  ///Converts byte array to a float value
+  _convertByteToDouble(List<int> data)
+  {
+    var bytes = Uint8List.fromList(data);
+    var byteData = ByteData.sublistView(bytes);
+    double x = byteData.getFloat32(0);
+    return x;
+  }
+  readMoveSenseData(List<int> event)
+  {
+    var response = event[0];
+    var reference = event[1];
+    if(response == 2 && reference == 99){
+      List<int> array = [event[2], event[3], event[4], event[5]];
+      var bytes = Uint8List.fromList(array);
+      var byteData = ByteData.sublistView(bytes);
+      int timeStamp = byteData.getUint32(0,Endian.little);
+      print(timeStamp);
+    //Accelerometer
+    var Xacc = _convertByteToDouble([event[9], event[8], event[7], event[6]]);
+    var Yacc = _convertByteToDouble([event[13], event[12], event[11], event[10]]);
+    var Zacc = _convertByteToDouble([event[17], event[16], event[15], event[14]]);
+    print(Xacc);
+    print(Yacc);
+    print(Zacc);
+
+    }
+  }
 }

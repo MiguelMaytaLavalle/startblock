@@ -20,10 +20,16 @@ class HistoryCardViewModel{
   double _peakForceLeft = 0;
   double _RFDLeft = 0;
   double _avgForceLeft = 0;
+  double _totalForceLeft = 0;
+  double _forceImpulseLeft = 0;
   int _timeToPeakForceLeft = 0;
+
+
   double _peakForceRight = 0;
   double _RFDRight = 0;
   double _avgForceRight = 0;
+  double _totalForceRight = 0;
+  double _forceImpulseRight = 0;
   int _timeToPeakForceRight = 0;
 
 // Will contain all business logic
@@ -232,41 +238,34 @@ class HistoryCardViewModel{
     //notifyListeners();
     return tempVal;
   }
-
   double getAverageForceLeft()
   {
-    _avgForceLeft = _calcAverageForce(leftChartData);
+    _totalForceLeft = _calcTotalForce(leftChartData);
+    _avgForceLeft = _calcAverageForce(leftChartData, _totalForceLeft);
     return _avgForceLeft;
   }
   double getAverageForceRight()
   {
-    _avgForceRight = _calcAverageForce(rightChartData);
+    _totalForceRight = _calcTotalForce(rightChartData);
+    _avgForceRight = _calcAverageForce(rightChartData, _totalForceRight);
     return _avgForceRight;
   }
-  ///Calculates the mean force for the sample where noise is removed.
-  double _calcAverageForce(List<Data> data)
+  double getForceImpulseLeft()
   {
-    double result = 0.0;
-    var tempT1;
-    var tempT2;
-    //Get time where noise stops frmo the beginning of the list
-    for(int i = 0; i < data.length; i++)
-    {
-      if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
-      {
-        tempT1 = data[i].getTime();
-        break;
-      }
-    }
-    //Get time where noise stops from the end of the list
-    for(int i = data.length-1; i >= 0; i--)
-    {
-      if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
-      {
-        tempT2 = data[i].getTime();
-        break;
-      }
-    }
+    _totalForceLeft = _calcTotalForce(leftChartData);
+    _forceImpulseLeft = _calcForceImpulse(leftChartData, _totalForceLeft);
+    return _forceImpulseLeft;
+  }
+  double getForceImpulseRight()
+  {
+    _totalForceRight = _calcTotalForce(rightChartData);
+    _forceImpulseRight = _calcForceImpulse(rightChartData, _totalForceRight);
+    return _forceImpulseRight;
+  }
+  ///Calculates the total force for the sample where noise is removed.
+  double _calcTotalForce(List<Data> data)
+  {
+    double result = 0;
     //Calculates the area the for the dataset using Trapezoidal rule. AKA numerical integration
     for(int i = 0; i < data.length-1; i++)
     {
@@ -277,8 +276,7 @@ class HistoryCardViewModel{
           result+=(q-p)/2*(data[i].getForce()+data[i+1].getForce());
         }
     }
-    //notifyListeners();
-    return result/(tempT2-tempT1);
+    return result;
   }
   ///Calculates the slope of the plotted function. Slope value represents Rate of Force Development
   double getRFDLeft()
@@ -305,5 +303,54 @@ class HistoryCardViewModel{
     }
     //notifyListeners();
     return slope;
+  }
+  _calcAverageForce(List<Data> data, double totalForce)
+  {
+    var tempT1;
+    var tempT2;
+    //Get time where noise stops frmo the beginning of the list
+    for(int i = 0; i < data.length; i++)
+    {
+      if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
+      {
+        tempT1 = data[i].getTime();
+        break;
+      }
+    }
+    //Get time where noise stops from the end of the list
+    for(int i = data.length-1; i >= 0; i--)
+    {
+      if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
+      {
+        tempT2 = data[i].getTime();
+        break;
+      }
+    }
+    totalForce/(tempT2-tempT1);
+  }
+  _calcForceImpulse(List<Data> data, double totalForce)
+  {
+    double result = 0.0;
+    var tempT1;
+    var tempT2;
+    //Get time where noise stops frmo the beginning of the list
+    for(int i = 0; i < data.length; i++)
+    {
+      if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
+      {
+        tempT1 = data[i].getTime();
+        break;
+      }
+    }
+    //Get time where noise stops from the end of the list
+    for(int i = data.length-1; i >= 0; i--)
+    {
+      if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
+      {
+        tempT2 = data[i].getTime();
+        break;
+      }
+    }
+    return totalForce*(tempT2-tempT1);
   }
 }
