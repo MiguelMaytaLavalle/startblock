@@ -241,6 +241,7 @@ class HistoryCardViewModel{
   double getAverageForceLeft()
   {
     _totalForceLeft = _calcTotalForce(leftChartData);
+    print("forceLeft: ${_totalForceLeft}");
     _avgForceLeft = _calcAverageForce(leftChartData, _totalForceLeft);
     return _avgForceLeft;
   }
