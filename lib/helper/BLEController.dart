@@ -253,6 +253,12 @@ class BLEController extends ChangeNotifier {
           krillesMetod(int.parse(tag[1]));
         }
         break;
+      case 'F':
+        {
+          isNotStarted = true;
+          notifyListeners();
+        }
+        break;
       default:
         {
           print('No data to read');

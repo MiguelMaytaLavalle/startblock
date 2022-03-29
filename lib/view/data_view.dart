@@ -95,7 +95,8 @@ class _DataState extends State<DataScreen> {
                 ),
                 Material(
                   //margin:const EdgeInsets.all(10),
-                    child: Text('Force impulse: 0'
+                    child: Text('Force impulse: ${sensorPageVM.getForceImpulseLeft()
+                    .toStringAsPrecision(2)}'
                     )
                 ),
                 Material(
@@ -156,7 +157,8 @@ class _DataState extends State<DataScreen> {
                 ),
                 Material(
                   //margin:const EdgeInsets.all(10),
-                    child: Text('Force impulse: 0'
+                    child: Text('Force impulse: ${sensorPageVM.getForceImpulseRight()
+                    .toStringAsPrecision(2)}'
                     )
                 ),
                 Material(

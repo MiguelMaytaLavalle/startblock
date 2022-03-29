@@ -21,40 +21,21 @@ class DataViewViewModel extends ChangeNotifier{
   double _peakForceLeft = 0;
   double _RFDLeft = 0;
   double _avgForceLeft = 0;
+  double _totalForceLeft = 0;
+  double _forceImpulseLeft = 0;
   int _timeToPeakForceLeft = 0;
+
   double _peakForceRight = 0;
   double _RFDRight = 0;
   double _avgForceRight = 0;
+  double _totalForceRight = 0;
+  double _forceImpulseRight = 0;
   int _timeToPeakForceRight = 0;
 
   DataViewViewModel()
   {
-    //tempLeft = _EWMAFilter(bleController.leftFoot);
-    //tempRight = _EWMAFilter(bleController.rightFoot);
     tempLeft = bleController.leftFootEWMA;
     tempRight = bleController.rightFootEWMA;
-    //tempLeft = bleController.leftFoot;
-    //tempRight = bleController.rightFoot;
-  }
-
-  List<Data>_EWMAFilter(List<Data> data)
-  {
-    List<Data> tempList = <Data>[];
-    for(int i = 0; i < data.length-1; i++)
-    {
-      if(i == 0)
-      {
-        tempList.add(data[i]);
-      }
-      else
-      {
-        Data tempData = data[i];
-        tempData.mForce = Constants.ALPHA * data[i].getForce() + (1-Constants.ALPHA) * tempList[i-1].getForce();
-        tempList.add(tempData);
-      }
-    }
-    notifyListeners();
-    return tempList;
   }
   ///Calculates the time to peak based on the array data since the
   ///ratio between sampled data array and time array is 1:1
@@ -107,55 +88,62 @@ class DataViewViewModel extends ChangeNotifier{
     notifyListeners();
     return tempVal;
   }
-
+  double getForceImpulseLeft()
+  {
+    _totalForceLeft = _calcTotalForce(tempLeft);
+    if(_totalForceLeft.isNaN)
+      {
+        return 0;
+      }
+    else
+      {
+        _forceImpulseLeft = _calcForceImpulse(tempLeft, _totalForceLeft);
+        return _forceImpulseLeft;
+      }
+  }
+  double getForceImpulseRight()
+  {
+    _totalForceRight = _calcTotalForce(tempRight);
+    if(_totalForceRight.isNaN)
+      {
+        return 0;
+      }
+    else
+      {
+        _forceImpulseRight = _calcForceImpulse(tempRight, _totalForceRight);
+        return _forceImpulseRight;
+      }
+  }
   double getAverageForceLeft()
   {
-    _avgForceLeft = _calcAverageForce(tempLeft);
-    if(_avgForceLeft.isNaN)
+    _totalForceLeft = _calcTotalForce(tempLeft);
+    if(_totalForceLeft.isNaN)
       {
         return  0;
       }
     else
       {
+        _avgForceLeft = _calcAverageForce(tempLeft, _totalForceLeft);
         return _avgForceLeft;
       }
   }
   double getAverageForceRight()
   {
-    _avgForceRight = _calcAverageForce(tempRight);
-    if(_avgForceRight.isNaN)
+    _totalForceRight = _calcTotalForce(tempRight);
+    if(_totalForceRight.isNaN)
       {
         return 0;
       }
     else
     {
+      _avgForceRight = _calcAverageForce(tempRight, _totalForceRight);
       return _avgForceRight;
     }
   }
   ///Calculates the area the for the dataset using Trapezoidal rule. AKA Integration
-  double _calcAverageForce(List<Data> data)
+  double _calcTotalForce(List<Data> data)
   {
     double result = 0.0;
-    var tempT1 = 0;
-    var tempT2 = 0;
-    //Get time where noise stops from the beginning of the list
-    for(int i = 0; i < data.length; i++)
-    {
-      if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
-      {
-        tempT1 = data[i].getTime();
-        break;
-      }
-    }
-    //Get time where noise stops from the end of the list
-    for(int i = data.length-1; i >= 0; i--)
-    {
-      if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
-      {
-        tempT2 = data[i].getTime();
-        break;
-      }
-    }
     //Calculates the area the for the dataset using Trapezoidal rule. AKA numerical integration
     for(int i = 0; i < data.length-1; i++)
     {
@@ -167,7 +155,69 @@ class DataViewViewModel extends ChangeNotifier{
       }
     }
     notifyListeners();
-    return result/(tempT2-tempT1);
+    return result;
+  }
+  double _calcAverageForce(List<Data> data, double totalForce)
+  {
+    var tempT1;
+    var tempT2;
+    if(data.isEmpty)
+      {
+        return 0;
+      }
+    else
+      {
+        //Get time where noise stops from the beginning of the list
+        for(int i = 0; i < data.length; i++)
+        {
+          if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
+          {
+            tempT1 = data[i].getTime();
+            break;
+          }
+        }
+        //Get time where noise stops from the end of the list
+        for(int i = data.length-1; i >= 0; i--)
+        {
+          if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
+          {
+            tempT2 = data[i].getTime();
+            break;
+          }
+        }
+        return totalForce/(tempT2-tempT1);
+      }
+  }
+  double _calcForceImpulse(List<Data> data, double totalForce)
+  {
+    var tempT1;
+    var tempT2;
+    if(data.isEmpty)
+    {
+      return 0;
+    }
+  else
+    {
+      //Get time where noise stops from the beginning of the list
+      for(int i = 0; i < data.length; i++)
+      {
+        if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
+        {
+          tempT1 = data[i].getTime();
+          break;
+        }
+      }
+      //Get time where noise stops from the end of the list
+      for(int i = data.length-1; i >= 0; i--)
+      {
+        if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
+        {
+          tempT2 = data[i].getTime();
+          break;
+        }
+      }
+      return totalForce*(tempT2-tempT1);
+    }
   }
   ///Calculates the slope of the plotted function. Slope value represents Rate of Force Development
   double getRFDLeft()
