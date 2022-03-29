@@ -43,16 +43,11 @@ class ExportToExcel{
     return reports;
   }
 
-  Future<num> _getMarzullo(num list) async {
-    final num reports = list;
-    return reports;
-  }
-
-
   Future<String> exportToExcel(HistoryCardModel history) async {
     //Create a Excel document.
     //Creating a workbook.
     print('Excel');
+    final String excelName = history.history.name;
     final Workbook workbook = Workbook();
 
     //Accessing via index
@@ -69,14 +64,12 @@ class ExportToExcel{
 
     print('Marzullo ${history.marzullo}');
 
-
     //Import the list to Sheet.
     sheet.importData(_dataRowsLeft, 1, 1);
     sheet.importData(_dataRowsRight, 1, 2);
     sheet.importData(_dataRowTimetamps, 1, 3);
     sheet.getRangeByIndex(1, 4).setText('Marzullo Micro:Bit Offset');
     sheet.getRangeByIndex(2, 4).setText(history.marzullo.toString());
-
 
     //Auto-Fit columns.
     sheet.getRangeByName('A1:B1').autoFitColumns();
@@ -93,13 +86,13 @@ class ExportToExcel{
 //Get the directory path
     final String? path = directory?.path;
 //Create an empty file to write the Excel data
-    final File file = File('$path/ImportData.xlsx');
+    final File file = File('$path/$excelName.xlsx');
     //Write Excel data
     await file.writeAsBytes(bytes, flush: true);
 
-    String excelPath = '$path/ImportData.xlsx';
+    /// change to title instead
+    String excelPath = '$path/$excelName.xlsx';
     return excelPath;
-
   }
 
  Future<String> attachExcel(HistoryCardModel hCardModel) async {
