@@ -304,7 +304,7 @@ class HistoryCardViewModel{
     //notifyListeners();
     return slope;
   }
-  _calcAverageForce(List<Data> data, double totalForce)
+  double _calcAverageForce(List<Data> data, double totalForce)
   {
     var tempT1;
     var tempT2;
@@ -326,14 +326,13 @@ class HistoryCardViewModel{
         break;
       }
     }
-    totalForce/(tempT2-tempT1);
+    return totalForce/(tempT2-tempT1);
   }
-  _calcForceImpulse(List<Data> data, double totalForce)
+  double _calcForceImpulse(List<Data> data, double totalForce)
   {
-    double result = 0.0;
     var tempT1;
     var tempT2;
-    //Get time where noise stops frmo the beginning of the list
+    //Get time where noise stops from the beginning of the list
     for(int i = 0; i < data.length; i++)
     {
       if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
