@@ -182,7 +182,7 @@ class BLEController extends ChangeNotifier {
     isNotStarted = false;
     notifyListeners();
     flushData();
-    startMovesenseSample();
+    startMovesenseSample(); //Starts a subscription to Movesense Accelerometer.
     String test = 'Start\n';
     List<int> bytes = utf8.encode(test);
     try {
@@ -235,6 +235,12 @@ class BLEController extends ChangeNotifier {
           _EWMAFilter(leftFoot, leftFootEWMA);
           _EWMAFilter(rightFoot, rightFootEWMA);
           stopMoveSenseSample();
+          accData.forEach((element)
+          {
+            print('${element.timestamp}');
+            print('${element.mAcc}');
+            print("\n");
+          });
 /*
           leftFoot.forEach((element) {
             print('${element.mForce}');
@@ -256,7 +262,7 @@ class BLEController extends ChangeNotifier {
          */
         }
         break;
-      case 'S' :
+      case 'S' ://Time sync. recieve time stamp from micro:bit
         {
           clientRecieveTime.add(DateTime
               .now()
@@ -264,9 +270,15 @@ class BLEController extends ChangeNotifier {
           krillesMetod(int.parse(tag[1]));
         }
         break;
-      case 'F':
+      case 'SM'://mibro:bit indicates when Movesense subscription should be cancelled.
+        {
+          stopMoveSenseSample();
+        }
+        break;
+      case 'FS'://False start
         {
           isNotStarted = true;
+          stopMoveSenseSample();
           notifyListeners();
         }
         break;
@@ -517,7 +529,8 @@ class BLEController extends ChangeNotifier {
             //await c.setNotifyValue(true);
             streamSubMovesense = c.value.listen((event) {
               //readDataTest(event);
-              print('Movesense event: ${event}');
+              //print('Movesense event: ${event}');
+              readMoveSenseData(event);
             });
           }
         }
@@ -585,16 +598,12 @@ class BLEController extends ChangeNotifier {
       var bytes = Uint8List.fromList(array);
       var byteData = ByteData.sublistView(bytes);
       int timeStamp = byteData.getUint32(0, Endian.little);
-      print(timeStamp);
       //Accelerometer
       var Xacc = _convertByteToDouble([event[9], event[8], event[7], event[6]]);
       var Yacc = _convertByteToDouble(
           [event[13], event[12], event[11], event[10]]);
       var Zacc = _convertByteToDouble(
           [event[17], event[16], event[15], event[14]]);
-      print(Xacc);
-      print(Yacc);
-      print(Zacc);
       var acc = sqrt(pow(Xacc, 2) + pow(Yacc, 2) + pow(Zacc, 2));
       accData.add(Movesense(timeStamp, acc));
     }

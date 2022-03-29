@@ -16,5 +16,9 @@ class SettingsViewModel{
   {
     _bleController.startMovesenseSample();
   }
+  void stopMovesense()
+  {
+    _bleController.stopMoveSenseSample();
+  }
 }
 
