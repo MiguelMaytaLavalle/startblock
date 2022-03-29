@@ -70,6 +70,8 @@ class ExportToExcel{
     sheet.importData(_dataRowTimetamps, 1, 3);
     sheet.getRangeByIndex(1, 4).setText('Marzullo Micro:Bit Offset');
     sheet.getRangeByIndex(2, 4).setText(history.marzullo.toString());
+    sheet.getRangeByIndex(1, 5).setText('Movesense total accelerometer');
+    sheet.getRangeByIndex(2, 5).setText(history.sumAcc.toString());
 
     //Auto-Fit columns.
     sheet.getRangeByName('A1:B1').autoFitColumns();

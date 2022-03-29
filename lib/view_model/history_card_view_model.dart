@@ -98,6 +98,10 @@ class HistoryCardViewModel{
   getMarzullo(){
     return hCardModel.history.marzullo;
   }
+
+  getSumAcc(){
+    return hCardModel.history.sumAcc;
+  }
   void setupRightChartData(){
     for(int i = 0; i < getRightLiveData().length-1; i++){
       if(i == 0)

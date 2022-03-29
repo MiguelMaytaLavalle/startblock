@@ -10,6 +10,7 @@ class HistoryCardModel{
   late List<Timestamp> timestamps = <Timestamp>[];
   bool _isLoading = false;
   late num _marzullo;
+  late num _sumAcc;
 
   set excelPath(String value) {
     _excelPath = value;
@@ -39,5 +40,11 @@ class HistoryCardModel{
 
   set marzullo(num value) {
     _marzullo = value;
+  }
+
+  num get sumAcc => _sumAcc;
+
+  set sumAcc(num value) {
+    _sumAcc = value;
   }
 }

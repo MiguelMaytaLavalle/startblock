@@ -148,6 +148,7 @@ class _TestPageState extends State<TestPage> {
         leftData: jsonEncode(testLeft),
         timestamps: jsonEncode(timestamps),
         marzullo: 1648054909673.0,
+        sumAcc: 321.321321,
         //liveData: getChartData(),
       );
 

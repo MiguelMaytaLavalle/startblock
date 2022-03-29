@@ -230,6 +230,7 @@ class _DataState extends State<DataScreen> {
         rightData: jsonEncode(rightList),
         timestamps: jsonEncode(timestamps),
         marzullo: marzullo,
+        sumAcc: 21321.3213,
       );
       print('SUCCESS');
       await HistoryDatabase.instance.create(history);

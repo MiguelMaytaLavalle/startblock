@@ -104,6 +104,10 @@ class _HistoryCardState extends State<HistoryCard> {
                       'Marzullo: ${hCardVM.getMarzullo().toString()}',
                       style: const TextStyle(color: Colors.blue),
                     ),
+                    Text(
+                      'Sum accelerometer : ${hCardVM.getSumAcc().toString()}',
+                      style: const TextStyle(color: Colors.blue),
+                    ),
                     Container(
                       //height: 400,
                       child: SingleChildScrollView(

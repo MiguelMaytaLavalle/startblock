@@ -1,4 +1,4 @@
-String tableHistory = 'test11';
+String tableHistory = 'test13';
 
 /**
  * test5
@@ -7,7 +7,7 @@ String tableHistory = 'test11';
 
 class HistoryFields{
   static final List<String> values = [
-    id, dateTime, name, rightData, leftData,timestamps, marzullo,
+    id, dateTime, name, rightData, leftData,timestamps, marzullo,sumAcc,//imuTimestamp,
   ];
   static const String id = '_id';
   static const String dateTime = 'dateTime';
@@ -16,6 +16,8 @@ class HistoryFields{
   static const String leftData = 'leftData';
   static const String timestamps = 'timestamps';
   static const String marzullo = 'marzullo';
+  static const String sumAcc = 'sumAcc';
+  //static const String imuTimestamp = 'imuTimestamp';
 }
 class History{
   final int? id;
@@ -25,6 +27,7 @@ class History{
   final String leftData;
   final String timestamps;
   final num? marzullo;
+  final num? sumAcc;
 
   History({
     this.id,
@@ -34,6 +37,7 @@ class History{
     required this.leftData,
     required this.timestamps,
     required this.marzullo,
+    required this.sumAcc,
   });
 
   Map<String, dynamic> toJson() =>{
@@ -44,6 +48,7 @@ class History{
     HistoryFields.leftData: leftData,
     HistoryFields.timestamps: timestamps,
     HistoryFields.marzullo: marzullo,
+    HistoryFields.sumAcc: sumAcc,
 
   };
 
@@ -55,6 +60,7 @@ class History{
     leftData: json[HistoryFields.leftData] as String,
     timestamps: json[HistoryFields.timestamps] as String,
     marzullo: json[HistoryFields.marzullo] as num?,
+    sumAcc: json[HistoryFields.sumAcc] as num?,
   );
 
   History copy({
@@ -65,6 +71,7 @@ class History{
     String? leftData,
     String? timestamps,
     num? marzullo,
+    num? sumAcc,
   }) =>
       History(
         id: id ?? this.id,
@@ -74,5 +81,6 @@ class History{
         leftData: leftData ?? this.leftData,
         timestamps: timestamps ?? this.timestamps,
         marzullo: marzullo ?? this.marzullo,
+        sumAcc: sumAcc ?? this.sumAcc,
       );
 }

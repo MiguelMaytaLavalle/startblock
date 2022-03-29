@@ -227,6 +227,9 @@ class BLEController extends ChangeNotifier {
           _counter = 0;
           print(tag[1]);
 
+          _EWMAFilter(leftFoot, leftFootEWMA);
+          _EWMAFilter(rightFoot, rightFootEWMA);
+/*
           leftFoot.forEach((element) {
             print('${element.mForce}');
           });
@@ -235,7 +238,9 @@ class BLEController extends ChangeNotifier {
 
           rightFoot.forEach((element) {
             print('${element.mForce}');
-          });
+          });*/
+
+
           isNotStarted = true;
           notifyListeners();
           /*
@@ -265,6 +270,35 @@ class BLEController extends ChangeNotifier {
         }
         break;
     }
+  }
+
+  //List<Data>_EWMAFilter(List<Data> data)
+  void _EWMAFilter(List<Data> data, List<Data> listEWMA) {
+    double alpha = 0.5;
+    //List<Data> tempList = <Data>[];
+    print("Data length: ${data.length}");
+
+    for (int i = 0; i < data.length - 1; i++) {
+      if (i == 0) {
+        print('i = 0');
+        print(data[i].mForce);
+        //tempList.add(data[i]);
+        listEWMA.add(data[i]);
+      }
+      else {
+        print('Data force: ${data[i].mForce}');
+        Data tempData = data[i];
+        //tempData.mForce = alpha * data[i].getForce() + (1-alpha) * tempList[i-1].getForce();
+        tempData.mForce = alpha * data[i].getForce() +
+            (1 - alpha) * listEWMA[i - 1].getForce();
+        print('tempData force: ${tempData.mForce}');
+        //tempList.add(tempData);
+        listEWMA.add(tempData);
+        //print('Templist length: ${tempList.length}');
+        print('Templist length: ${listEWMA.length}');
+      }
+    }
+    //return tempList;
   }
 
   void krillesMetod(int data) {
@@ -556,35 +590,7 @@ class BLEController extends ChangeNotifier {
       print(Yacc);
       print(Zacc);
 
-      //List<Data>_EWMAFilter(List<Data> data)
-      void _EWMAFilter(List<Data> data, List<Data> listEWMA) {
-        double alpha = 0.5;
-        //List<Data> tempList = <Data>[];
-        print("Data length: ${data.length}");
-
-        for (int i = 0; i < data.length - 1; i++) {
-          if (i == 0) {
-            print('i = 0');
-            print(data[i].mForce);
-            //tempList.add(data[i]);
-            listEWMA.add(data[i]);
-          }
-          else {
-            print('Data force: ${data[i].mForce}');
-            Data tempData = data[i];
-            //tempData.mForce = alpha * data[i].getForce() + (1-alpha) * tempList[i-1].getForce();
-            tempData.mForce = alpha * data[i].getForce() +
-                (1 - alpha) * listEWMA[i - 1].getForce();
-            print('tempData force: ${tempData.mForce}');
-            //tempList.add(tempData);
-            listEWMA.add(tempData);
-            //print('Templist length: ${tempList.length}');
-            print('Templist length: ${listEWMA.length}');
-          }
-        }
-        //return tempList;
-      }
-
     }
   }
 }
+
