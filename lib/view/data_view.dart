@@ -6,9 +6,7 @@ import 'package:startblock/view_model/data_view_view_model.dart';
 import 'package:startblock/model/livedata.dart';
 import 'package:startblock/db/database_helper.dart';
 import 'package:startblock/model/history.dart';
-import 'package:startblock/model/livedata.dart';
 
-import '../model/sensor.dart';
 import '../model/timestamp.dart';
 class DataScreen extends StatefulWidget {
   @override
@@ -46,11 +44,12 @@ class _DataState extends State<DataScreen> {
         child:Column(
           children: [
             SfCartesianChart(
-              //crosshairBehavior: _crosshairBehavior,
               legend: Legend(isVisible: true),
-              //zoomPanBehavior: _zoomPanBehavior,
               series: sensorPageVM.getDataLeft(),
               primaryXAxis: NumericAxis(
+                isVisible: false,
+                  //Uncomment if X-axis shall be visible and set isVisible = true;
+                  /*
                   interactiveTooltip: const InteractiveTooltip(
                     enable: true,
                   ),
@@ -58,11 +57,11 @@ class _DataState extends State<DataScreen> {
                   edgeLabelPlacement: EdgeLabelPlacement.shift,
                   interval: 1000, //1000ms between two timestamps equals a second
                   title: AxisTitle(text: 'Time [S]')
+                   */
               ),
 
               primaryYAxis: NumericAxis(
                   minimum: 0,
-                  //maximum: 800,
                   interactiveTooltip: const InteractiveTooltip(
                     enable: true,
                   ),
@@ -108,12 +107,13 @@ class _DataState extends State<DataScreen> {
               ],
             ),
             SfCartesianChart(
-              //crosshairBehavior: _crosshairBehavior,
               legend: Legend(isVisible: true),
-              //zoomPanBehavior: _zoomPanBehavior,
               series: sensorPageVM.getDataRight(),
 
               primaryXAxis: NumericAxis(
+                isVisible: false,
+                  //Uncomment if X-axis shall be visible and set isVisible = true;
+                  /*
                   interactiveTooltip: const InteractiveTooltip(
                     enable: true,
                   ),
@@ -121,6 +121,7 @@ class _DataState extends State<DataScreen> {
                   edgeLabelPlacement: EdgeLabelPlacement.shift,
                   interval: 1000, //1000ms between two timestamps equals a second
                   title: AxisTitle(text: 'Time [S]')
+                   */
               ),
 
               primaryYAxis: NumericAxis(
@@ -230,7 +231,7 @@ class _DataState extends State<DataScreen> {
         timestamps: jsonEncode(timestamps),
         marzullo: marzullo,
         imuData: jsonEncode(imuDataList),
-        imuTimestamps: jsonEncode(imuTimestampList), 
+        imuTimestamps: jsonEncode(imuTimestampList),
         movesenseArriveTime: jsonEncode(movesenseArriveTimeList),
       );
       print('SUCCESS');

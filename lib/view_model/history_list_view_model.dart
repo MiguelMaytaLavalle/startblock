@@ -5,7 +5,6 @@ class HistoryListViewModel{
   // Provide all the state = data needed by the home view
   String historyListTitle = 'History List';
 
-// Will contain all business logic
   var historyListModel = HistoryListModel();
 
   getHistoryList(){

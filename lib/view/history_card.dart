@@ -146,6 +146,9 @@ class _HistoryCardState extends State<HistoryCard> {
                               //series: sensorPageVM.getDataRight(),
                               series: hCardVM.leftSplineSeries(),
                               primaryXAxis: NumericAxis(
+                                isVisible:false,
+                                  //Uncomment if X-axis shall be visible and set isVisible = true;
+                                  /*
                                   interactiveTooltip: const InteractiveTooltip(
                                     enable: true,
                                   ),
@@ -153,6 +156,7 @@ class _HistoryCardState extends State<HistoryCard> {
                                   edgeLabelPlacement: EdgeLabelPlacement.shift,
                                   interval: 1000, //1000ms between two timestamps equals a second
                                   title: AxisTitle(text: 'Time [S]')
+                                   */
                               ),
 
                               primaryYAxis: NumericAxis(
@@ -203,17 +207,18 @@ class _HistoryCardState extends State<HistoryCard> {
                             SfCartesianChart(
                               //crosshairBehavior: _crosshairBehavior,
                               legend: Legend(isVisible: true),
-                              //zoomPanBehavior: _zoomPanBehavior,
-                              //series: sensorPageVM.getDataRight(),
                               series: hCardVM.rightSplineSeries(),
                               primaryXAxis: NumericAxis(
+                                isVisible:false,
+                                  //Uncomment if X-axis shall be visible and set isVisible = true;
+                                  /*
                                   interactiveTooltip: const InteractiveTooltip(
                                     enable: true,
                                   ),
                                   majorGridLines: const MajorGridLines(width: 0),
                                   edgeLabelPlacement: EdgeLabelPlacement.shift,
                                   interval: 1000, //1000ms between two timestamps equals a second
-                                  title: AxisTitle(text: 'Time [S]')
+                                  title: AxisTitle(text: 'Time [S]')*/
                               ),
 
                               primaryYAxis: NumericAxis(
@@ -266,30 +271,6 @@ class _HistoryCardState extends State<HistoryCard> {
                           ],
                         ),
                       ),
-                      /*child: SfCartesianChart(
-                        legend: Legend(isVisible: true),
-                        series: _getUpdateSeries(),
-                        primaryXAxis: NumericAxis(
-                            interactiveTooltip: const InteractiveTooltip(
-                              enable: true,
-                            ),
-                            majorGridLines: const MajorGridLines(width: 0),
-                            edgeLabelPlacement: EdgeLabelPlacement.shift,
-                            interval: 3,
-                            title: AxisTitle(text: 'Time [S]')
-                        ),
-                        primaryYAxis: NumericAxis(
-                            minimum: 0,
-                            //maximum: 800,
-                            interactiveTooltip: const InteractiveTooltip(
-                              enable: true,
-                            ),
-                            axisLine: const AxisLine(width: 0),
-                            majorTickLines: const MajorTickLines(size: 0),
-                            title: AxisTitle(text: 'Force [N]')
-                        ),
-                      ),*/
-
                     ),
                   ],
                 ),

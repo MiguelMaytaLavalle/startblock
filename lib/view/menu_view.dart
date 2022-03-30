@@ -1,13 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:startblock/view/connection_view.dart';
-import 'package:startblock/view/find_device_view.dart';
 import 'package:startblock/view/history_list_view.dart';
-import 'package:startblock/view/recording_view.dart';
 import 'package:startblock/view/tmp_view.dart';
 import 'package:startblock/view_model/menu_view_model.dart';
-
-//import 'movesense.dart';
 
 class MenuScreen extends StatelessWidget {
 
@@ -72,20 +68,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
             },
             child: const Text('Test'),
           ),
-
-/*
-          ElevatedButton(
-            style: style,
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => MoveSenseScreen()),
-              );
-            },
-            child: const Text('Movesense'),
-          ),
-*/
-
         ],
       ),
     );

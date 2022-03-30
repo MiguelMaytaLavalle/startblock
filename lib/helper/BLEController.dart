@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:ffi';
 import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:startblock/constant/constants.dart';
-import 'package:startblock/model/livedata.dart';
 import 'package:startblock/model/movesense.dart';
 import 'package:startblock/model/sensor.dart';
 
@@ -27,9 +25,6 @@ class BLEController extends ChangeNotifier {
   List<Data> leftFootEWMA = <Data>[];
   List<Data> rightFootEWMA = <Data>[];
   late List<Movesense> movesenseData = <Movesense>[];
-
-  /*late List<Data> leftFootEWMA;
-  late List<Data> rightFootEWMA;*/
   List<Timestamp> timestamps = <Timestamp>[];
 
   FlutterBlue flutterBlue = FlutterBlue.instance;
@@ -56,24 +51,23 @@ class BLEController extends ChangeNotifier {
   late List<num> listRTT = <num>[];
   late List<num> tMaxList = <num>[];
   late List<num> tMinList = <num>[];
-  late List<num> krilleOffsets = <num>[];
+  late List<num> timeSyncOffsets = <num>[];
   late num timeSend, timeServer, timeRecieve, syncedTime, RTT, RTT_mean,
-      latestMeasure, timeOffset, offsetMean, marzullo;
-  int _krilleCounter = 0;
+      latestMeasure, cristianTimeOffset, offsetMean, marzulloTimeOffset;
+  int _timeSyncCounter = 0;
 
-  late Timer _krilleTimer;
-  int _counter = 0;
+  late Timer _timeSyncTimer;
+  int _timeStampCounter = 0;
 
   startScan() async {
     scanSubScription = flutterBlue.scan().listen((scanResult) async {
-      if (scanResult.device.name == Constants.TARGET_DEVICE_NAME_TIZEZ) {
+      if (scanResult.device.name == Constants.TARGET_DEVICE_NAME_ZIVIT) {
         print("Found device");
         targetDevice = scanResult.device;
         await stopScan();
       }
     });
   }
-
   stopScan() {
     print("Stopping subscription");
     flutterBlue.stopScan();
@@ -94,7 +88,7 @@ class BLEController extends ChangeNotifier {
     if (targetDevice == null) {
       return;
     }
-    _krilleTimer.cancel();
+    _timeSyncTimer.cancel();
     streamSubscription?.cancel();
     await targetDevice?.disconnect();
 
@@ -132,11 +126,11 @@ class BLEController extends ChangeNotifier {
           if (c.uuid.toString() == Constants.CHARACTERISTIC_UART_SEND) {
             //characteristic.setNotifyValue(!characteristic.isNotifying);
             writeChar = c;
-            sendKrille(); //As soon as device is connected to micro:bit - Time Sync immediately
-            _krilleTimer = Timer.periodic(Duration(minutes: 10), (timer) {
+            sendTimeSyncRequest(); //As soon as device is connected to micro:bit - Time Sync immediately
+            _timeSyncTimer = Timer.periodic(Duration(minutes: 10), (timer) {
               isNotStarted = false;
               notifyListeners();
-              sendKrille();
+              sendTimeSyncRequest();
             });
           }
         }
@@ -152,11 +146,11 @@ class BLEController extends ChangeNotifier {
   }
 
   void flushKrille() {
-    _counter = 0;
-    _krilleCounter = 0;
+    _timeStampCounter = 0;
+    _timeSyncCounter = 0;
     offsetMean = 0;
     listRTT.clear();
-    krilleOffsets.clear();
+    timeSyncOffsets.clear();
     serverTime.clear();
     clientSendTime.clear();
     clientRecieveTime.clear();
@@ -216,20 +210,18 @@ class BLEController extends ChangeNotifier {
         break;
       case 'T':
         {
-          leftFoot[_counter].setTime(int.parse(tag[1]));
-          rightFoot[_counter].setTime(int.parse(tag[1]));
+          leftFoot[_timeStampCounter].setTime(int.parse(tag[1]));
+          rightFoot[_timeStampCounter].setTime(int.parse(tag[1]));
           timestamps.add(Timestamp(
               time: int.parse(tag[1])
           ));
-          _counter++;
-          //sensorPageModel.setTime(int.parse(tag[1]));
+          _timeStampCounter++;
         }
         break;
       case 'D' :
         {
-          //testUpdateSetState();
           print('DONE');
-          _counter = 0;
+          _timeStampCounter = 0;
           print(tag[1]);
 
           _EWMAFilter(leftFoot, leftFootEWMA);
@@ -241,25 +233,8 @@ class BLEController extends ChangeNotifier {
             print('${element.mAcc}');
             print("\n");
           });
-/*
-          leftFoot.forEach((element) {
-            print('${element.mForce}');
-          });
-
-          print('---------------------------------');
-
-          rightFoot.forEach((element) {
-            print('${element.mForce}');
-          });*/
-
-
           isNotStarted = true;
           notifyListeners();
-          /*
-        setState(() {
-          isNotStarted = true;
-        });
-         */
         }
         break;
       case 'S' ://Time sync. recieve time stamp from micro:bit
@@ -267,7 +242,7 @@ class BLEController extends ChangeNotifier {
           clientRecieveTime.add(DateTime
               .now()
               .millisecondsSinceEpoch);
-          krillesMetod(int.parse(tag[1]));
+          timeSync(int.parse(tag[1]));
         }
         break;
       case 'SM'://mibro:bit indicates when Movesense subscription should be cancelled.
@@ -289,11 +264,8 @@ class BLEController extends ChangeNotifier {
         break;
     }
   }
-
-  //List<Data>_EWMAFilter(List<Data> data)
+  ///Takes raw data and applies EWMA-filter for view
   void _EWMAFilter(List<Data> data, List<Data> listEWMA) {
-    double alpha = 0.5;
-    //List<Data> tempList = <Data>[];
     print("Data length: ${data.length}");
 
     for (int i = 0; i < data.length - 1; i++) {
@@ -307,8 +279,8 @@ class BLEController extends ChangeNotifier {
         print('Data force: ${data[i].mForce}');
         Data tempData = data[i];
         //tempData.mForce = alpha * data[i].getForce() + (1-alpha) * tempList[i-1].getForce();
-        tempData.mForce = alpha * data[i].getForce() +
-            (1 - alpha) * listEWMA[i - 1].getForce();
+        tempData.mForce = Constants.ALPHA * data[i].getForce() +
+            (1 - Constants.ALPHA) * listEWMA[i - 1].getForce();
         print('tempData force: ${tempData.mForce}');
         //tempList.add(tempData);
         listEWMA.add(tempData);
@@ -316,16 +288,15 @@ class BLEController extends ChangeNotifier {
         print('Templist length: ${listEWMA.length}');
       }
     }
-    //return tempList;
   }
-
-  void krillesMetod(int data) {
+///Method to re-send time syncing and check how many times a time sync request has been made.
+  void timeSync(int data) {
     serverTime.add(data);
-    _krilleCounter++;
-    if (_krilleCounter < Constants.LIST_LEN) {
-      sendKrille();
+    _timeSyncCounter++;
+    if (_timeSyncCounter < Constants.LIST_LEN) {
+      sendTimeSyncRequest();
     }
-    else if (_krilleCounter == Constants.LIST_LEN) {
+    else if (_timeSyncCounter == Constants.LIST_LEN) {
       if (isReady == false) {
         isReady = true;
         notifyListeners();
@@ -334,12 +305,12 @@ class BLEController extends ChangeNotifier {
         isNotStarted = true;
         notifyListeners();
       }
-      calculateKrilles();
-      _krilleCounter = 0;
+      calculateTimeSync();
+      _timeSyncCounter = 0;
     }
   }
-
-  void sendKrille() async
+  ///Method to send time sync request over BLE
+  void sendTimeSyncRequest() async
   {
     print('Time to send');
     String test = "TS\n";
@@ -354,8 +325,8 @@ class BLEController extends ChangeNotifier {
       //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
     }
   }
-
-  void calculateKrilles() {
+  ///Calculates time sync offsets for Cristian's algorithm and Marzullo's algorithm.
+  void calculateTimeSync() {
     /**
      * Calculate Cristian's RTT Value
      */
@@ -381,18 +352,18 @@ class BLEController extends ChangeNotifier {
      */
     print("------------Krille Offsets------------");
     for (int i = 0; i < Constants.LIST_LEN; i++) {
-      timeOffset = (clientSendTime[i] - serverTime[i]) +
+      cristianTimeOffset = (clientSendTime[i] - serverTime[i]) +
           ((clientRecieveTime[i] - clientSendTime[i]) / 2);
-      krilleOffsets.add(timeOffset);
-      print("Offset: ${timeOffset}");
+      timeSyncOffsets.add(cristianTimeOffset);
+      print("Offset: ${cristianTimeOffset}");
       //print(currentTime - (clientSendTime[i] - serverTime[i]));
     }
     num sum2 = 0;
-    for (int i = 0; i < krilleOffsets.length; i++) {
-      sum2 += krilleOffsets[i];
+    for (int i = 0; i < timeSyncOffsets.length; i++) {
+      sum2 += timeSyncOffsets[i];
     }
     RTT_mean = sum / listRTT.length;
-    offsetMean = sum2 / krilleOffsets.length;
+    offsetMean = sum2 / timeSyncOffsets.length;
     latestMeasure = syncedTime;
     //print("RTT Mean: $RTT_mean");
     print("Offset mean: $offsetMean");
@@ -430,12 +401,11 @@ class BLEController extends ChangeNotifier {
     num timeOffset2 = (maxVal + minVal) / 2;
 
     print("Offset marzullo: $timeOffset2");
-    marzullo = timeOffset2;
+    marzulloTimeOffset = timeOffset2;
     flushKrille();
   }
 
-  ///Send method to set threshold value to the micro:bit
-  ///
+  ///Send method to set threshold value to the micro:bit over BLE
   void sendSetThresh(String val) async
   {
     print("Setting Thresh");
@@ -451,7 +421,7 @@ class BLEController extends ChangeNotifier {
       print(error);
     }
   }
-
+  ///Scanning method for Movesense BLE
   void startScanMovesense() async {
     scanSubScription = flutterBlue.scan().listen((scanResult) async {
       print('Device: ${scanResult.device.name}');
@@ -487,9 +457,6 @@ class BLEController extends ChangeNotifier {
     }
 
     servicesMovesense = (await targetMovesenseDevice?.discoverServices())!;
-
-    String test = '/Meas/Acc/52';
-    //List<int> bytes = [1, 99, 47, 77, 101, 97, 115, 47, 65, 99, 99, 47, 53, 50];
     print('Look after movesense services');
     for (var service in servicesMovesense) {
       // do something with service
@@ -501,18 +468,6 @@ class BLEController extends ChangeNotifier {
           if (c.uuid.toString() == Constants.MOVESENSE_SEND) {
             print('MOVESENSE SEND: ${c}');
             testChar = c;
-            //testMove();
-            //List<int> bytes = utf8.encode(test);
-            //print('Bytes: ${bytes.toString()}');
-            //c.write(bytes);
-            //characteristic.setNotifyValue(!characteristic.isNotifying);
-            /*writeChar = c;
-            sendKrille(); //As soon as device is connected to micro:bit - Time Sync immediately
-            _krilleTimer = Timer.periodic(Duration(minutes: 10), (timer) {
-              isNotStarted = false;
-              notifyListeners();
-              sendKrille();
-            });*/
           }
         }
       }
@@ -526,10 +481,7 @@ class BLEController extends ChangeNotifier {
           if (c.uuid.toString() == Constants.MOVESENSE_DATA) {
             print('Char: ${c.uuid.toString()}');
             await c.setNotifyValue(!c.isNotifying);
-            //await c.setNotifyValue(true);
             streamSubMovesense = c.value.listen((event) {
-              //readDataTest(event);
-              //print('Movesense event: ${event}');
               readMoveSenseData(event);
             });
           }
@@ -537,10 +489,10 @@ class BLEController extends ChangeNotifier {
       }
     }
   }
-
+  ///Send method to stop Movesense accelerometer subscription over BLE
   void stopMoveSenseSample() async
   {
-    List<int> bytes = [2, 99]; //Stopping subscription
+    List<int> bytes = [2, 99]; //2 = Stop subscription
     print('Stopping subscription');
     try {
       await testChar.write(bytes);
@@ -550,12 +502,12 @@ class BLEController extends ChangeNotifier {
       //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
     }
   }
-
+  ///Send method to start Movesense accelerometer subscription over BLE
   void startMovesenseSample() async
   {
     // 1, 99/Meas/Acc/208
     List<int> bytes = [
-      1,
+      1,// 1 = Start subscription
       99,
       47,
       77,
@@ -589,7 +541,10 @@ class BLEController extends ChangeNotifier {
     double x = byteData.getFloat32(0);
     return x;
   }
-
+  ///Reads array of byte data from Movesense subscription
+  ///Timestamping when data arrived. Used for single clock time sync.
+  ///Converts byte-data to a float value for every axis
+  ///Summerize all the accelerometer forces using Pythagoras to get an accelerometer value.
   readMoveSenseData(List<int> event) {
     int currentTime = DateTime
         .now()

@@ -1,6 +1,3 @@
-
-import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:startblock/helper/BLEController.dart';
@@ -161,6 +158,7 @@ class DataViewViewModel extends ChangeNotifier{
     notifyListeners();
     return result;
   }
+  ///Calculates the average force were noise can no longer be detected
   double _calcAverageForce(List<Data> data, double totalForce)
   {
     var tempT1;
@@ -192,6 +190,7 @@ class DataViewViewModel extends ChangeNotifier{
         return totalForce/(tempT2-tempT1);
       }
   }
+  ///Calculates the force impulse where noise can no longer be detected
   double _calcForceImpulse(List<Data> data, double totalForce)
   {
     var tempT1;
@@ -249,6 +248,7 @@ class DataViewViewModel extends ChangeNotifier{
     notifyListeners();
     return slope;
   }
+  ///Gets raw value data to be saved persistently .
   List<LiveData> getLeftDataToSave (){
     List<LiveData> tmpLeftList = <LiveData>[];
     for(int i = 0; i < bleController.leftFoot.length; i++){
@@ -261,7 +261,7 @@ class DataViewViewModel extends ChangeNotifier{
     }
     return tmpLeftList;
   }
-
+  ///Gets raw value data to be saved persistently.
   List<LiveData> getRightDataToSave (){
     List<LiveData> tmpRightList = <LiveData>[];
     for(int i = 0; i < bleController.rightFoot.length; i++){
@@ -274,7 +274,7 @@ class DataViewViewModel extends ChangeNotifier{
     }
     return tmpRightList;
   }
-
+  ///Gets time stamps from sample to be saved persistently.
   List<Timestamp> getTimestampsToSave(){
     List<Timestamp> tmpList = <Timestamp>[];
     for(int i = 0; i < bleController.timestamps.length; i++){
@@ -288,7 +288,7 @@ class DataViewViewModel extends ChangeNotifier{
     return tmpList;
   }
 
-  /// Updates the chart
+  /// Updates the chart if data is added to temp arrays.
   List<SplineSeries<Data, int>> getDataLeft(){
     //notifyListeners();
     return<SplineSeries<Data, int>>[
@@ -324,9 +324,9 @@ class DataViewViewModel extends ChangeNotifier{
   }
 
   num getMarzullo() {
-    return bleController.marzullo;
+    return bleController.marzulloTimeOffset;
   }
-
+  /// Gets data from Movesense accelerometer to be saved persistently.
   List<LiveData> getImuDataToSave (){
     List<LiveData> tmpAccList = <LiveData>[];
     for(int i = 0; i < bleController.movesenseData.length; i++){
@@ -339,8 +339,7 @@ class DataViewViewModel extends ChangeNotifier{
     }
     return tmpAccList;
   }
-
-
+  ///Gets timestamps from Movesense sample to be saved persistently.
   List<Timestamp> getImuTimestampsToSave (){
     List<Timestamp> tmpTimestampList = <Timestamp>[];
     for(int i = 0; i < bleController.movesenseData.length; i++){
@@ -353,7 +352,7 @@ class DataViewViewModel extends ChangeNotifier{
     }
     return tmpTimestampList;
   }
-
+  ///Gets timestamps for when Movesense data was received to be stored persistently.
   List<Timestamp> getMovesenseArriveTimestampsToSave (){
     List<Timestamp> tmpTimestampList = <Timestamp>[];
     for(int i = 0; i < bleController.movesenseData.length; i++){
@@ -366,6 +365,4 @@ class DataViewViewModel extends ChangeNotifier{
     }
     return tmpTimestampList;
   }
-
-
 }

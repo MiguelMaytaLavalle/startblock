@@ -1,14 +1,6 @@
-import 'dart:async';
-import 'dart:math';
-import 'dart:convert' show jsonEncode, utf8;
-
 import 'package:flutter/material.dart';
-import 'package:startblock/db/database_helper.dart';
-import 'package:startblock/model/history.dart';
-import 'package:startblock/model/livedata.dart';
 import 'package:startblock/view/recording_view.dart';
 import 'package:startblock/view/setting_view.dart';
-import 'package:startblock/view_model/data_view_view_model.dart';
 
 import '../helper/BLEController.dart';
 import 'data_view.dart';

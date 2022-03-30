@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:startblock/view_model/data_view_view_model.dart';
 import 'package:camera/camera.dart';
 import '../helper/BLEController.dart';
 import 'package:gallery_saver/gallery_saver.dart';
@@ -44,7 +43,6 @@ class _RecordingState extends State<RecordingScreen> {
     _cameraController = CameraController(front, ResolutionPreset.max);
     await _cameraController.initialize();
     setState(() => _isLoading = false);
-    //setState(() => sensorPageVM.setIsLoading(false));
   }
 
   _recordVideo() async {
@@ -52,12 +50,8 @@ class _RecordingState extends State<RecordingScreen> {
       final file = await _cameraController.stopVideoRecording();
       setState(() => _isRecording = false);
       await GallerySaver.saveVideo(file.path);
-/*      final route = MaterialPageRoute(
-        fullscreenDialog: true,
-        builder: (_) => VideoPage(filePath: file.path),
-      );*/
-      //Navigator.push(context, route);
-    } else {
+    }
+    else {
       await _cameraController.prepareForVideoRecording();
       await _cameraController.startVideoRecording();
       setState(() => _isRecording = true);

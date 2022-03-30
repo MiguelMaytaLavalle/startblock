@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:startblock/model/history.dart';
 import 'package:startblock/model/history_card.dart';
@@ -31,8 +29,6 @@ class HistoryCardViewModel{
   double _totalForceRight = 0;
   double _forceImpulseRight = 0;
   int _timeToPeakForceRight = 0;
-
-// Will contain all business logic
   var hCardModel = HistoryCardModel();
 
   getHistory(){
@@ -122,7 +118,8 @@ class HistoryCardViewModel{
   getMovesenseArriveTime(){
     return hCardModel.movesenseArriveTime;
   }
-
+  ///Gets raw data that is stored persistently and applies EWMA-filter to temporary data.
+  ///Alpha value can be changed in file Constants.dart
   void setupRightChartData(){
     for(int i = 0; i < getRightLiveData().length-1; i++){
       if(i == 0)
@@ -152,15 +149,15 @@ class HistoryCardViewModel{
       }
     }
   }
-
+  ///Getter for Excel doc. saving path.
   getAttachments(){
     return hCardModel.excelPath;
   }
-
+  ///Setter for Excel dock the save path.
   addAttachment(String path){
     hCardModel.excelPath = path;
   }
-  /// Updates the chart
+  /// Updates the chart in view when data is changed.
   List<SplineSeries<Data, int>> leftSplineSeries(){
     //notifyListeners();
     return<SplineSeries<Data, int>>[
@@ -243,7 +240,6 @@ class HistoryCardViewModel{
         tempVal = data[i].getForce();
       }
     }
-    //notifyListeners();
     return tempVal;
   }
   double getAverageForceLeft()
@@ -312,6 +308,7 @@ class HistoryCardViewModel{
     //notifyListeners();
     return slope;
   }
+  ///Calculates the average force were noise can no longer be detected
   double _calcAverageForce(List<Data> data, double totalForce)
   {
     var tempT1;
@@ -336,6 +333,7 @@ class HistoryCardViewModel{
     }
     return totalForce/(tempT2-tempT1);
   }
+  ///Calculates the force impulse where noise can no longer be detected
   double _calcForceImpulse(List<Data> data, double totalForce)
   {
     var tempT1;
