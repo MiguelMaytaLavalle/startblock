@@ -12,7 +12,7 @@ class HistoryDatabase{
   Future<Database> get database async{
     if(_database != null) return _database!;
 
-    _database = await  _initDB('test13.db');
+    _database = await  _initDB('test14.db');
     return _database!;
   }
 
@@ -25,7 +25,8 @@ class HistoryDatabase{
 
   Future _createDB(Database db, int version) async{
     const idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
-    const textType = 'TEXT NOT NULL';
+    const textTypeNotNull = 'TEXT NOT NULL';
+    const textTypeNull = 'TEXT';
     const boolType = 'BOOLEAN NOT NULL';
     final integerType = 'INTEGER NOT NULL';
     final realType = 'REAL NOT NULL';
@@ -33,14 +34,15 @@ class HistoryDatabase{
     await db.execute('''
 CREATE TABLE $tableHistory ( 
   ${HistoryFields.id} $idType, 
-  ${HistoryFields.dateTime} $textType,
-  ${HistoryFields.name} $textType,
-  ${HistoryFields.rightData} $textType,
-  ${HistoryFields.leftData} $textType,
-  ${HistoryFields.timestamps} $textType,
+  ${HistoryFields.dateTime} $textTypeNotNull,
+  ${HistoryFields.name} $textTypeNotNull,
+  ${HistoryFields.rightData} $textTypeNotNull,
+  ${HistoryFields.leftData} $textTypeNotNull,
+  ${HistoryFields.timestamps} $textTypeNotNull,
   ${HistoryFields.marzullo} $realType,
-  ${HistoryFields.sumAcc} $realType
-  
+  ${HistoryFields.imuData} $textTypeNull,
+  ${HistoryFields.imuTimestamps} $textTypeNull,
+  ${HistoryFields.movesenseArriveTime} $textTypeNull
   )
 ''');
   }

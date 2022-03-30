@@ -1,4 +1,4 @@
-String tableHistory = 'test13';
+String tableHistory = 'test14';
 
 /**
  * test5
@@ -7,7 +7,7 @@ String tableHistory = 'test13';
 
 class HistoryFields{
   static final List<String> values = [
-    id, dateTime, name, rightData, leftData,timestamps, marzullo,sumAcc,//imuTimestamp,
+    id, dateTime, name, rightData, leftData,timestamps, marzullo, imuData, imuTimestamps, movesenseArriveTime,//sumAcc,imuTimestamp,
   ];
   static const String id = '_id';
   static const String dateTime = 'dateTime';
@@ -16,7 +16,10 @@ class HistoryFields{
   static const String leftData = 'leftData';
   static const String timestamps = 'timestamps';
   static const String marzullo = 'marzullo';
-  static const String sumAcc = 'sumAcc';
+  static const String imuData = 'imuData';
+  static const String imuTimestamps = 'imuTimestamps';
+  static const String movesenseArriveTime = 'movesenseArriveTime';
+  //static const String sumAcc = 'sumAcc';
   //static const String imuTimestamp = 'imuTimestamp';
 }
 class History{
@@ -27,7 +30,10 @@ class History{
   final String leftData;
   final String timestamps;
   final num? marzullo;
-  final num? sumAcc;
+  final String imuData;
+  final String imuTimestamps;
+  final String movesenseArriveTime;
+  //final num? sumAcc;
 
   History({
     this.id,
@@ -37,7 +43,10 @@ class History{
     required this.leftData,
     required this.timestamps,
     required this.marzullo,
-    required this.sumAcc,
+    required this.imuData,
+    required this.imuTimestamps,
+    required this.movesenseArriveTime,
+    //required this.sumAcc,
   });
 
   Map<String, dynamic> toJson() =>{
@@ -48,7 +57,10 @@ class History{
     HistoryFields.leftData: leftData,
     HistoryFields.timestamps: timestamps,
     HistoryFields.marzullo: marzullo,
-    HistoryFields.sumAcc: sumAcc,
+    HistoryFields.imuData: imuData,
+    HistoryFields.imuTimestamps: imuTimestamps,
+    HistoryFields.movesenseArriveTime: movesenseArriveTime,
+    //HistoryFields.sumAcc: sumAcc,
 
   };
 
@@ -60,7 +72,11 @@ class History{
     leftData: json[HistoryFields.leftData] as String,
     timestamps: json[HistoryFields.timestamps] as String,
     marzullo: json[HistoryFields.marzullo] as num?,
-    sumAcc: json[HistoryFields.sumAcc] as num?,
+    imuData: json[HistoryFields.imuData] as String,
+    imuTimestamps: json[HistoryFields.imuTimestamps] as String,
+    movesenseArriveTime: json[HistoryFields.movesenseArriveTime] as String,
+
+    //sumAcc: json[HistoryFields.sumAcc] as num?,
   );
 
   History copy({
@@ -71,7 +87,10 @@ class History{
     String? leftData,
     String? timestamps,
     num? marzullo,
-    num? sumAcc,
+    String? imuData,
+    String? imuTimestamps,
+    String? movesenseArriveTime,
+    //num? sumAcc,
   }) =>
       History(
         id: id ?? this.id,
@@ -81,6 +100,10 @@ class History{
         leftData: leftData ?? this.leftData,
         timestamps: timestamps ?? this.timestamps,
         marzullo: marzullo ?? this.marzullo,
-        sumAcc: sumAcc ?? this.sumAcc,
+        imuData: imuData ?? this.imuData,
+        imuTimestamps: imuTimestamps ?? this.imuTimestamps,
+        movesenseArriveTime: movesenseArriveTime ?? this.movesenseArriveTime,
+
+        //sumAcc: sumAcc ?? this.sumAcc,
       );
 }

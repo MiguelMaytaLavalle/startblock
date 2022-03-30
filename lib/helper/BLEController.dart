@@ -26,7 +26,7 @@ class BLEController extends ChangeNotifier {
   List<Data> rightFoot = <Data>[];
   List<Data> leftFootEWMA = <Data>[];
   List<Data> rightFootEWMA = <Data>[];
-  late List<Movesense> accData = <Movesense>[];
+  late List<Movesense> movesenseData = <Movesense>[];
 
   /*late List<Data> leftFootEWMA;
   late List<Data> rightFootEWMA;*/
@@ -171,7 +171,7 @@ class BLEController extends ChangeNotifier {
     timestamps.clear();
     leftFootEWMA.clear();
     rightFootEWMA.clear();
-    accData.clear();
+    movesenseData.clear();
   }
 
 
@@ -235,7 +235,7 @@ class BLEController extends ChangeNotifier {
           _EWMAFilter(leftFoot, leftFootEWMA);
           _EWMAFilter(rightFoot, rightFootEWMA);
           stopMoveSenseSample();
-          accData.forEach((element)
+          movesenseData.forEach((element)
           {
             print('${element.timestamp}');
             print('${element.mAcc}');
@@ -591,6 +591,9 @@ class BLEController extends ChangeNotifier {
   }
 
   readMoveSenseData(List<int> event) {
+    int currentTime = DateTime
+        .now()
+        .millisecondsSinceEpoch;
     var response = event[0];
     var reference = event[1];
     if (response == 2 && reference == 99) {
@@ -605,7 +608,7 @@ class BLEController extends ChangeNotifier {
       var Zacc = _convertByteToDouble(
           [event[17], event[16], event[15], event[14]]);
       var acc = sqrt(pow(Xacc, 2) + pow(Yacc, 2) + pow(Zacc, 2));
-      accData.add(Movesense(timeStamp, acc));
+      movesenseData.add(Movesense(timeStamp, acc, currentTime));
     }
   }
 }

@@ -217,12 +217,11 @@ class _DataState extends State<DataScreen> {
       List<LiveData> leftList = sensorPageVM.getLeftDataToSave();
       List<LiveData> rightList = sensorPageVM.getRightDataToSave();
       List<Timestamp> timestamps = sensorPageVM.getTimestampsToSave();
-
-     print('Left length: ${leftList.length}');
-      print('Right length: ${rightList.length}');
-      print('Timestamps length: ${timestamps.length}');
-
       num marzullo = sensorPageVM.getMarzullo();
+      List<LiveData> imuDataList = sensorPageVM.getImuDataToSave();
+      List<Timestamp> imuTimestampList = sensorPageVM.getImuTimestampsToSave();
+      List<Timestamp> movesenseArriveTimeList = sensorPageVM.getMovesenseArriveTimestampsToSave();
+
       final history =  History(
         dateTime: DateTime.now(),
         name: name,
@@ -230,7 +229,9 @@ class _DataState extends State<DataScreen> {
         rightData: jsonEncode(rightList),
         timestamps: jsonEncode(timestamps),
         marzullo: marzullo,
-        sumAcc: 21321.3213,
+        imuData: jsonEncode(imuDataList),
+        imuTimestamps: jsonEncode(imuTimestampList), 
+        movesenseArriveTime: jsonEncode(movesenseArriveTimeList),
       );
       print('SUCCESS');
       await HistoryDatabase.instance.create(history);

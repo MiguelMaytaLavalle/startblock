@@ -57,12 +57,21 @@ class ExportToExcel{
     final Future<List<ExcelDataRow>> dataRowsLeft = _mapExcelData('Left',history.leftData);
     final Future<List<ExcelDataRow>> dataRowsRight = _mapExcelData('Right',history.rightData);
     final Future<List<ExcelDataRow>> dataRowsTimestamp = _mapExcelTimestamps('Time',history.timestamps);
+    final Future<List<ExcelDataRow>> dataRowsIMUAcc = _mapExcelData('IMU Acc',history.imuData);
+    final Future<List<ExcelDataRow>> dataRowsIMUTimestamp = _mapExcelTimestamps('IMU Timestamp',history.imuTimestamps);
+    final Future<List<ExcelDataRow>> dataRowsMovesenseArriveTime = _mapExcelTimestamps('Movesense Arrive Time',history.movesenseArriveTime);
     //final Future<List<ExcelDataRow>> dataRowsMarzullo = _mapExcelMarzullo('Marzullo',history.marzullo);
     List<ExcelDataRow> _dataRowsLeft = await Future.value(dataRowsLeft);
     List<ExcelDataRow> _dataRowsRight = await Future.value(dataRowsRight);
     List<ExcelDataRow> _dataRowTimetamps = await Future.value(dataRowsTimestamp);
+    List<ExcelDataRow> _dataRowIMUAcc = await Future.value(dataRowsIMUAcc);
+    List<ExcelDataRow> _dataRowIMUTimestamp = await Future.value(dataRowsIMUTimestamp);
+    List<ExcelDataRow> _dataRowMovesenseArriveTime = await Future.value(dataRowsMovesenseArriveTime);
 
     print('Marzullo ${history.marzullo}');
+    print('IMUDATA ${history.imuData.length}');
+    print('Timestamps ${history.imuTimestamps.length}');
+    print('Arrivetime ${history.movesenseArriveTime.length}');
 
     //Import the list to Sheet.
     sheet.importData(_dataRowsLeft, 1, 1);
@@ -70,8 +79,9 @@ class ExportToExcel{
     sheet.importData(_dataRowTimetamps, 1, 3);
     sheet.getRangeByIndex(1, 4).setText('Marzullo Micro:Bit Offset');
     sheet.getRangeByIndex(2, 4).setText(history.marzullo.toString());
-    sheet.getRangeByIndex(1, 5).setText('Movesense total accelerometer');
-    sheet.getRangeByIndex(2, 5).setText(history.sumAcc.toString());
+    sheet.importData(_dataRowIMUAcc,1,5);
+    sheet.importData(_dataRowIMUTimestamp, 1, 6);
+    sheet.importData(_dataRowMovesenseArriveTime, 1, 7);
 
     //Auto-Fit columns.
     sheet.getRangeByName('A1:B1').autoFitColumns();

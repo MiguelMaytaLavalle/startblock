@@ -99,9 +99,30 @@ class HistoryCardViewModel{
     return hCardModel.history.marzullo;
   }
 
-  getSumAcc(){
-    return hCardModel.history.sumAcc;
+  setImuData(List<LiveData> list){
+    hCardModel.imuData = list;
   }
+
+  getImuData(){
+    return hCardModel.imuData;
+  }
+
+  setImuTimestamps(List<Timestamp> list){
+    hCardModel.imuTimestamps = list;
+  }
+
+  getImuTimestamps(){
+    return hCardModel.imuTimestamps;
+  }
+
+  setMovesenseArriveTime(List<Timestamp> list){
+    hCardModel.movesenseArriveTime = list;
+  }
+
+  getMovesenseArriveTime(){
+    return hCardModel.movesenseArriveTime;
+  }
+
   void setupRightChartData(){
     for(int i = 0; i < getRightLiveData().length-1; i++){
       if(i == 0)
@@ -140,23 +161,6 @@ class HistoryCardViewModel{
     hCardModel.excelPath = path;
   }
   /// Updates the chart
- /* List<SplineSeries<Data, int>> leftSplineSeries(){
-    //notifyListeners();
-    return<SplineSeries<Data, int>>[
-      SplineSeries<Data, int>(
-        color: Colors.blue,
-        dataSource: leftChartData,
-        width: 2,
-        name: 'Left foot',
-        onRendererCreated: (ChartSeriesController controller) {
-          _chartSeriesLeftController = controller; //Updates the chart live
-        },
-        xValueMapper: (Data data, _) => data.timestamp,
-        yValueMapper: (Data data, _) => data.mForce,
-      ),
-    ];
-  }*/
-
   List<SplineSeries<Data, int>> leftSplineSeries(){
     //notifyListeners();
     return<SplineSeries<Data, int>>[

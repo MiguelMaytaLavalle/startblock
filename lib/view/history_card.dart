@@ -57,17 +57,19 @@ class _HistoryCardState extends State<HistoryCard> {
 
     hCardVM.setMarzulloHistory(hCardVM.getMarzullo());
 
+    hCardVM.setImuData((json.decode(hCardVM.getHistory().imuData) as List)
+        .map((e) => LiveData.fromJson(e))
+        .toList());
+
+    hCardVM.setImuTimestamps((json.decode(hCardVM.getHistory().imuTimestamps) as List)
+        .map((e) => Timestamp.fromJson(e))
+        .toList());
+
+    hCardVM.setMovesenseArriveTime((json.decode(hCardVM.getHistory().movesenseArriveTime) as List)
+        .map((e) => Timestamp.fromJson(e))
+        .toList());
+
     setState(() => hCardVM.setIsLoading(false));
-
-    //hCardVM.getHistory().timestamps;
-
-/*    hCardVM.setRightHistory((json.decode(hCardVM.getHistory().rightData) as List)
-        .map((e) => LiveData.fromJson(e))
-        .toList());
-    hCardVM.setLeftHistory((json.decode(hCardVM.getHistory().leftData) as List)
-        .map((e) => LiveData.fromJson(e))
-        .toList());
-    setState(() => hCardVM.setIsLoading(false));*/
 
 
     hCardVM.setupLeftChartData();
@@ -102,10 +104,6 @@ class _HistoryCardState extends State<HistoryCard> {
                     ),
                     Text(
                       'Marzullo: ${hCardVM.getMarzullo().toString()}',
-                      style: const TextStyle(color: Colors.blue),
-                    ),
-                    Text(
-                      'Sum accelerometer : ${hCardVM.getSumAcc().toString()}',
                       style: const TextStyle(color: Colors.blue),
                     ),
                     Container(

@@ -9,6 +9,7 @@ import 'package:startblock/model/sensor.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 import '../constant/constants.dart';
+import '../model/movesense.dart';
 import '../model/timestamp.dart';
 
 class DataViewViewModel extends ChangeNotifier{
@@ -16,8 +17,11 @@ class DataViewViewModel extends ChangeNotifier{
   late ChartSeriesController _chartSeriesRightController;
   late ChartSeriesController _chartSeriesLeftController;
   BLEController bleController = BLEController();
+
   late List<Data> tempLeft;
   late List<Data> tempRight;
+  late List<Movesense> tempMovesenseData;
+
   double _peakForceLeft = 0;
   double _RFDLeft = 0;
   double _avgForceLeft = 0;
@@ -322,5 +326,46 @@ class DataViewViewModel extends ChangeNotifier{
   num getMarzullo() {
     return bleController.marzullo;
   }
+
+  List<LiveData> getImuDataToSave (){
+    List<LiveData> tmpAccList = <LiveData>[];
+    for(int i = 0; i < bleController.movesenseData.length; i++){
+      print("Acc: ${bleController.movesenseData[i].mAcc}");
+      tmpAccList.add(LiveData(
+          force: bleController.movesenseData[i].mAcc
+      ));
+      print("Index: $i");
+      print("-----------");
+    }
+    return tmpAccList;
+  }
+
+
+  List<Timestamp> getImuTimestampsToSave (){
+    List<Timestamp> tmpTimestampList = <Timestamp>[];
+    for(int i = 0; i < bleController.movesenseData.length; i++){
+      print("IMU timestamp: ${bleController.movesenseData[i].timestamp}");
+      tmpTimestampList.add(Timestamp(
+          time: bleController.movesenseData[i].timestamp
+      ));
+      print("Index: $i");
+      print("-----------");
+    }
+    return tmpTimestampList;
+  }
+
+  List<Timestamp> getMovesenseArriveTimestampsToSave (){
+    List<Timestamp> tmpTimestampList = <Timestamp>[];
+    for(int i = 0; i < bleController.movesenseData.length; i++){
+      print("IMU timestamp: ${bleController.movesenseData[i].mobileTimestamp}");
+      tmpTimestampList.add(Timestamp(
+          time: bleController.movesenseData[i].mobileTimestamp
+      ));
+      print("Index: $i");
+      print("-----------");
+    }
+    return tmpTimestampList;
+  }
+
 
 }
