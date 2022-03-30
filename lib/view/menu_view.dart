@@ -39,6 +39,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
+
         children: <Widget>[
           ElevatedButton(
             style: style,
@@ -72,21 +73,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
             },
             child: const Text('Test'),
           ),
-
-/*
-          ElevatedButton(
-            style: style,
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => MoveSenseScreen()),
-              );
-            },
-            child: const Text('Movesense'),
-          ),
-*/
-
         ],
+
       ),
     );
   }
