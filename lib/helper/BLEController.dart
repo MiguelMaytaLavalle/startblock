@@ -89,6 +89,11 @@ class BLEController extends ChangeNotifier {
       return;
     }
     _timeSyncTimer.cancel();
+
+    flutterBlue.stopScan();
+    scanSubScription.cancel();
+
+    _timeSyncTimer.cancel();
     streamSubscription?.cancel();
     await targetDevice?.disconnect();
 

@@ -2,13 +2,13 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:startblock/db/database_helper.dart';
 import 'package:startblock/helper/excel.dart';
 import 'package:startblock/model/livedata.dart';
 import 'package:startblock/model/timestamp.dart';
 import 'package:startblock/view_model/history_card_view_model.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:share_plus/share_plus.dart';
 
 class HistoryCard extends StatefulWidget {
   final int historyId;
@@ -23,7 +23,10 @@ class HistoryCard extends StatefulWidget {
 }
 
 class _HistoryCardState extends State<HistoryCard> {
+  final ButtonStyle style =
+  ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 20));
   HistoryCardViewModel hCardVM = HistoryCardViewModel();
+
   //SendEmailViewModel sendEmailVM = SendEmailViewModel();
   ExportToExcel exportExcel = ExportToExcel();
   late SfCartesianChart chart;
@@ -79,9 +82,7 @@ class _HistoryCardState extends State<HistoryCard> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-            //actions: [editButton(), deleteButton()],
-            ),
+        appBar: AppBar(),
         body: hCardVM.getIsLoading()
             ? const Center(child: CircularProgressIndicator())
             : Padding(
@@ -167,8 +168,7 @@ class _HistoryCardState extends State<HistoryCard> {
                                   ),
                                   axisLine: const AxisLine(width: 0),
                                   majorTickLines: const MajorTickLines(size: 0),
-                                  title: AxisTitle(text: 'Force [N]')
-                              ),
+                                  title: AxisTitle(text: 'Force [N]')),
                             ),
                             Wrap(
                               direction: Axis.vertical,
@@ -229,111 +229,99 @@ class _HistoryCardState extends State<HistoryCard> {
                                   ),
                                   axisLine: const AxisLine(width: 0),
                                   majorTickLines: const MajorTickLines(size: 0),
-                                  title: AxisTitle(text: 'Force [N]')
-                              ),
+                                  title: AxisTitle(text: 'Force [N]')),
                             ),
                             Wrap(
                               direction: Axis.vertical,
                               children: <Widget>[
                                 Material(
-                                  //margin:const EdgeInsets.all(10),
-                                    child: Text('Rate of force (RFD): ${hCardVM.getRFDRight()
-                                    .toStringAsPrecision(2)}'
-                                    )
-                                ),
+                                    //margin:const EdgeInsets.all(10),
+                                    child: Text(
+                                        'Rate of force (RFD): ${hCardVM.getRFDRight().toStringAsPrecision(2)}')),
                                 Material(
-                                  //margin:const EdgeInsets.all(10),
-                                    child: Text('Time to peak (TTP): ${hCardVM.getTimeToPeakForceRight()}'
-                                    )
-                                ),
+                                    //margin:const EdgeInsets.all(10),
+                                    child: Text(
+                                        'Time to peak (TTP): ${hCardVM.getTimeToPeakForceRight()}')),
                                 Material(
-                                  //margin:const EdgeInsets.all(10),
-                                    child: Text('Average Force: ${hCardVM.getAverageForceRight()
-                                        .toStringAsFixed(2)}'
-                                    )
-                                ),
+                                    //margin:const EdgeInsets.all(10),
+                                    child: Text(
+                                        'Average Force: ${hCardVM.getAverageForceRight().toStringAsFixed(2)}')),
                                 Material(
-                                  //margin:const EdgeInsets.all(10),
-                                    child: Text('Force impulse: ${hCardVM.getForceImpulseRight()
-                                    .toStringAsPrecision(2)}'
-                                    )
-                                ),
+                                    //margin:const EdgeInsets.all(10),
+                                    child: Text(
+                                        'Force impulse: ${hCardVM.getForceImpulseRight().toStringAsPrecision(2)}')),
                                 Material(
-                                  //margin:const EdgeInsets.all(10),
-                                    child: Text('Peak force: ${hCardVM.getPeakForceRight()
-                                        .toStringAsPrecision(2)}'
-                                    )
-                                ),
+                                    //margin:const EdgeInsets.all(10),
+                                    child: Text(
+                                        'Peak force: ${hCardVM.getPeakForceRight().toStringAsPrecision(2)}')),
                               ],
                             ),
-
-
+                            //const SizedBox(height: 60),
                           ],
                         ),
                       ),
                     ),
+                    const SizedBox(height: 50),
                   ],
                 ),
               ),
 
-    floatingActionButton:Wrap(
-      direction: Axis.horizontal,
-      children: <Widget>[
-        Container(
-            margin:const EdgeInsets.all(10),
-            child: ElevatedButton(
-              onPressed: openDialog,
-              child: const Icon(Icons.delete),
-            )
+        floatingActionButton: Wrap(
+          spacing: 20,
+          direction: Axis.horizontal,
+          children: <Widget>[
+            Container(
+                margin: const EdgeInsets.all(10),
+                child: ElevatedButton(
+                  onPressed: openDialog,
+                  child: const Icon(Icons.delete),
+                )),
+            Container(
+                margin: EdgeInsets.all(10),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Share.shareFiles([hCardVM.getAttachments()]);
+                  },
+                  child: const Icon(Icons.share),
+                )),
+          ],
         ),
-        Container(
-            margin: EdgeInsets.all(10),
-            child: ElevatedButton(
-              onPressed: () {
-                Share.shareFiles([hCardVM.getAttachments()]);
-                },
-              child: const Icon(Icons.share),
-            )
-        ),
-      ],
-    ),
       );
 
   Future<String?> openDialog() => showDialog<String>(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: Text('Do you want to delete this log?'),
-      actions: [
-        TextButton(
-          child: Text('No'),
-          onPressed: (){Navigator.of(context).pop();},
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Do you want to delete this log?'),
+          actions: [
+            TextButton(
+              child: Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Yes'),
+              onPressed: _deleteHistory,
+            ),
+          ],
         ),
-        TextButton(
-          child: Text('Yes'),
-          onPressed: _deleteHistory,
-        ),
-      ],
-    ),
-  );
+      );
 
-  Future _deleteHistory() async{
+  Future _deleteHistory() async {
     Navigator.of(context).pop();
     await HistoryDatabase.instance.delete(widget.historyId);
     Navigator.of(context).pop();
   }
 
   _attachExcel() async {
-    try{
+    try {
       String tmp = await exportExcel.attachExcel(hCardVM.getHCardModel());
       hCardVM.addAttachment(tmp);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Exported excel file succesfully')));
-    }catch(error){
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("NO ${error.toString()}")));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: const Text('Exported excel file succesfully')));
+    } catch (error) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("NO ${error.toString()}")));
     }
-
   }
-
-
-
 }
-
