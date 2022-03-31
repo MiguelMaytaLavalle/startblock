@@ -82,8 +82,7 @@ class _DataState extends State<DataScreen> {
                 ),
                 Material(
                   //margin:const EdgeInsets.all(10),
-                    child: Text('Time to peak (TTP): ${sensorPageVM.getTimeToPeakForceLeft()
-                    .toStringAsPrecision(2)}'
+                    child: Text('Time to peak (TTP): ${sensorPageVM.getTimeToPeakForceLeft()}'
                     )
                 ),
                 Material(
@@ -146,8 +145,7 @@ class _DataState extends State<DataScreen> {
                 ),
                 Material(
                   //margin:const EdgeInsets.all(10),
-                    child: Text('Time to peak (TTP): ${sensorPageVM.getTimeToPeakForceRight()
-                    .toStringAsPrecision(2)}'
+                    child: Text('Time to peak (TTP): ${sensorPageVM.getTimeToPeakForceRight()}'
                     )
                 ),
                 Material(

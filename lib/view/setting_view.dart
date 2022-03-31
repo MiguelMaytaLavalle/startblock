@@ -53,7 +53,7 @@ class _SettingState extends State<SettingScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   child:const Text("Set threshold value to zero if you want to turn off the False start function.\n"
-                      "The function is initially set to 500N when the system starts.",
+                      "The function is initially set to 100N when the system starts.",
                     style: TextStyle(color: Colors.grey),
                   ),
                 ),
