@@ -22,8 +22,6 @@ class BLEController extends ChangeNotifier {
 
   List<Data> leftFoot = <Data>[];
   List<Data> rightFoot = <Data>[];
-  List<Data> leftFootEWMA = <Data>[];
-  List<Data> rightFootEWMA = <Data>[];
   late List<Movesense> movesenseData = <Movesense>[];
   List<Timestamp> timestamps = <Timestamp>[];
 
@@ -61,7 +59,7 @@ class BLEController extends ChangeNotifier {
 
   startScan() async {
     scanSubScription = flutterBlue.scan().listen((scanResult) async {
-      if (scanResult.device.name == Constants.TARGET_DEVICE_NAME_ZIVIT) {
+      if (scanResult.device.name == Constants.TARGET_DEVICE_NAME_TIZEZ) {
         print("Found device");
         targetDevice = scanResult.device;
         await stopScan();
@@ -149,7 +147,6 @@ class BLEController extends ChangeNotifier {
     List<int> bytes = utf8.encode(data);
     receiveChar.write(bytes);
   }
-
   void flushKrille() {
     _timeStampCounter = 0;
     _timeSyncCounter = 0;
@@ -163,13 +160,9 @@ class BLEController extends ChangeNotifier {
 
   void flushData() async
   {
-    //sensorPageVM.flushData();
-    //sensorPageVM.getTimes().clear();
     leftFoot.clear();
     rightFoot.clear();
     timestamps.clear();
-    leftFootEWMA.clear();
-    rightFootEWMA.clear();
     movesenseData.clear();
   }
 
@@ -226,12 +219,9 @@ class BLEController extends ChangeNotifier {
       case 'D' :
         {
           print('DONE');
+          stopMoveSenseSample();
           _timeStampCounter = 0;
           print(tag[1]);
-
-          _EWMAFilter(leftFoot, leftFootEWMA);
-          _EWMAFilter(rightFoot, rightFootEWMA);
-          stopMoveSenseSample();
           movesenseData.forEach((element)
           {
             print('${element.timestamp}');
@@ -267,31 +257,6 @@ class BLEController extends ChangeNotifier {
           print('No data to read');
         }
         break;
-    }
-  }
-  ///Takes raw data and applies EWMA-filter for view
-  void _EWMAFilter(List<Data> data, List<Data> listEWMA) {
-    print("Data length: ${data.length}");
-
-    for (int i = 0; i < data.length - 1; i++) {
-      if (i == 0) {
-        print('i = 0');
-        print(data[i].mForce);
-        //tempList.add(data[i]);
-        listEWMA.add(data[i]);
-      }
-      else {
-        print('Data force: ${data[i].mForce}');
-        Data tempData = data[i];
-        //tempData.mForce = alpha * data[i].getForce() + (1-alpha) * tempList[i-1].getForce();
-        tempData.mForce = Constants.ALPHA * data[i].getForce() +
-            (1 - Constants.ALPHA) * listEWMA[i - 1].getForce();
-        print('tempData force: ${tempData.mForce}');
-        //tempList.add(tempData);
-        listEWMA.add(tempData);
-        //print('Templist length: ${tempList.length}');
-        print('Templist length: ${listEWMA.length}');
-      }
     }
   }
 ///Method to re-send time syncing and check how many times a time sync request has been made.
