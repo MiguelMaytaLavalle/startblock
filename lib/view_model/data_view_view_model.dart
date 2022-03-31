@@ -294,7 +294,8 @@ class DataViewViewModel extends ChangeNotifier{
     return<SplineSeries<Data, int>>[
       SplineSeries<Data, int>(
         color: Colors.blue,
-        dataSource: tempLeft,
+        //dataSource: tempLeft,
+        dataSource: bleController.leftFootEWMA,
         width: 2,
         name: 'Left foot',
         onRendererCreated: (ChartSeriesController controller) {
@@ -311,7 +312,8 @@ class DataViewViewModel extends ChangeNotifier{
     return<SplineSeries<Data, int>>[
       SplineSeries<Data, int>(
         color: Colors.red,
-        dataSource: tempRight,
+        //dataSource: tempRight,
+        dataSource: bleController.rightFootEWMA,
         width: 2,
         name: 'Right foot',
         onRendererCreated: (ChartSeriesController controller) {
