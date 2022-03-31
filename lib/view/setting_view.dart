@@ -1,11 +1,11 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:startblock/helper/BLEController.dart';
 import 'package:startblock/view_model/settings_view_model.dart';
-import '../model/sensor.dart';
-//import //'package:movesense_flutter/movesense_flutter.dart';
 
+/// A user can choose to adjust the false start threshold from the Setting view.
+/// A user can also connect to a movesense if the user chooses to.
+/// After connecting to a movesense a user can initiate an episode and record the movesense data.
+///
 class SettingScreen extends StatefulWidget {
   @override
   _SettingState createState() => _SettingState();
@@ -57,16 +57,31 @@ class _SettingState extends State<SettingScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   child:const Text("Set threshold value to zero if you want to turn off the False start function.\n"
-                      "The function is initially set to off when the system starts.",
+                      "The function is initially set to 100N when the system starts.",
                     style: TextStyle(color: Colors.grey),
                   ),
                 ),
-               /* ElevatedButton(
+               ElevatedButton(
                     onPressed:(){
+                      settingVM.connectToMovesense();
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Deez")));
                     },
                     child: Text("Connect Movesense")
-                ),*/
+                ),
+                ElevatedButton(
+                    onPressed:(){
+                      settingVM.sendMoveSense();
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Deez")));
+                    },
+                    child: Text("Send Movesense")
+                ),
+                ElevatedButton(
+                    onPressed:(){
+                      settingVM.stopMovesense();
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Deez")));
+                    },
+                    child: Text("Stop Movesense")
+                )
               ],
             ),
           ),

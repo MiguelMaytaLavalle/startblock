@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:startblock/model/history.dart';
 import 'package:startblock/model/history_card.dart';
@@ -11,7 +9,6 @@ import '../model/timestamp.dart';
 import '../constant/constants.dart';
 
 class HistoryCardViewModel{
-  // Provide all the state = data needed by the home view
   String hCardTitle = 'Test';
   late ChartSeriesController _chartSeriesRightController;
   late ChartSeriesController _chartSeriesLeftController;
@@ -20,13 +17,16 @@ class HistoryCardViewModel{
   double _peakForceLeft = 0;
   double _RFDLeft = 0;
   double _avgForceLeft = 0;
+  double _totalForceLeft = 0;
+  double _forceImpulseLeft = 0;
   int _timeToPeakForceLeft = 0;
+
   double _peakForceRight = 0;
   double _RFDRight = 0;
   double _avgForceRight = 0;
+  double _totalForceRight = 0;
+  double _forceImpulseRight = 0;
   int _timeToPeakForceRight = 0;
-
-// Will contain all business logic
   var hCardModel = HistoryCardModel();
 
   getHistory(){
@@ -92,6 +92,32 @@ class HistoryCardViewModel{
   getMarzullo(){
     return hCardModel.history.marzullo;
   }
+
+  setImuData(List<LiveData> list){
+    hCardModel.imuData = list;
+  }
+
+  getImuData(){
+    return hCardModel.imuData;
+  }
+
+  setImuTimestamps(List<Timestamp> list){
+    hCardModel.imuTimestamps = list;
+  }
+
+  getImuTimestamps(){
+    return hCardModel.imuTimestamps;
+  }
+
+  setMovesenseArriveTime(List<Timestamp> list){
+    hCardModel.movesenseArriveTime = list;
+  }
+
+  getMovesenseArriveTime(){
+    return hCardModel.movesenseArriveTime;
+  }
+  ///Gets raw data that is stored persistently and applies EWMA-filter to temporary data.
+  ///Alpha value can be changed in file Constants.dart
   void setupRightChartData(){
     for(int i = 0; i < getRightLiveData().length-1; i++){
       if(i == 0)
@@ -121,32 +147,15 @@ class HistoryCardViewModel{
       }
     }
   }
-
+  ///Getter for Excel doc. saving path.
   getAttachments(){
     return hCardModel.excelPath;
   }
-
+  ///Setter for Excel dock the save path.
   addAttachment(String path){
     hCardModel.excelPath = path;
   }
-  /// Updates the chart
- /* List<SplineSeries<Data, int>> leftSplineSeries(){
-    //notifyListeners();
-    return<SplineSeries<Data, int>>[
-      SplineSeries<Data, int>(
-        color: Colors.blue,
-        dataSource: leftChartData,
-        width: 2,
-        name: 'Left foot',
-        onRendererCreated: (ChartSeriesController controller) {
-          _chartSeriesLeftController = controller; //Updates the chart live
-        },
-        xValueMapper: (Data data, _) => data.timestamp,
-        yValueMapper: (Data data, _) => data.mForce,
-      ),
-    ];
-  }*/
-
+  /// Updates the chart in view when data is changed.
   List<SplineSeries<Data, int>> leftSplineSeries(){
     //notifyListeners();
     return<SplineSeries<Data, int>>[
@@ -229,44 +238,36 @@ class HistoryCardViewModel{
         tempVal = data[i].getForce();
       }
     }
-    //notifyListeners();
     return tempVal;
   }
-
   double getAverageForceLeft()
   {
-    _avgForceLeft = _calcAverageForce(leftChartData);
+    _totalForceLeft = _calcTotalForce(leftChartData);
+    _avgForceLeft = _calcAverageForce(leftChartData, _totalForceLeft);
     return _avgForceLeft;
   }
   double getAverageForceRight()
   {
-    _avgForceRight = _calcAverageForce(rightChartData);
+    _totalForceRight = _calcTotalForce(rightChartData);
+    _avgForceRight = _calcAverageForce(rightChartData, _totalForceRight);
     return _avgForceRight;
   }
-  ///Calculates the mean force for the sample where noise is removed.
-  double _calcAverageForce(List<Data> data)
+  double getForceImpulseLeft()
   {
-    double result = 0.0;
-    var tempT1;
-    var tempT2;
-    //Get time where noise stops frmo the beginning of the list
-    for(int i = 0; i < data.length; i++)
-    {
-      if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
-      {
-        tempT1 = data[i].getTime();
-        break;
-      }
-    }
-    //Get time where noise stops from the end of the list
-    for(int i = data.length-1; i >= 0; i--)
-    {
-      if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
-      {
-        tempT2 = data[i].getTime();
-        break;
-      }
-    }
+    _totalForceLeft = _calcTotalForce(leftChartData);
+    _forceImpulseLeft = _calcForceImpulse(leftChartData, _totalForceLeft);
+    return _forceImpulseLeft;
+  }
+  double getForceImpulseRight()
+  {
+    _totalForceRight = _calcTotalForce(rightChartData);
+    _forceImpulseRight = _calcForceImpulse(rightChartData, _totalForceRight);
+    return _forceImpulseRight;
+  }
+  ///Calculates the total force for the sample where noise is removed.
+  double _calcTotalForce(List<Data> data)
+  {
+    double result = 0;
     //Calculates the area the for the dataset using Trapezoidal rule. AKA numerical integration
     for(int i = 0; i < data.length-1; i++)
     {
@@ -277,8 +278,7 @@ class HistoryCardViewModel{
           result+=(q-p)/2*(data[i].getForce()+data[i+1].getForce());
         }
     }
-    //notifyListeners();
-    return result/(tempT2-tempT1);
+    return result;
   }
   ///Calculates the slope of the plotted function. Slope value represents Rate of Force Development
   double getRFDLeft()
@@ -305,5 +305,55 @@ class HistoryCardViewModel{
     }
     //notifyListeners();
     return slope;
+  }
+  ///Calculates the average force were noise can no longer be detected
+  double _calcAverageForce(List<Data> data, double totalForce)
+  {
+    var tempT1;
+    var tempT2;
+    //Get time where noise stops frmo the beginning of the list
+    for(int i = 0; i < data.length; i++)
+    {
+      if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
+      {
+        tempT1 = data[i].getTime();
+        break;
+      }
+    }
+    //Get time where noise stops from the end of the list
+    for(int i = data.length-1; i >= 0; i--)
+    {
+      if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
+      {
+        tempT2 = data[i].getTime();
+        break;
+      }
+    }
+    return totalForce/(tempT2-tempT1);
+  }
+  ///Calculates the force impulse where noise can no longer be detected
+  double _calcForceImpulse(List<Data> data, double totalForce)
+  {
+    var tempT1;
+    var tempT2;
+    //Get time where noise stops from the beginning of the list
+    for(int i = 0; i < data.length; i++)
+    {
+      if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
+      {
+        tempT1 = data[i].getTime();
+        break;
+      }
+    }
+    //Get time where noise stops from the end of the list
+    for(int i = data.length-1; i >= 0; i--)
+    {
+      if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
+      {
+        tempT2 = data[i].getTime();
+        break;
+      }
+    }
+    return totalForce*(tempT2-tempT1);
   }
 }

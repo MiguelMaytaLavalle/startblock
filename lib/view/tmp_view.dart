@@ -9,6 +9,7 @@ import 'dart:math' as math;
 
 import '../model/timestamp.dart';
 
+/// A test view for testing saving an episode to the database.
 class TestScreen extends StatelessWidget {
   // This widget is the root of your application.
   final History? history;
@@ -140,14 +141,19 @@ class _TestPageState extends State<TestPage> {
       List<LiveData> testRight = getRightData();
       List<LiveData> testLeft = getLeftData();
       List<Timestamp> timestamps = getTimestamps();
+      List<LiveData> imuData = getImuData();
+      List<Timestamp> imuTimestamps = getImuTimestamps();
 
       final history =  History(
         dateTime: DateTime.now(),
-        name: 'Ricardo',
+        name: 'TestData',
         rightData: jsonEncode(testRight),
         leftData: jsonEncode(testLeft),
         timestamps: jsonEncode(timestamps),
         marzullo: 1648054909673.0,
+        imuData: jsonEncode(imuData),
+        imuTimestamps: jsonEncode(imuTimestamps),
+        movesenseArriveTime: jsonEncode(imuTimestamps),
         //liveData: getChartData(),
       );
 
@@ -287,5 +293,48 @@ void updateDataSource(Timer timer) {
     ];
   }
 
+  List<LiveData> getImuData() {return <LiveData>[
+    LiveData(force:54)
+    ,LiveData(force:64)
+    ,LiveData(force:67)
+    ,LiveData(force:70)
+    ,LiveData(force:100)
+    ,LiveData(force:123)
+    ,LiveData(force:124)
+    ,LiveData(force:145)
+    ,LiveData(force:160)
+    ,LiveData(force:130)
+    ,LiveData(force:132)
+    ,LiveData(force:110)
+    ,LiveData(force:90)
+    ,LiveData(force:89)
+    ,LiveData(force:86)
+    ,LiveData(force:50)
+    ,LiveData(force:40)
+    ,LiveData(force:35)
+  ];
+  }
+  List<Timestamp> getImuTimestamps() {
+    return <Timestamp>[
+      Timestamp(time:0)
+      ,Timestamp(time:1)
+      ,Timestamp(time:2)
+      ,Timestamp(time:3)
+      ,Timestamp(time:4)
+      ,Timestamp(time:5)
+      ,Timestamp(time:6)
+      ,Timestamp(time:7)
+      ,Timestamp(time:8)
+      ,Timestamp(time:9)
+      ,Timestamp(time:10)
+      ,Timestamp(time:11)
+      ,Timestamp(time:12)
+      ,Timestamp(time:13)
+      ,Timestamp(time:14)
+      ,Timestamp(time:15)
+      ,Timestamp(time:16)
+      ,Timestamp(time:17)
+    ];
+  }
 
 }

@@ -7,7 +7,10 @@ class HistoryCardModel{
   late String _excelPath;
   late List<LiveData> _rightData = [];
   late List<LiveData> _leftData = [];
+  late List<LiveData> _imuData = [];
   late List<Timestamp> timestamps = <Timestamp>[];
+  late List<Timestamp> _imuTimestamps = [];
+  late List<Timestamp> _movesenseArriveTime = [];
   bool _isLoading = false;
   late num _marzullo;
 
@@ -39,5 +42,23 @@ class HistoryCardModel{
 
   set marzullo(num value) {
     _marzullo = value;
+  }
+
+  List<LiveData> get imuData => _imuData;
+
+  set imuData(List<LiveData> value) {
+    _imuData = value;
+  }
+
+  List<Timestamp> get imuTimestamps => _imuTimestamps;
+
+  set imuTimestamps(List<Timestamp> value) {
+    _imuTimestamps = value;
+  }
+
+  List<Timestamp> get movesenseArriveTime => _movesenseArriveTime;
+
+  set movesenseArriveTime(List<Timestamp> value) {
+    _movesenseArriveTime = value;
   }
 }

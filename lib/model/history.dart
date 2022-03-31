@@ -1,13 +1,14 @@
-String tableHistory = 'test11';
+import 'package:startblock/constant/constants.dart';
+String tableHistory = Constants.HISTORY_TABLE_NAME;
 
 /**
- * test5
- *
+ * The class History contains the parameters for when creating
+ * the table in the database.
  */
 
 class HistoryFields{
   static final List<String> values = [
-    id, dateTime, name, rightData, leftData,timestamps, marzullo,
+    id, dateTime, name, rightData, leftData,timestamps, marzullo, imuData, imuTimestamps, movesenseArriveTime,
   ];
   static const String id = '_id';
   static const String dateTime = 'dateTime';
@@ -16,6 +17,10 @@ class HistoryFields{
   static const String leftData = 'leftData';
   static const String timestamps = 'timestamps';
   static const String marzullo = 'marzullo';
+  static const String imuData = 'imuData';
+  static const String imuTimestamps = 'imuTimestamps';
+  static const String movesenseArriveTime = 'movesenseArriveTime';
+
 }
 class History{
   final int? id;
@@ -25,6 +30,9 @@ class History{
   final String leftData;
   final String timestamps;
   final num? marzullo;
+  final String imuData;
+  final String imuTimestamps;
+  final String movesenseArriveTime;
 
   History({
     this.id,
@@ -34,6 +42,9 @@ class History{
     required this.leftData,
     required this.timestamps,
     required this.marzullo,
+    required this.imuData,
+    required this.imuTimestamps,
+    required this.movesenseArriveTime,
   });
 
   Map<String, dynamic> toJson() =>{
@@ -44,6 +55,9 @@ class History{
     HistoryFields.leftData: leftData,
     HistoryFields.timestamps: timestamps,
     HistoryFields.marzullo: marzullo,
+    HistoryFields.imuData: imuData,
+    HistoryFields.imuTimestamps: imuTimestamps,
+    HistoryFields.movesenseArriveTime: movesenseArriveTime,
 
   };
 
@@ -55,6 +69,9 @@ class History{
     leftData: json[HistoryFields.leftData] as String,
     timestamps: json[HistoryFields.timestamps] as String,
     marzullo: json[HistoryFields.marzullo] as num?,
+    imuData: json[HistoryFields.imuData] as String,
+    imuTimestamps: json[HistoryFields.imuTimestamps] as String,
+    movesenseArriveTime: json[HistoryFields.movesenseArriveTime] as String,
   );
 
   History copy({
@@ -65,6 +82,9 @@ class History{
     String? leftData,
     String? timestamps,
     num? marzullo,
+    String? imuData,
+    String? imuTimestamps,
+    String? movesenseArriveTime,
   }) =>
       History(
         id: id ?? this.id,
@@ -74,5 +94,8 @@ class History{
         leftData: leftData ?? this.leftData,
         timestamps: timestamps ?? this.timestamps,
         marzullo: marzullo ?? this.marzullo,
+        imuData: imuData ?? this.imuData,
+        imuTimestamps: imuTimestamps ?? this.imuTimestamps,
+        movesenseArriveTime: movesenseArriveTime ?? this.movesenseArriveTime,
       );
 }

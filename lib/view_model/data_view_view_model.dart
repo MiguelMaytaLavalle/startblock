@@ -1,6 +1,3 @@
-
-import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:startblock/helper/BLEController.dart';
@@ -9,6 +6,7 @@ import 'package:startblock/model/sensor.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 import '../constant/constants.dart';
+import '../model/movesense.dart';
 import '../model/timestamp.dart';
 
 class DataViewViewModel extends ChangeNotifier{
@@ -16,60 +14,31 @@ class DataViewViewModel extends ChangeNotifier{
   late ChartSeriesController _chartSeriesRightController;
   late ChartSeriesController _chartSeriesLeftController;
   BLEController bleController = BLEController();
-  late List<Data> tempLeft;
-  late List<Data> tempRight;
+  late List<Movesense> tempMovesenseData;
+
   double _peakForceLeft = 0;
   double _RFDLeft = 0;
   double _avgForceLeft = 0;
+  double _totalForceLeft = 0;
+  double _forceImpulseLeft = 0;
   int _timeToPeakForceLeft = 0;
+
   double _peakForceRight = 0;
   double _RFDRight = 0;
   double _avgForceRight = 0;
+  double _totalForceRight = 0;
+  double _forceImpulseRight = 0;
   int _timeToPeakForceRight = 0;
-
-  DataViewViewModel()
-  {
-    //tempLeft = _EWMAFilter(bleController.leftFoot);
-    //tempRight = _EWMAFilter(bleController.rightFoot);
-    tempLeft = bleController.leftFoot;
-    tempRight = bleController.rightFoot;
-  }
-  void EWMAFilter(double alpha)
-  {
-    _EWMAFilter(bleController.leftFoot);
-    _EWMAFilter(bleController.rightFoot);
-    notifyListeners();
-  }
-  List<Data>_EWMAFilter(List<Data> data)
-  {
-    double alpha = 0.5;
-    List<Data> tempList = [];
-    for(int i = 0; i < data.length-1; i++)
-    {
-      if(i == 0)
-      {
-        tempList.add(data[i]);
-      }
-      else
-      {
-        Data tempData = data[i];
-        tempData.mForce = alpha * data[i].getForce() + (1-alpha) * tempList[i-1].getForce();
-        tempList.add(tempData);
-      }
-    }
-    notifyListeners();
-    return tempList;
-  }
   ///Calculates the time to peak based on the array data since the
   ///ratio between sampled data array and time array is 1:1
   int getTimeToPeakForceLeft()
   {
-    _timeToPeakForceLeft = _calcTimeToPeakForce(tempLeft);
+    _timeToPeakForceLeft = _calcTimeToPeakForce(_EWMAFilter2(bleController.leftFoot));
     return _timeToPeakForceLeft;
   }
   int getTimeToPeakForceRight()
   {
-    _timeToPeakForceRight =_calcTimeToPeakForce(tempRight);
+    _timeToPeakForceRight =_calcTimeToPeakForce(_EWMAFilter2(bleController.rightFoot));
     return _timeToPeakForceRight;
   }
   int _calcTimeToPeakForce(List<Data> data)
@@ -90,12 +59,12 @@ class DataViewViewModel extends ChangeNotifier{
   ///Calculates the highest value in the array, AKA peak force
   double getPeakForceLeft()
   {
-    _peakForceLeft = _calcPeakForce(tempLeft);
+    _peakForceLeft = _calcPeakForce(_EWMAFilter2(bleController.leftFoot));
     return _peakForceLeft;
   }
   double getPeakForceRight()
   {
-    _peakForceRight = _calcPeakForce(tempRight);
+    _peakForceRight = _calcPeakForce(_EWMAFilter2(bleController.rightFoot));
     return _peakForceRight;
   }
   double _calcPeakForce(List<Data> data)
@@ -111,55 +80,62 @@ class DataViewViewModel extends ChangeNotifier{
     notifyListeners();
     return tempVal;
   }
-
+  double getForceImpulseLeft()
+  {
+    _totalForceLeft = _calcTotalForce(_EWMAFilter2(bleController.leftFoot));
+    if(_totalForceLeft.isNaN)
+      {
+        return 0;
+      }
+    else
+      {
+        _forceImpulseLeft = _calcForceImpulse(_EWMAFilter2(bleController.leftFoot), _totalForceLeft);
+        return _forceImpulseLeft;
+      }
+  }
+  double getForceImpulseRight()
+  {
+    _totalForceRight = _calcTotalForce(_EWMAFilter2(bleController.rightFoot));
+    if(_totalForceRight.isNaN)
+      {
+        return 0;
+      }
+    else
+      {
+        _forceImpulseRight = _calcForceImpulse(_EWMAFilter2(bleController.rightFoot), _totalForceRight);
+        return _forceImpulseRight;
+      }
+  }
   double getAverageForceLeft()
   {
-    _avgForceLeft = _calcAverageForce(tempLeft);
-    if(_avgForceLeft.isNaN)
+    _totalForceLeft = _calcTotalForce(_EWMAFilter2(bleController.leftFoot));
+    if(_totalForceLeft.isNaN)
       {
         return  0;
       }
     else
       {
+        _avgForceLeft = _calcAverageForce(_EWMAFilter2(bleController.leftFoot), _totalForceLeft);
         return _avgForceLeft;
       }
   }
   double getAverageForceRight()
   {
-    _avgForceRight = _calcAverageForce(tempRight);
-    if(_avgForceRight.isNaN)
+    _totalForceRight = _calcTotalForce(_EWMAFilter2(bleController.rightFoot));
+    if(_totalForceRight.isNaN)
       {
         return 0;
       }
     else
     {
+      _avgForceRight = _calcAverageForce(_EWMAFilter2(bleController.rightFoot), _totalForceRight);
       return _avgForceRight;
     }
   }
   ///Calculates the area the for the dataset using Trapezoidal rule. AKA Integration
-  double _calcAverageForce(List<Data> data)
+  double _calcTotalForce(List<Data> data)
   {
     double result = 0.0;
-    var tempT1 = 0;
-    var tempT2 = 0;
-    //Get time where noise stops from the beginning of the list
-    for(int i = 0; i < data.length; i++)
-    {
-      if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
-      {
-        tempT1 = data[i].getTime();
-        break;
-      }
-    }
-    //Get time where noise stops from the end of the list
-    for(int i = data.length-1; i >= 0; i--)
-    {
-      if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
-      {
-        tempT2 = data[i].getTime();
-        break;
-      }
-    }
     //Calculates the area the for the dataset using Trapezoidal rule. AKA numerical integration
     for(int i = 0; i < data.length-1; i++)
     {
@@ -171,17 +147,81 @@ class DataViewViewModel extends ChangeNotifier{
       }
     }
     notifyListeners();
-    return result/(tempT2-tempT1);
+    return result;
+  }
+  ///Calculates the average force were noise can no longer be detected
+  double _calcAverageForce(List<Data> data, double totalForce)
+  {
+    var tempT1;
+    var tempT2;
+    if(data.isEmpty)
+      {
+        return 0;
+      }
+    else
+      {
+        //Get time where noise stops from the beginning of the list
+        for(int i = 0; i < data.length; i++)
+        {
+          if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
+          {
+            tempT1 = data[i].getTime();
+            break;
+          }
+        }
+        //Get time where noise stops from the end of the list
+        for(int i = data.length-1; i >= 0; i--)
+        {
+          if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
+          {
+            tempT2 = data[i].getTime();
+            break;
+          }
+        }
+        return totalForce/(tempT2-tempT1);
+      }
+  }
+  ///Calculates the force impulse where noise can no longer be detected
+  double _calcForceImpulse(List<Data> data, double totalForce)
+  {
+    var tempT1;
+    var tempT2;
+    if(data.isEmpty)
+    {
+      return 0;
+    }
+  else
+    {
+      //Get time where noise stops from the beginning of the list
+      for(int i = 0; i < data.length; i++)
+      {
+        if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
+        {
+          tempT1 = data[i].getTime();
+          break;
+        }
+      }
+      //Get time where noise stops from the end of the list
+      for(int i = data.length-1; i >= 0; i--)
+      {
+        if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
+        {
+          tempT2 = data[i].getTime();
+          break;
+        }
+      }
+      return totalForce*(tempT2-tempT1);
+    }
   }
   ///Calculates the slope of the plotted function. Slope value represents Rate of Force Development
   double getRFDLeft()
   {
-    _RFDLeft = _calcRFD(tempLeft);
+    _RFDLeft = _calcRFD(_EWMAFilter2(bleController.leftFoot));
     return _RFDLeft;
   }
   double getRFDRight()
   {
-    _RFDRight = _calcRFD(tempRight);
+    _RFDRight = _calcRFD(_EWMAFilter2(bleController.rightFoot));
     return _RFDRight;
   }
   double _calcRFD(List<Data> data)
@@ -199,6 +239,7 @@ class DataViewViewModel extends ChangeNotifier{
     notifyListeners();
     return slope;
   }
+  ///Gets raw value data to be saved persistently .
   List<LiveData> getLeftDataToSave (){
     List<LiveData> tmpLeftList = <LiveData>[];
     for(int i = 0; i < bleController.leftFoot.length; i++){
@@ -211,7 +252,7 @@ class DataViewViewModel extends ChangeNotifier{
     }
     return tmpLeftList;
   }
-
+  ///Gets raw value data to be saved persistently.
   List<LiveData> getRightDataToSave (){
     List<LiveData> tmpRightList = <LiveData>[];
     for(int i = 0; i < bleController.rightFoot.length; i++){
@@ -224,7 +265,7 @@ class DataViewViewModel extends ChangeNotifier{
     }
     return tmpRightList;
   }
-
+  ///Gets time stamps from sample to be saved persistently.
   List<Timestamp> getTimestampsToSave(){
     List<Timestamp> tmpList = <Timestamp>[];
     for(int i = 0; i < bleController.timestamps.length; i++){
@@ -238,13 +279,14 @@ class DataViewViewModel extends ChangeNotifier{
     return tmpList;
   }
 
-  /// Updates the chart
+  /// Updates the chart if data is added to temp arrays.
   List<SplineSeries<Data, int>> getDataLeft(){
     //notifyListeners();
     return<SplineSeries<Data, int>>[
       SplineSeries<Data, int>(
         color: Colors.blue,
-        dataSource: tempLeft,
+        //dataSource: tempLeft,
+        dataSource: _EWMAFilter2(bleController.leftFoot),
         width: 2,
         name: 'Left foot',
         onRendererCreated: (ChartSeriesController controller) {
@@ -261,7 +303,8 @@ class DataViewViewModel extends ChangeNotifier{
     return<SplineSeries<Data, int>>[
       SplineSeries<Data, int>(
         color: Colors.red,
-        dataSource: tempRight,
+        //dataSource: tempRight,
+        dataSource: _EWMAFilter2(bleController.rightFoot),
         width: 2,
         name: 'Right foot',
         onRendererCreated: (ChartSeriesController controller) {
@@ -274,7 +317,63 @@ class DataViewViewModel extends ChangeNotifier{
   }
 
   num getMarzullo() {
-    return bleController.marzullo;
+    return bleController.marzulloTimeOffset;
   }
-
+  /// Gets data from Movesense accelerometer to be saved persistently.
+  List<LiveData> getImuDataToSave (){
+    List<LiveData> tmpAccList = <LiveData>[];
+    for(int i = 0; i < bleController.movesenseData.length; i++){
+      print("Acc: ${bleController.movesenseData[i].mAcc}");
+      tmpAccList.add(LiveData(
+          force: bleController.movesenseData[i].mAcc
+      ));
+      print("Index: $i");
+      print("-----------");
+    }
+    return tmpAccList;
+  }
+  ///Gets timestamps from Movesense sample to be saved persistently.
+  List<Timestamp> getImuTimestampsToSave (){
+    List<Timestamp> tmpTimestampList = <Timestamp>[];
+    for(int i = 0; i < bleController.movesenseData.length; i++){
+      print("IMU timestamp: ${bleController.movesenseData[i].timestamp}");
+      tmpTimestampList.add(Timestamp(
+          time: bleController.movesenseData[i].timestamp
+      ));
+      print("Index: $i");
+      print("-----------");
+    }
+    return tmpTimestampList;
+  }
+  ///Gets timestamps for when Movesense data was received to be stored persistently.
+  List<Timestamp> getMovesenseArriveTimestampsToSave (){
+    List<Timestamp> tmpTimestampList = <Timestamp>[];
+    for(int i = 0; i < bleController.movesenseData.length; i++){
+      print("IMU timestamp: ${bleController.movesenseData[i].mobileTimestamp}");
+      tmpTimestampList.add(Timestamp(
+          time: bleController.movesenseData[i].mobileTimestamp
+      ));
+      print("Index: $i");
+      print("-----------");
+    }
+    return tmpTimestampList;
+  }
+  ///Takes raw data and applies EWMA-filter for view
+  List<Data> _EWMAFilter2(List<Data> data)
+  {
+    List<Data> tempList=<Data>[];
+    for(int i = 0; i < data.length-1; i++){
+      if(i == 0)
+      {
+        tempList.add(data[i]);
+      }
+      else
+      {
+        Data tempData = data[i];
+        tempData.mForce = Constants.ALPHA * tempData.getForce() + (1-Constants.ALPHA) * tempList[i-1].getForce();
+        tempList.add(tempData);
+      }
+    }
+    return tempList;
+  }
 }

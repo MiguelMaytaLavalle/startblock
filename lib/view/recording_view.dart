@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:startblock/view_model/data_view_view_model.dart';
 import 'package:camera/camera.dart';
 import '../helper/BLEController.dart';
 import 'package:gallery_saver/gallery_saver.dart';
+
+/// This view is part of the bottomnavigationbar after selecting 'Connect' from the menu.
+/// This view contains a controller for the back camera of a phone for recording an episode.
+/// This view also contains a button 'Start' if a user only wants to record a episode without using the camera phone.
 
 class RecordingScreen extends StatefulWidget {
   @override
@@ -30,21 +33,12 @@ class _RecordingState extends State<RecordingScreen> {
     }
   }
 
-/*
-  @override
-  dispose(){
-    _cameraController.dispose();
-    super.dispose();
-  }
-*/
-
   _initCamera() async {
     final cameras = await availableCameras();
     final front = cameras.firstWhere((camera) => camera.lensDirection == CameraLensDirection.back);
     _cameraController = CameraController(front, ResolutionPreset.max);
     await _cameraController.initialize();
     setState(() => _isLoading = false);
-    //setState(() => sensorPageVM.setIsLoading(false));
   }
 
   _recordVideo() async {
@@ -52,17 +46,17 @@ class _RecordingState extends State<RecordingScreen> {
       final file = await _cameraController.stopVideoRecording();
       setState(() => _isRecording = false);
       await GallerySaver.saveVideo(file.path);
-/*      final route = MaterialPageRoute(
-        fullscreenDialog: true,
-        builder: (_) => VideoPage(filePath: file.path),
-      );*/
-      //Navigator.push(context, route);
-    } else {
+    }
+    else {
       await _cameraController.prepareForVideoRecording();
       await _cameraController.startVideoRecording();
       setState(() => _isRecording = true);
     }
   }
+
+  /// This method will be invoked if a user wants to return back to the menu view by pressing back
+  /// It will invoke another method for disconnecting from the micro:bit and movesense if the user chooses to return
+  /// back to the menu.
   Future<bool> _onWillPop() {
     return showDialog(
         context: context,
@@ -90,8 +84,6 @@ class _RecordingState extends State<RecordingScreen> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: !bleController.isReady ? Container(
-      //child: _isLoading ? Container(
-      //child: sensorPageVM.getIsLoading() ? Container(
         color: Colors.white,
         child: const Center(
           child: CircularProgressIndicator(),

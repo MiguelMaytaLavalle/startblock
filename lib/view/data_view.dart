@@ -6,10 +6,13 @@ import 'package:startblock/view_model/data_view_view_model.dart';
 import 'package:startblock/model/livedata.dart';
 import 'package:startblock/db/database_helper.dart';
 import 'package:startblock/model/history.dart';
-import 'package:startblock/model/livedata.dart';
 
-import '../model/sensor.dart';
 import '../model/timestamp.dart';
+
+/***
+ * This view contains two graphs for each foot.
+ * A user can initiate an episode from this view. All the data for each foot will be presented for their respective graph.
+ */
 class DataScreen extends StatefulWidget {
   @override
   _DataState createState() => _DataState();
@@ -46,11 +49,12 @@ class _DataState extends State<DataScreen> {
         child:Column(
           children: [
             SfCartesianChart(
-              //crosshairBehavior: _crosshairBehavior,
               legend: Legend(isVisible: true),
-              //zoomPanBehavior: _zoomPanBehavior,
               series: sensorPageVM.getDataLeft(),
               primaryXAxis: NumericAxis(
+                isVisible: false,
+                  //Uncomment if X-axis shall be visible and set isVisible = true;
+                  /*
                   interactiveTooltip: const InteractiveTooltip(
                     enable: true,
                   ),
@@ -58,11 +62,11 @@ class _DataState extends State<DataScreen> {
                   edgeLabelPlacement: EdgeLabelPlacement.shift,
                   interval: 1000, //1000ms between two timestamps equals a second
                   title: AxisTitle(text: 'Time [S]')
+                   */
               ),
 
               primaryYAxis: NumericAxis(
                   minimum: 0,
-                  //maximum: 800,
                   interactiveTooltip: const InteractiveTooltip(
                     enable: true,
                   ),
@@ -83,8 +87,7 @@ class _DataState extends State<DataScreen> {
                 ),
                 Material(
                   //margin:const EdgeInsets.all(10),
-                    child: Text('Time to peak (TTP): ${sensorPageVM.getTimeToPeakForceLeft()
-                    .toStringAsPrecision(2)}'
+                    child: Text('Time to peak (TTP): ${sensorPageVM.getTimeToPeakForceLeft()}'
                     )
                 ),
                 Material(
@@ -95,7 +98,8 @@ class _DataState extends State<DataScreen> {
                 ),
                 Material(
                   //margin:const EdgeInsets.all(10),
-                    child: Text('Force impulse: 0'
+                    child: Text('Force impulse: ${sensorPageVM.getForceImpulseLeft()
+                    .toStringAsPrecision(2)}'
                     )
                 ),
                 Material(
@@ -107,12 +111,13 @@ class _DataState extends State<DataScreen> {
               ],
             ),
             SfCartesianChart(
-              //crosshairBehavior: _crosshairBehavior,
               legend: Legend(isVisible: true),
-              //zoomPanBehavior: _zoomPanBehavior,
               series: sensorPageVM.getDataRight(),
 
               primaryXAxis: NumericAxis(
+                isVisible: false,
+                  //Uncomment if X-axis shall be visible and set isVisible = true;
+                  /*
                   interactiveTooltip: const InteractiveTooltip(
                     enable: true,
                   ),
@@ -120,6 +125,7 @@ class _DataState extends State<DataScreen> {
                   edgeLabelPlacement: EdgeLabelPlacement.shift,
                   interval: 1000, //1000ms between two timestamps equals a second
                   title: AxisTitle(text: 'Time [S]')
+                   */
               ),
 
               primaryYAxis: NumericAxis(
@@ -144,8 +150,7 @@ class _DataState extends State<DataScreen> {
                 ),
                 Material(
                   //margin:const EdgeInsets.all(10),
-                    child: Text('Time to peak (TTP): ${sensorPageVM.getTimeToPeakForceRight()
-                    .toStringAsPrecision(2)}'
+                    child: Text('Time to peak (TTP): ${sensorPageVM.getTimeToPeakForceRight()}'
                     )
                 ),
                 Material(
@@ -156,7 +161,8 @@ class _DataState extends State<DataScreen> {
                 ),
                 Material(
                   //margin:const EdgeInsets.all(10),
-                    child: Text('Force impulse: 0'
+                    child: Text('Force impulse: ${sensorPageVM.getForceImpulseRight()
+                    .toStringAsPrecision(2)}'
                     )
                 ),
                 Material(
@@ -187,6 +193,11 @@ class _DataState extends State<DataScreen> {
       ),
     );
   }
+
+  /***
+   * This method will be invoked when a user wants to save a run.
+   *
+   */
   Future<String?> openDialog() => showDialog<String>(
     context: context,
     builder: (context) => AlertDialog(
@@ -205,22 +216,25 @@ class _DataState extends State<DataScreen> {
       ],
     ),
   );
+
   void submit(){
     Navigator.of(context).pop(controller.text );
     controller.clear();
   }
 
+  /***
+   * This method will save the recorded data to the database after an episode has been executed
+   */
   Future addHistory() async {
     try{
       List<LiveData> leftList = sensorPageVM.getLeftDataToSave();
       List<LiveData> rightList = sensorPageVM.getRightDataToSave();
       List<Timestamp> timestamps = sensorPageVM.getTimestampsToSave();
-
-     print('Left length: ${leftList.length}');
-      print('Right length: ${rightList.length}');
-      print('Timestamps length: ${timestamps.length}');
-
       num marzullo = sensorPageVM.getMarzullo();
+      List<LiveData> imuDataList = sensorPageVM.getImuDataToSave();
+      List<Timestamp> imuTimestampList = sensorPageVM.getImuTimestampsToSave();
+      List<Timestamp> movesenseArriveTimeList = sensorPageVM.getMovesenseArriveTimestampsToSave();
+
       final history =  History(
         dateTime: DateTime.now(),
         name: name,
@@ -228,12 +242,13 @@ class _DataState extends State<DataScreen> {
         rightData: jsonEncode(rightList),
         timestamps: jsonEncode(timestamps),
         marzullo: marzullo,
+        imuData: jsonEncode(imuDataList),
+        imuTimestamps: jsonEncode(imuTimestampList),
+        movesenseArriveTime: jsonEncode(movesenseArriveTimeList),
       );
-      print('SUCCESS');
       await HistoryDatabase.instance.create(history);
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Saved Successfully!")));
     }catch(error){
-      print('Fail');
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
     }
   }
