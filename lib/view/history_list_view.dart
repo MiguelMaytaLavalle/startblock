@@ -5,6 +5,10 @@ import 'package:startblock/view_model/history_list_view_model.dart';
 import '../db/database_helper.dart';
 import 'package:flutter/material.dart';
 
+/// This view will present all the recorded episodes from the database.
+/// Each recorded episode will be presented as a selectable button with its name and recorded date.
+/// A user can select and open up an episode for more details in a new view.
+///
 class HistoryScreen extends StatefulWidget{
   @override
   _HistoryScreenState createState() => _HistoryScreenState();
@@ -17,7 +21,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   void initState() {
     super.initState();
-
     refreshHistory();
   }
 
@@ -27,6 +30,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     super.dispose();
   }
 
+  /// Calls the database for fetching all the recorded episodes.
   Future refreshHistory() async {
     setState(() => isLoading = true);
     historyListViewModel.setHistoryList(await HistoryDatabase.instance.readAllHistory());

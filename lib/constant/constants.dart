@@ -13,6 +13,7 @@ class Constants {
   static const LEDMATRIXSTATE_CHARACTERISTIC_UUID = "e95d7b77-251d-470a-a062-fa1922dfa9a8";
   static const LEDTEXT_CHARACTERISTIC_UUID = "e95d93ee-251d-470a-a062-fa1922dfa9a8";
   static const SCROLLINGDELAY_CHARACTERISTIC_UUID = "e95d0d2d-251d-470a-a062-fa1922dfa9a8";
+
   /* Movesense BLE-services */
   static const MOVESENSE_SERVICE = "34802252-7185-4d5d-b431-630e7050e8f0";
   static const MOVESENSE_SEND = "34800001-7185-4d5d-b431-630e7050e8f0";
@@ -25,6 +26,8 @@ class Constants {
   static const ALPHA = 0.1; //EWMA alpha value
   static const MEAN_NOISE_THRESH = 68; //Threshold value for noise. Mean value based on samples (see Excel tab "Noise").
   static const MOVESENSE_DEVICE_NAME = 'Movesense 175130000971';
+  static const DATABASE_NAME = 'test14';
+  static const HISTORY_TABLE_NAME = 'test14';
 
 }
 

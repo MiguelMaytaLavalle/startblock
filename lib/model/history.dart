@@ -1,13 +1,14 @@
-String tableHistory = 'test14';
+import 'package:startblock/constant/constants.dart';
+String tableHistory = Constants.HISTORY_TABLE_NAME;
 
 /**
- * test5
- *
+ * The class History contains the parameters for when creating
+ * the table in the database.
  */
 
 class HistoryFields{
   static final List<String> values = [
-    id, dateTime, name, rightData, leftData,timestamps, marzullo, imuData, imuTimestamps, movesenseArriveTime,//sumAcc,imuTimestamp,
+    id, dateTime, name, rightData, leftData,timestamps, marzullo, imuData, imuTimestamps, movesenseArriveTime,
   ];
   static const String id = '_id';
   static const String dateTime = 'dateTime';
@@ -19,8 +20,7 @@ class HistoryFields{
   static const String imuData = 'imuData';
   static const String imuTimestamps = 'imuTimestamps';
   static const String movesenseArriveTime = 'movesenseArriveTime';
-  //static const String sumAcc = 'sumAcc';
-  //static const String imuTimestamp = 'imuTimestamp';
+
 }
 class History{
   final int? id;
@@ -33,7 +33,6 @@ class History{
   final String imuData;
   final String imuTimestamps;
   final String movesenseArriveTime;
-  //final num? sumAcc;
 
   History({
     this.id,
@@ -46,7 +45,6 @@ class History{
     required this.imuData,
     required this.imuTimestamps,
     required this.movesenseArriveTime,
-    //required this.sumAcc,
   });
 
   Map<String, dynamic> toJson() =>{
@@ -60,7 +58,6 @@ class History{
     HistoryFields.imuData: imuData,
     HistoryFields.imuTimestamps: imuTimestamps,
     HistoryFields.movesenseArriveTime: movesenseArriveTime,
-    //HistoryFields.sumAcc: sumAcc,
 
   };
 
@@ -75,8 +72,6 @@ class History{
     imuData: json[HistoryFields.imuData] as String,
     imuTimestamps: json[HistoryFields.imuTimestamps] as String,
     movesenseArriveTime: json[HistoryFields.movesenseArriveTime] as String,
-
-    //sumAcc: json[HistoryFields.sumAcc] as num?,
   );
 
   History copy({
@@ -90,7 +85,6 @@ class History{
     String? imuData,
     String? imuTimestamps,
     String? movesenseArriveTime,
-    //num? sumAcc,
   }) =>
       History(
         id: id ?? this.id,
@@ -103,7 +97,5 @@ class History{
         imuData: imuData ?? this.imuData,
         imuTimestamps: imuTimestamps ?? this.imuTimestamps,
         movesenseArriveTime: movesenseArriveTime ?? this.movesenseArriveTime,
-
-        //sumAcc: sumAcc ?? this.sumAcc,
       );
 }

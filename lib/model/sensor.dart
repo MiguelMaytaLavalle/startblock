@@ -4,7 +4,6 @@ class Data{
 
   Data(this.timestamp, this.mForce);
 
-
   void setTime(int time)
   {
     timestamp = time;

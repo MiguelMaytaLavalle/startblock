@@ -5,6 +5,14 @@ import 'package:startblock/view/setting_view.dart';
 import '../helper/BLEController.dart';
 import 'data_view.dart';
 
+/***
+ * ConnectionView contains the bottomnavigation bar which
+ * a user can navigate to three different views when connected to the micro:bit:
+ * RecordingScreen
+ * DataScreen
+ * SettingScreen
+ */
+
 class ConnectionView extends StatefulWidget {
   @override
   _ConnectionState createState() => _ConnectionState();

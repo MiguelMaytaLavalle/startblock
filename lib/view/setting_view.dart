@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:startblock/view_model/settings_view_model.dart';
 
+/// A user can choose to adjust the false start threshold from the Setting view.
+/// A user can also connect to a movesense if the user chooses to.
+/// After connecting to a movesense a user can initiate an episode and record the movesense data.
+///
 class SettingScreen extends StatefulWidget {
   @override
   _SettingState createState() => _SettingState();

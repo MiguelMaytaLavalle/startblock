@@ -1,6 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:startblock/model/history.dart';
 import 'package:path/path.dart';
+import 'package:startblock/constant/constants.dart';
 
 class HistoryDatabase{
   static final HistoryDatabase instance = HistoryDatabase._init();
@@ -12,7 +13,7 @@ class HistoryDatabase{
   Future<Database> get database async{
     if(_database != null) return _database!;
 
-    _database = await  _initDB('test14.db');
+    _database = await  _initDB(Constants.DATABASE_NAME);
     return _database!;
   }
 

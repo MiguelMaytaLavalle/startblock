@@ -8,6 +8,11 @@ import 'package:startblock/db/database_helper.dart';
 import 'package:startblock/model/history.dart';
 
 import '../model/timestamp.dart';
+
+/***
+ * This view contains two graphs for each foot.
+ * A user can initiate an episode from this view. All the data for each foot will be presented for their respective graph.
+ */
 class DataScreen extends StatefulWidget {
   @override
   _DataState createState() => _DataState();
@@ -188,6 +193,11 @@ class _DataState extends State<DataScreen> {
       ),
     );
   }
+
+  /***
+   * This method will be invoked when a user wants to save a run.
+   *
+   */
   Future<String?> openDialog() => showDialog<String>(
     context: context,
     builder: (context) => AlertDialog(
@@ -206,11 +216,15 @@ class _DataState extends State<DataScreen> {
       ],
     ),
   );
+
   void submit(){
     Navigator.of(context).pop(controller.text );
     controller.clear();
   }
 
+  /***
+   * This method will save the recorded data to the database after an episode has been executed
+   */
   Future addHistory() async {
     try{
       List<LiveData> leftList = sensorPageVM.getLeftDataToSave();
@@ -232,11 +246,9 @@ class _DataState extends State<DataScreen> {
         imuTimestamps: jsonEncode(imuTimestampList),
         movesenseArriveTime: jsonEncode(movesenseArriveTimeList),
       );
-      print('SUCCESS');
       await HistoryDatabase.instance.create(history);
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Saved Successfully!")));
     }catch(error){
-      print('Fail');
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
     }
   }

@@ -27,7 +27,6 @@ class _HistoryCardState extends State<HistoryCard> {
   ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 20));
   HistoryCardViewModel hCardVM = HistoryCardViewModel();
 
-  //SendEmailViewModel sendEmailVM = SendEmailViewModel();
   ExportToExcel exportExcel = ExportToExcel();
   late SfCartesianChart chart;
   late TooltipBehavior _tooltipBehavior;
@@ -41,6 +40,8 @@ class _HistoryCardState extends State<HistoryCard> {
     refreshHistory();
   }
 
+  /// When this view is invoked it will fetch the selected episode and present the data in this view.
+  /// It will also create an excel file after fetching the data.
   Future refreshHistory() async {
     setState(() => hCardVM.setIsLoading(true));
 
@@ -73,7 +74,6 @@ class _HistoryCardState extends State<HistoryCard> {
         .toList());
 
     setState(() => hCardVM.setIsLoading(false));
-
 
     hCardVM.setupLeftChartData();
     hCardVM.setupRightChartData();
@@ -108,38 +108,9 @@ class _HistoryCardState extends State<HistoryCard> {
                       style: const TextStyle(color: Colors.blue),
                     ),
                     Container(
-                      //height: 400,
                       child: SingleChildScrollView(
                         child:Column(
                           children: [
-                            /*SfCartesianChart(
-                              //crosshairBehavior: _crosshairBehavior,
-                              legend: Legend(isVisible: true),
-                              //zoomPanBehavior: _zoomPanBehavior,
-                              //series: sensorPageVM.getDataLeft(),
-                              //series: hCardVM.getDataLeft(),
-                              series: hCardVM.leftSplineSeries(),
-                              primaryXAxis: NumericAxis(
-                                  interactiveTooltip: const InteractiveTooltip(
-                                    enable: true,
-                                  ),
-                                  majorGridLines: const MajorGridLines(width: 0),
-                                  edgeLabelPlacement: EdgeLabelPlacement.shift,
-                                  interval: 1000, //1000ms between two timestamps equals a second
-                                  title: AxisTitle(text: 'Time [S]')
-                              ),
-
-                              primaryYAxis: NumericAxis(
-                                  minimum: 0,
-                                  //maximum: 800,
-                                  interactiveTooltip: const InteractiveTooltip(
-                                    enable: true,
-                                  ),
-                                  axisLine: const AxisLine(width: 0),
-                                  majorTickLines: const MajorTickLines(size: 0),
-                                  title: AxisTitle(text: 'Force [N]')
-                              ),
-                            ),*/
                             SfCartesianChart(
                               //crosshairBehavior: _crosshairBehavior,
                               legend: Legend(isVisible: true),
@@ -162,7 +133,6 @@ class _HistoryCardState extends State<HistoryCard> {
 
                               primaryYAxis: NumericAxis(
                                   minimum: 0,
-                                  //maximum: 800,
                                   interactiveTooltip: const InteractiveTooltip(
                                     enable: true,
                                   ),
@@ -174,30 +144,25 @@ class _HistoryCardState extends State<HistoryCard> {
                               direction: Axis.vertical,
                               children: <Widget>[
                                 Material(
-                                  //margin:const EdgeInsets.all(10),
                                     child: Text('Rate of force (RFD): ${hCardVM.getRFDLeft()
                                     .toStringAsPrecision(2)}'
                                     )
                                 ),
                                 Material(
-                                  //margin:const EdgeInsets.all(10),
                                     child: Text('Time to peak (TTP): ${hCardVM.getTimeToPeakForceLeft()}'
                                     )
                                 ),
                                 Material(
-                                  //margin:const EdgeInsets.all(10),
                                     child: Text('Average Force: ${hCardVM.getAverageForceLeft()
                                         .toStringAsFixed(2)}'
                                     )
                                 ),
                                 Material(
-                                  //margin:const EdgeInsets.all(10),
                                     child: Text('Force impulse: ${hCardVM.getForceImpulseLeft()
                                     .toStringAsPrecision(2)}'
                                     )
                                 ),
                                 Material(
-                                  //margin:const EdgeInsets.all(10),
                                     child: Text('Peak force: ${hCardVM.getPeakForceLeft()
                                     .toStringAsPrecision(2)}'
                                     )
@@ -205,7 +170,6 @@ class _HistoryCardState extends State<HistoryCard> {
                               ],
                             ),
                             SfCartesianChart(
-                              //crosshairBehavior: _crosshairBehavior,
                               legend: Legend(isVisible: true),
                               series: hCardVM.rightSplineSeries(),
                               primaryXAxis: NumericAxis(
@@ -223,7 +187,6 @@ class _HistoryCardState extends State<HistoryCard> {
 
                               primaryYAxis: NumericAxis(
                                   minimum: 0,
-                                  //maximum: 800,
                                   interactiveTooltip: const InteractiveTooltip(
                                     enable: true,
                                   ),
@@ -235,28 +198,23 @@ class _HistoryCardState extends State<HistoryCard> {
                               direction: Axis.vertical,
                               children: <Widget>[
                                 Material(
-                                    //margin:const EdgeInsets.all(10),
                                     child: Text(
                                         'Rate of force (RFD): ${hCardVM.getRFDRight().toStringAsPrecision(2)}')),
                                 Material(
-                                    //margin:const EdgeInsets.all(10),
                                     child: Text(
                                         'Time to peak (TTP): ${hCardVM.getTimeToPeakForceRight()}')),
                                 Material(
-                                    //margin:const EdgeInsets.all(10),
                                     child: Text(
                                         'Average Force: ${hCardVM.getAverageForceRight().toStringAsFixed(2)}')),
                                 Material(
-                                    //margin:const EdgeInsets.all(10),
                                     child: Text(
                                         'Force impulse: ${hCardVM.getForceImpulseRight().toStringAsPrecision(2)}')),
                                 Material(
-                                    //margin:const EdgeInsets.all(10),
                                     child: Text(
                                         'Peak force: ${hCardVM.getPeakForceRight().toStringAsPrecision(2)}')),
                               ],
                             ),
-                            //const SizedBox(height: 60),
+                            const SizedBox(height: 60),
                           ],
                         ),
                       ),
@@ -277,7 +235,7 @@ class _HistoryCardState extends State<HistoryCard> {
                   child: const Icon(Icons.delete),
                 )),
             Container(
-                margin: EdgeInsets.all(10),
+                margin: const EdgeInsets.all(10),
                 child: ElevatedButton(
                   onPressed: () {
                     Share.shareFiles([hCardVM.getAttachments()]);
@@ -288,6 +246,9 @@ class _HistoryCardState extends State<HistoryCard> {
         ),
       );
 
+  /***
+   * This method will be invoked when a user wants to delete a episode from the database.
+   */
   Future<String?> openDialog() => showDialog<String>(
         context: context,
         builder: (context) => AlertDialog(
@@ -313,15 +274,17 @@ class _HistoryCardState extends State<HistoryCard> {
     Navigator.of(context).pop();
   }
 
+  /// This method will be invoked at the start after fetching the selected episode.
+  /// It will create the excel file from the episode and return the filepath for when a user wants to share the excel file.
   _attachExcel() async {
     try {
       String tmp = await exportExcel.attachExcel(hCardVM.getHCardModel());
       hCardVM.addAttachment(tmp);
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: const Text('Exported excel file succesfully')));
+          const SnackBar(content: Text('Exported to excel successfully')));
     } catch (error) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("NO ${error.toString()}")));
+          .showSnackBar(SnackBar(content: Text("Can't export the data to excel! ${error.toString()}")));
     }
   }
 }

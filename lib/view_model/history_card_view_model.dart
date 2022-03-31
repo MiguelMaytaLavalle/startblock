@@ -9,7 +9,6 @@ import '../model/timestamp.dart';
 import '../constant/constants.dart';
 
 class HistoryCardViewModel{
-  // Provide all the state = data needed by the home view
   String hCardTitle = 'Test';
   late ChartSeriesController _chartSeriesRightController;
   late ChartSeriesController _chartSeriesLeftController;
@@ -21,7 +20,6 @@ class HistoryCardViewModel{
   double _totalForceLeft = 0;
   double _forceImpulseLeft = 0;
   int _timeToPeakForceLeft = 0;
-
 
   double _peakForceRight = 0;
   double _RFDRight = 0;

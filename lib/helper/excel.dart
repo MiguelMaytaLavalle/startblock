@@ -6,6 +6,7 @@ import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 
 import '../model/timestamp.dart';
 
+/// Using Syncfusion xlsio we can create an excel file
 class ExportToExcel{
 
   Future<List<ExcelDataRow>> _mapExcelData(String colName,List<LiveData> list) async {
@@ -60,7 +61,8 @@ class ExportToExcel{
     final Future<List<ExcelDataRow>> dataRowsIMUAcc = _mapExcelData('IMU Acc',history.imuData);
     final Future<List<ExcelDataRow>> dataRowsIMUTimestamp = _mapExcelTimestamps('IMU Timestamp',history.imuTimestamps);
     final Future<List<ExcelDataRow>> dataRowsMovesenseArriveTime = _mapExcelTimestamps('Movesense Arrive Time',history.movesenseArriveTime);
-    //final Future<List<ExcelDataRow>> dataRowsMarzullo = _mapExcelMarzullo('Marzullo',history.marzullo);
+
+    /// Transmit the converted data into appropriate ExcelDataRow which will be used for setting up the excel to each column.
     List<ExcelDataRow> _dataRowsLeft = await Future.value(dataRowsLeft);
     List<ExcelDataRow> _dataRowsRight = await Future.value(dataRowsRight);
     List<ExcelDataRow> _dataRowTimetamps = await Future.value(dataRowsTimestamp);
@@ -68,12 +70,7 @@ class ExportToExcel{
     List<ExcelDataRow> _dataRowIMUTimestamp = await Future.value(dataRowsIMUTimestamp);
     List<ExcelDataRow> _dataRowMovesenseArriveTime = await Future.value(dataRowsMovesenseArriveTime);
 
-    print('Marzullo ${history.marzullo}');
-    print('IMUDATA ${history.imuData.length}');
-    print('Timestamps ${history.imuTimestamps.length}');
-    print('Arrivetime ${history.movesenseArriveTime.length}');
-
-    //Import the list to Sheet.
+    ///Import the lists to a Sheet.
     sheet.importData(_dataRowsLeft, 1, 1);
     sheet.importData(_dataRowsRight, 1, 2);
     sheet.importData(_dataRowTimetamps, 1, 3);
@@ -83,30 +80,30 @@ class ExportToExcel{
     sheet.importData(_dataRowIMUTimestamp, 1, 6);
     sheet.importData(_dataRowMovesenseArriveTime, 1, 7);
 
-    //Auto-Fit columns.
+    ///Auto-Fit columns.
     sheet.getRangeByName('A1:B1').autoFitColumns();
     sheet.getRangeByName('D1:E1').autoFitColumns();
 
-    //Save and launch the excel.
+    ///Save and launch the excel.
     final List<int> bytes = workbook.saveAsStream();
 
-    //Dispose the document.
+    ///Dispose the document after setting up the sheet.
     workbook.dispose();
 
     //Get the storage folder location using path_provider package.
     final Directory? directory = await getTemporaryDirectory() ;
-//Get the directory path
+    //Get the directory path
     final String? path = directory?.path;
-//Create an empty file to write the Excel data
+    //Create an empty file to write the Excel data
     final File file = File('$path/$excelName.xlsx');
     //Write Excel data
     await file.writeAsBytes(bytes, flush: true);
-
-    /// change to title instead
+    //Get the patch for the excel file
     String excelPath = '$path/$excelName.xlsx';
     return excelPath;
   }
 
+  /// Returns the filepath for the created excel file.
  Future<String> attachExcel(HistoryCardModel hCardModel) async {
     String tmp = await exportToExcel(hCardModel);
    return tmp;

@@ -5,8 +5,11 @@ import 'package:startblock/view/history_list_view.dart';
 import 'package:startblock/view/tmp_view.dart';
 import 'package:startblock/view_model/menu_view_model.dart';
 
-class MenuScreen extends StatelessWidget {
 
+/// This view is the menu where a user can select to either start a new episode from the 'Connect' button
+/// or see all the previous recorded episodes from the 'History' button.
+///
+class MenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var menuData = MenuViewModel();
@@ -58,7 +61,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
             },
             child: const Text('History'),
           ),
-          const SizedBox(height: 30),
+          /*const SizedBox(height: 30),
           ElevatedButton(
             style: style,
             onPressed: () {
@@ -68,9 +71,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
               );
             },
             child: const Text('Test'),
-          ),
+          ),*/
         ],
-
       ),
     );
   }
