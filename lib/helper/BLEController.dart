@@ -190,7 +190,6 @@ class BLEController extends ChangeNotifier {
 
   void readDataTest(List<int> event) {
     var currentValue = _dataParser(event);
-    print(currentValue);
     var tag = currentValue.split(':');
     switch (tag[0]) {
       case 'RF':
@@ -251,11 +250,6 @@ class BLEController extends ChangeNotifier {
           isNotStarted = true;
           stopMoveSenseSample();
           notifyListeners();
-        }
-        break;
-      case 'A':
-        {
-          print(int.parse(tag[1]));
         }
         break;
       default:
