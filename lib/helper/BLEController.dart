@@ -109,7 +109,6 @@ class BLEController extends ChangeNotifier {
 
     services = (await targetDevice?.discoverServices())!;
     for (var service in services) {
-      // do something with service
       if (service.uuid.toString() == Constants.SERVICE_UART) {
         for (var c in service.characteristics) {
           if (c.uuid.toString() == Constants.CHARACTERISTIC_UART_RECIEVE) {
@@ -123,11 +122,9 @@ class BLEController extends ChangeNotifier {
     }
 
     for (var service in services) {
-      // do something with service
       if (service.uuid.toString() == Constants.SERVICE_UART) {
         for (var c in service.characteristics) {
           if (c.uuid.toString() == Constants.CHARACTERISTIC_UART_SEND) {
-            //characteristic.setNotifyValue(!characteristic.isNotifying);
             writeChar = c;
             sendTimeSyncRequest(); //As soon as device is connected to micro:bit - Time Sync immediately
             _timeSyncTimer = Timer.periodic(Duration(minutes: 10), (timer) {
@@ -285,9 +282,7 @@ class BLEController extends ChangeNotifier {
     print('Time to send');
     String test = "TS\n";
     List<int> bytes = utf8.encode(test);
-    int currentTime = DateTime
-        .now()
-        .millisecondsSinceEpoch;
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
     clientSendTime.add(currentTime);
     try {
       await writeChar.write(bytes);

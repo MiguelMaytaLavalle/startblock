@@ -70,46 +70,13 @@ class _DataState extends State<DataScreen> {
                   interactiveTooltip: const InteractiveTooltip(
                     enable: true,
                   ),
-                  axisLine: const AxisLine(width: 0),
+                  axisLine: const AxisLine(width: 1),
                   majorTickLines: const MajorTickLines(size: 0),
                   title: AxisTitle(text: 'Force [N]')
               ),
             ),
 
-            Wrap(
-              direction: Axis.vertical,
-              children: <Widget>[
-                Material(
-                  //margin:const EdgeInsets.all(10),
-                    child: Text('Rate of force (RFD): ${sensorPageVM.getRFDLeft()
-                        .toStringAsFixed(2)}'
-                    )
-                ),
-                Material(
-                  //margin:const EdgeInsets.all(10),
-                    child: Text('Time to peak (TTP): ${sensorPageVM.getTimeToPeakForceLeft()}'
-                    )
-                ),
-                Material(
-                  //margin:const EdgeInsets.all(10),
-                    child: Text('Average Force: ${sensorPageVM.getAverageForceLeft()
-                        .toStringAsFixed(2)}'
-                    )
-                ),
-                Material(
-                  //margin:const EdgeInsets.all(10),
-                    child: Text('Force impulse: ${sensorPageVM.getForceImpulseLeft()
-                    .toStringAsPrecision(2)}'
-                    )
-                ),
-                Material(
-                  //margin:const EdgeInsets.all(10),
-                    child: Text('Peak force: ${sensorPageVM.getPeakForceLeft()
-                        .toStringAsFixed(2)}'
-                    )
-                ),
-              ],
-            ),
+
             SfCartesianChart(
               legend: Legend(isVisible: true),
               series: sensorPageVM.getDataRight(),
@@ -138,6 +105,40 @@ class _DataState extends State<DataScreen> {
                   majorTickLines: const MajorTickLines(size: 0),
                   title: AxisTitle(text: 'Force [N]')
               ),
+            ),
+            Wrap(
+              direction: Axis.vertical,
+              children: <Widget>[
+                Material(
+                  //margin:const EdgeInsets.all(10),
+                    child: Text('Rate of force (RFD): ${sensorPageVM.getRFDLeft()
+                        .toStringAsFixed(2)}'
+                    )
+                ),
+                Material(
+                  //margin:const EdgeInsets.all(10),
+                    child: Text('Time to peak (TTP): ${sensorPageVM.getTimeToPeakForceLeft()}'
+                    )
+                ),
+                Material(
+                  //margin:const EdgeInsets.all(10),
+                    child: Text('Average Force: ${sensorPageVM.getAverageForceLeft()
+                        .toStringAsFixed(2)}'
+                    )
+                ),
+                Material(
+                  //margin:const EdgeInsets.all(10),
+                    child: Text('Force impulse: ${sensorPageVM.getForceImpulseLeft()
+                        .toStringAsPrecision(2)}'
+                    )
+                ),
+                Material(
+                  //margin:const EdgeInsets.all(10),
+                    child: Text('Peak force: ${sensorPageVM.getPeakForceLeft()
+                        .toStringAsFixed(2)}'
+                    )
+                ),
+              ],
             ),
             Wrap(
               direction: Axis.vertical,

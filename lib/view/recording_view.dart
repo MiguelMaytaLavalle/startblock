@@ -16,7 +16,7 @@ class RecordingScreen extends StatefulWidget {
 class _RecordingState extends State<RecordingScreen> {
   BLEController bleController = BLEController();
 
-  bool _isLoading = true;
+ bool _isLoading = true;
   bool _isRecording = false;
   late CameraController _cameraController;
 
@@ -24,7 +24,7 @@ class _RecordingState extends State<RecordingScreen> {
   void initState() {
     super.initState();
     bleController.addListener(updateDetails);
-    _initCamera();
+    //_initCamera();
   }
 
   void updateDetails(){
@@ -92,16 +92,15 @@ class _RecordingState extends State<RecordingScreen> {
         child: Stack(
           alignment: Alignment.bottomCenter,
           children: <Widget>[
-            CameraPreview(_cameraController),
+           /* CameraPreview(_cameraController),
             Padding(
               padding: const EdgeInsets.all(100),
               child: FloatingActionButton(
                 backgroundColor: Colors.red,
                 child: Icon(_isRecording ? Icons.stop : Icons.circle),
                 onPressed: () => _recordVideo(),
-                //onPressed: () => initGo(),
               ),
-            ),
+            ),*/
             Padding(
               padding: const EdgeInsets.all(30),
               child: TextButton(
