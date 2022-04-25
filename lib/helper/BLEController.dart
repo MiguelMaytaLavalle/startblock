@@ -59,7 +59,7 @@ class BLEController extends ChangeNotifier {
 
   startScan() async {
     scanSubScription = flutterBlue.scan().listen((scanResult) async {
-      if (scanResult.device.name == Constants.TARGET_DEVICE_NAME_TIZEZ) {
+      if (scanResult.device.name == Constants.TARGET_DEVICE_NAME_ZIVIT) {
         print("Found device");
         targetDevice = scanResult.device;
         await stopScan();
@@ -156,6 +156,9 @@ class BLEController extends ChangeNotifier {
     serverTime.clear();
     clientSendTime.clear();
     clientRecieveTime.clear();
+    tMaxList.clear();
+    tMinList.clear();
+    listSyncedTime.clear();
   }
 
   void flushData() async
@@ -190,6 +193,7 @@ class BLEController extends ChangeNotifier {
 
   void readDataTest(List<int> event) {
     var currentValue = _dataParser(event);
+    print(currentValue);
     var tag = currentValue.split(':');
     switch (tag[0]) {
       case 'RF':
@@ -250,6 +254,11 @@ class BLEController extends ChangeNotifier {
           isNotStarted = true;
           stopMoveSenseSample();
           notifyListeners();
+        }
+        break;
+      case 'A':
+        {
+          print(int.parse(tag[1]));
         }
         break;
       default:
@@ -352,6 +361,7 @@ class BLEController extends ChangeNotifier {
       tMaxList.add(clientSendTime[i] - serverTime[i]);
       tMinList.add(clientRecieveTime[i] - serverTime [i]);
     }
+    /*
     print("----------Marzullo T1 - T2------------");
     for (int i = 0; i < tMaxList.length; i++) {
       print(tMaxList[i]);
@@ -360,6 +370,7 @@ class BLEController extends ChangeNotifier {
     for (int i = 0; i < tMinList.length; i++) {
       print(tMinList[i]);
     }
+     */
     num maxVal = tMaxList.reduce((current, next) =>
     current < next
         ? current
@@ -372,6 +383,25 @@ class BLEController extends ChangeNotifier {
 
     print("Offset marzullo: $timeOffset2");
     marzulloTimeOffset = timeOffset2;
+
+    /**
+     * Test
+     */
+    print("----------T1------------");
+    for(int i = 0; i < Constants.LIST_LEN; i++)
+      {
+        print(clientSendTime[i]);
+      }
+    print("----------T2------------");
+    for(int i = 0; i < Constants.LIST_LEN; i++)
+    {
+      print(serverTime[i]);
+    }
+    print("----------T3------------");
+    for(int i = 0; i < Constants.LIST_LEN; i++)
+    {
+      print(clientRecieveTime[i]);
+    }
     flushKrille();
   }
 

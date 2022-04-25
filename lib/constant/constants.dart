@@ -24,7 +24,7 @@ class Constants {
   static const TARGET_DEVICE_NAME_ZIVIT = 'BBC micro:bit [zivit]';
   static const LIST_LEN = 100;
   static const ALPHA = 0.1; //EWMA alpha value
-  static const MEAN_NOISE_THRESH = 68; //Threshold value for noise. Mean value based on samples (see Excel tab "Noise").
+  static const MEAN_NOISE_THRESH = 200; //Threshold value for noise.
   static const MOVESENSE_DEVICE_NAME = 'Movesense 175130000971';
   static const DATABASE_NAME = 'test14';
   static const HISTORY_TABLE_NAME = 'test14';
