@@ -163,7 +163,7 @@ class HistoryCardViewModel{
         color: Colors.blue,
         dataSource: leftChartData,
         width: 2,
-        name: 'Left foot',
+        name: null,
         onRendererCreated: (ChartSeriesController controller) {
           _chartSeriesLeftController = controller; //Updates the chart live
         },

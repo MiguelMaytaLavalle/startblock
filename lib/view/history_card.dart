@@ -30,12 +30,17 @@ class _HistoryCardState extends State<HistoryCard> {
   ExportToExcel exportExcel = ExportToExcel();
   late SfCartesianChart chart;
   late TooltipBehavior _tooltipBehavior;
+  late CrosshairBehavior _crosshairBehavior;
   late TextEditingController controller;
 
   @override
   void initState() {
     _tooltipBehavior = TooltipBehavior(enable: true);
     controller = TextEditingController();
+    _crosshairBehavior = CrosshairBehavior(
+      // Enables the crosshair
+        enable: true
+    );
     super.initState();
     refreshHistory();
   }
@@ -112,23 +117,24 @@ class _HistoryCardState extends State<HistoryCard> {
                         child:Column(
                           children: [
                             SfCartesianChart(
-                              //crosshairBehavior: _crosshairBehavior,
-                              legend: Legend(isVisible: true),
+                              crosshairBehavior: _crosshairBehavior,
+                              legend: Legend(isVisible: false),
                               //zoomPanBehavior: _zoomPanBehavior,
                               //series: sensorPageVM.getDataRight(),
                               series: hCardVM.leftSplineSeries(),
                               primaryXAxis: NumericAxis(
-                                isVisible:false,
+                                isVisible:true,
                                   //Uncomment if X-axis shall be visible and set isVisible = true;
-                                  /*
+
                                   interactiveTooltip: const InteractiveTooltip(
                                     enable: true,
                                   ),
-                                  majorGridLines: const MajorGridLines(width: 0),
+                                  majorGridLines: const MajorGridLines(width: 1),
+                                  axisLine: AxisLine(width:1),
                                   edgeLabelPlacement: EdgeLabelPlacement.shift,
                                   interval: 1000, //1000ms between two timestamps equals a second
-                                  title: AxisTitle(text: 'Time [S]')
-                                   */
+                                  //title: AxisTitle(text: 'Time [S]')
+
                               ),
 
                               primaryYAxis: NumericAxis(
@@ -138,6 +144,32 @@ class _HistoryCardState extends State<HistoryCard> {
                                   ),
                                   axisLine: const AxisLine(width: 0),
                                   majorTickLines: const MajorTickLines(size: 0),
+                                  title: AxisTitle(text: 'Force [N]')),
+                            ),
+                            SfCartesianChart(
+                              legend: Legend(isVisible: false),
+                              series: hCardVM.rightSplineSeries(),
+                              primaryXAxis: NumericAxis(
+                                isVisible:true,
+                                //Uncomment if X-axis shall be visible and set isVisible = true;
+
+                                  interactiveTooltip: const InteractiveTooltip(
+                                    enable: true,
+                                  ),
+                                  majorGridLines: const MajorGridLines(width: 1),
+                                  axisLine: AxisLine(width:1),
+                                  edgeLabelPlacement: EdgeLabelPlacement.shift,
+                                  interval: 1000, //1000ms between two timestamps equals a second
+                                  //title: AxisTitle(text: 'Time [S]')
+                              ),
+
+                              primaryYAxis: NumericAxis(
+                                  minimum: 0,
+                                  interactiveTooltip: const InteractiveTooltip(
+                                    enable: true,
+                                  ),
+                                  axisLine: const AxisLine(width: 1),
+                                  majorTickLines: const MajorTickLines(size: 1),
                                   title: AxisTitle(text: 'Force [N]')),
                             ),
                             Wrap(
@@ -169,31 +201,7 @@ class _HistoryCardState extends State<HistoryCard> {
                                 ),
                               ],
                             ),
-                            SfCartesianChart(
-                              legend: Legend(isVisible: true),
-                              series: hCardVM.rightSplineSeries(),
-                              primaryXAxis: NumericAxis(
-                                isVisible:false,
-                                  //Uncomment if X-axis shall be visible and set isVisible = true;
-                                  /*
-                                  interactiveTooltip: const InteractiveTooltip(
-                                    enable: true,
-                                  ),
-                                  majorGridLines: const MajorGridLines(width: 0),
-                                  edgeLabelPlacement: EdgeLabelPlacement.shift,
-                                  interval: 1000, //1000ms between two timestamps equals a second
-                                  title: AxisTitle(text: 'Time [S]')*/
-                              ),
 
-                              primaryYAxis: NumericAxis(
-                                  minimum: 0,
-                                  interactiveTooltip: const InteractiveTooltip(
-                                    enable: true,
-                                  ),
-                                  axisLine: const AxisLine(width: 0),
-                                  majorTickLines: const MajorTickLines(size: 0),
-                                  title: AxisTitle(text: 'Force [N]')),
-                            ),
                             Wrap(
                               direction: Axis.vertical,
                               children: <Widget>[
