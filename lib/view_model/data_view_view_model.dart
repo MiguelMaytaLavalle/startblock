@@ -166,6 +166,7 @@ class DataViewViewModel extends ChangeNotifier{
           if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
           {
             tempT1 = data[i].getTime();
+            print(tempT1);
             break;
           }
         }
@@ -175,10 +176,18 @@ class DataViewViewModel extends ChangeNotifier{
           if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
           {
             tempT2 = data[i].getTime();
+            print(tempT2);
             break;
           }
         }
-        return totalForce/(tempT2-tempT1);
+        if(tempT1 == null && tempT2 == null)
+        {
+          return 0;
+        }
+        else
+        {
+          return totalForce/(tempT2-tempT1);
+        }
       }
   }
   ///Calculates the force impulse where noise can no longer be detected
@@ -210,7 +219,14 @@ class DataViewViewModel extends ChangeNotifier{
           break;
         }
       }
-      return totalForce*(tempT2-tempT1);
+      if(tempT1 == null && tempT2 == null)
+      {
+        return 0;
+      }
+      else
+      {
+        return totalForce*(tempT2-tempT1);
+      }
     }
   }
   ///Calculates the slope of the plotted function. Slope value represents Rate of Force Development

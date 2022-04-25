@@ -329,7 +329,14 @@ class HistoryCardViewModel{
         break;
       }
     }
-    return totalForce/(tempT2-tempT1);
+    if(tempT1 == null && tempT2 == null)
+    {
+      return 0;
+    }
+    else
+    {
+      return totalForce/(tempT2-tempT1);
+    }
   }
   ///Calculates the force impulse where noise can no longer be detected
   double _calcForceImpulse(List<Data> data, double totalForce)
@@ -354,6 +361,13 @@ class HistoryCardViewModel{
         break;
       }
     }
-    return totalForce*(tempT2-tempT1);
+    if(tempT1 == null && tempT2 == null)
+    {
+      return 0;
+    }
+    else
+    {
+      return totalForce*(tempT2-tempT1);
+    }
   }
 }

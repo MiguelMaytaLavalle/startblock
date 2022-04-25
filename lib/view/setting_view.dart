@@ -59,31 +59,30 @@ class _SettingState extends State<SettingScreen> {
                 ),
                   Container(
                     padding: const EdgeInsets.all(16),
-                    child:const Text("Set threshold value to zero if you want to turn off the False start function.\n"
-                        "The function is initially set to 100N when the system starts.",
+                    child:const Text("The function is initially set to 200N when the system starts.",
                       style: TextStyle(color: Colors.grey),
                     ),
                   ),
                   ElevatedButton(
                       onPressed:(){
                         settingVM.connectToMovesense();
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Deez")));
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Connecting.")));
                       },
                       child: Text("Connect Movesense")
                   ),
                   ElevatedButton(
                       onPressed:(){
                         settingVM.sendMoveSense();
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Deez")));
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Starting Movesense sample.")));
                       },
-                      child: Text("Send Movesense")
+                      child: Text("Start Movesense sample")
                   ),
                   ElevatedButton(
                       onPressed:(){
                         settingVM.stopMovesense();
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Deez")));
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Stopping Movesense sample.")));
                       },
-                      child: Text("Stop Movesense")
+                      child: Text("Stop Movesense sample")
                   )
                 ],
               ),
