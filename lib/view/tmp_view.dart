@@ -1,3 +1,4 @@
+/*
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:startblock/db/database_helper.dart';
@@ -85,7 +86,8 @@ class _TestPageState extends State<TestPage> {
               ),
             )
 
-            /*SfCartesianChart(
+            */
+/*SfCartesianChart(
                 series: <LineSeries<LiveData, int>>[
                   LineSeries<LiveData, int>(
                     onRendererCreated: (ChartSeriesController controller) {
@@ -108,8 +110,10 @@ class _TestPageState extends State<TestPage> {
                     title: AxisTitle(text: 'Internet speed (Mbps)'))
 
             ),
-*/
-          /*floatingActionButton:
+*//*
+
+          */
+/*floatingActionButton:
           Wrap(
           direction: Axis.horizontal,
           children: <Widget>[
@@ -121,7 +125,8 @@ class _TestPageState extends State<TestPage> {
                 )
             ),
           ],
-        ),*/
+        ),*//*
+
 
         )
 
@@ -133,9 +138,11 @@ class _TestPageState extends State<TestPage> {
   }
 
   Future addHistory() async {
-    /*List<LiveData> test = getChartData();
+    */
+/*List<LiveData> test = getChartData();
     List<LiveData> test1 = getChartData1();
-*/
+*//*
+
 
     try{
       List<LiveData> testRight = getRightData();
@@ -168,6 +175,7 @@ class _TestPageState extends State<TestPage> {
 
 
   }
+*/
 /*
   int time = 19;
 void updateDataSource(Timer timer) {
@@ -176,8 +184,10 @@ void updateDataSource(Timer timer) {
     _chartSeriesController.updateDataSource(
         addedDataIndex: chartData.length - 1, removedDataIndex: 0);
   }
+  *//*
+
   */
-  /*List<LiveData> getChartData() {
+/*List<LiveData> getChartData() {
     return <LiveData>[
       LiveData(time: 0, force: 42),
       LiveData(time: 1, force: 47),
@@ -224,7 +234,8 @@ void updateDataSource(Timer timer) {
       LiveData(time: 18, force: 80)
 
     ];
-  }*/
+  }*//*
+
 
   List<LiveData> getLeftData() {return <LiveData>[
     LiveData(force:23)
@@ -338,3 +349,4 @@ void updateDataSource(Timer timer) {
   }
 
 }
+*/

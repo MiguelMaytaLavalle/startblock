@@ -13,6 +13,8 @@ class HistoryCardModel{
   late List<Timestamp> _movesenseArriveTime = [];
   bool _isLoading = false;
   late num _marzullo;
+  late num _marzulloCreationTime;
+  late num _lastServerTime;
 
   set excelPath(String value) {
     _excelPath = value;
@@ -38,6 +40,7 @@ class HistoryCardModel{
   List<LiveData> get rightData => _rightData;
 
   List<LiveData> get leftData => _leftData;
+
   num get marzullo => _marzullo;
 
   set marzullo(num value) {
@@ -60,5 +63,17 @@ class HistoryCardModel{
 
   set movesenseArriveTime(List<Timestamp> value) {
     _movesenseArriveTime = value;
+  }
+
+  num get lastServerTime => _lastServerTime;
+
+  set lastServerTime(num value) {
+    _lastServerTime = value;
+  }
+
+  num get marzulloCreationTime => _marzulloCreationTime;
+
+  set marzulloCreationTime(num value) {
+    _marzulloCreationTime = value;
   }
 }

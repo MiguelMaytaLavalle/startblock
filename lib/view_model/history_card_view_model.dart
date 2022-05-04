@@ -93,6 +93,22 @@ class HistoryCardViewModel{
     return hCardModel.history.marzullo;
   }
 
+  getMarzulloCreationTime(){
+    return hCardModel.history.marzulloCreationTime;
+  }
+
+  setMarzulloCreationTime(num m){
+    hCardModel.marzulloCreationTime = m;
+  }
+
+  getLastServerTime(){
+    return hCardModel.history.lastServerTime;
+  }
+
+  setLastServerTime(num m){
+    hCardModel.lastServerTime = m;
+  }
+
   setImuData(List<LiveData> list){
     hCardModel.imuData = list;
   }

@@ -235,6 +235,8 @@ class _DataState extends State<DataScreen> {
       List<LiveData> imuDataList = sensorPageVM.getImuDataToSave();
       List<Timestamp> imuTimestampList = sensorPageVM.getImuTimestampsToSave();
       List<Timestamp> movesenseArriveTimeList = sensorPageVM.getMovesenseArriveTimestampsToSave();
+      num marzulloCreationTime = sensorPageVM.getMarzulloCreationTime();
+      num lastServerTime = sensorPageVM.getLastServerTime();
 
       final history =  History(
         dateTime: DateTime.now(),
@@ -246,6 +248,8 @@ class _DataState extends State<DataScreen> {
         imuData: jsonEncode(imuDataList),
         imuTimestamps: jsonEncode(imuTimestampList),
         movesenseArriveTime: jsonEncode(movesenseArriveTimeList),
+        marzulloCreationTime: marzulloCreationTime,
+        lastServerTime: lastServerTime,
       );
       await HistoryDatabase.instance.create(history);
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Saved Successfully!")));

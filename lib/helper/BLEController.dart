@@ -51,7 +51,8 @@ class BLEController extends ChangeNotifier {
   late List<num> tMinList = <num>[];
   late List<num> timeSyncOffsets = <num>[];
   late num timeSend, timeServer, timeRecieve, syncedTime, RTT, RTT_mean,
-      latestMeasure, cristianTimeOffset, offsetMean, marzulloTimeOffset;
+      latestMeasure, cristianTimeOffset, offsetMean, marzulloTimeOffset,
+      lastServerTime, marzulloCreationTime;
   int _timeSyncCounter = 0;
 
   late Timer _timeSyncTimer;
@@ -59,7 +60,7 @@ class BLEController extends ChangeNotifier {
 
   startScan() async {
     scanSubScription = flutterBlue.scan().listen((scanResult) async {
-      if (scanResult.device.name == Constants.TARGET_DEVICE_NAME_ZIVIT) {
+      if (scanResult.device.name == Constants.TARGET_DEVICE_NAME_TIZEZ) {
         print("Found device");
         targetDevice = scanResult.device;
         await stopScan();
@@ -373,24 +374,17 @@ class BLEController extends ChangeNotifier {
     print("Offset marzullo: $timeOffset2");
     marzulloTimeOffset = timeOffset2;
 
-    /**
-     * Test
+    /** Save the time when the marzullo offset was created
+     *
      */
-    print("----------T1------------");
-    for(int i = 0; i < Constants.LIST_LEN; i++)
-      {
-        print(clientSendTime[i]);
-      }
-    print("----------T2------------");
-    for(int i = 0; i < Constants.LIST_LEN; i++)
-    {
-      print(serverTime[i]);
-    }
-    print("----------T3------------");
-    for(int i = 0; i < Constants.LIST_LEN; i++)
-    {
-      print(clientRecieveTime[i]);
-    }
+    marzulloCreationTime = DateTime.now().millisecondsSinceEpoch;
+
+    /**
+     * Saves the last servertime.
+     */
+    lastServerTime = serverTime.last;
+
+
     flushKrille();
   }
 

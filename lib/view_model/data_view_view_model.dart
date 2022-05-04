@@ -22,6 +22,8 @@ class DataViewViewModel extends ChangeNotifier{
   double _totalForceLeft = 0;
   double _forceImpulseLeft = 0;
   int _timeToPeakForceLeft = 0;
+  num _marzulloCreationTime = 0;
+  num _lastServerTime = 0;
 
   double _peakForceRight = 0;
   double _RFDRight = 0;
@@ -255,6 +257,8 @@ class DataViewViewModel extends ChangeNotifier{
     notifyListeners();
     return slope;
   }
+
+
   ///Gets raw value data to be saved persistently .
   List<LiveData> getLeftDataToSave (){
     List<LiveData> tmpLeftList = <LiveData>[];
@@ -391,5 +395,13 @@ class DataViewViewModel extends ChangeNotifier{
       }
     }
     return tempList;
+  }
+
+  num getMarzulloCreationTime() {
+    return bleController.marzulloCreationTime;
+  }
+
+  num getLastServerTime(){
+    return bleController.lastServerTime;
   }
 }

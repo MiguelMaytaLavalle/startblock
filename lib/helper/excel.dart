@@ -58,17 +58,14 @@ class ExportToExcel{
     final Future<List<ExcelDataRow>> dataRowsLeft = _mapExcelData('Left',history.leftData);
     final Future<List<ExcelDataRow>> dataRowsRight = _mapExcelData('Right',history.rightData);
     final Future<List<ExcelDataRow>> dataRowsTimestamp = _mapExcelTimestamps('Time',history.timestamps);
-    final Future<List<ExcelDataRow>> dataRowsIMUAcc = _mapExcelData('IMU Acc',history.imuData);
-    final Future<List<ExcelDataRow>> dataRowsIMUTimestamp = _mapExcelTimestamps('IMU Timestamp',history.imuTimestamps);
-    final Future<List<ExcelDataRow>> dataRowsMovesenseArriveTime = _mapExcelTimestamps('Movesense Arrive Time',history.movesenseArriveTime);
+
 
     /// Transmit the converted data into appropriate ExcelDataRow which will be used for setting up the excel to each column.
     List<ExcelDataRow> _dataRowsLeft = await Future.value(dataRowsLeft);
     List<ExcelDataRow> _dataRowsRight = await Future.value(dataRowsRight);
     List<ExcelDataRow> _dataRowTimetamps = await Future.value(dataRowsTimestamp);
-    List<ExcelDataRow> _dataRowIMUAcc = await Future.value(dataRowsIMUAcc);
-    List<ExcelDataRow> _dataRowIMUTimestamp = await Future.value(dataRowsIMUTimestamp);
-    List<ExcelDataRow> _dataRowMovesenseArriveTime = await Future.value(dataRowsMovesenseArriveTime);
+
+
 
     ///Import the lists to a Sheet.
     sheet.importData(_dataRowsLeft, 1, 1);
@@ -76,9 +73,30 @@ class ExportToExcel{
     sheet.importData(_dataRowTimetamps, 1, 3);
     sheet.getRangeByIndex(1, 4).setText('Marzullo Micro:Bit Offset');
     sheet.getRangeByIndex(2, 4).setText(history.marzullo.toString());
-    sheet.importData(_dataRowIMUAcc,1,5);
-    sheet.importData(_dataRowIMUTimestamp, 1, 6);
-    sheet.importData(_dataRowMovesenseArriveTime, 1, 7);
+    sheet.getRangeByIndex(1, 5).setText('Marzullo Micro:Bit Creation Time');
+    sheet.getRangeByIndex(2, 5).setText(history.marzulloCreationTime.toString());
+    sheet.getRangeByIndex(1, 6).setText('Marzullo Micro:Bit Last Server Time');
+    sheet.getRangeByIndex(2, 6).setText(history.lastServerTime.toString());
+
+
+    try{
+      final Future<List<ExcelDataRow>> dataRowsIMUAcc = _mapExcelData('IMU Acc',history.imuData);
+      final Future<List<ExcelDataRow>> dataRowsIMUTimestamp = _mapExcelTimestamps('IMU Timestamp',history.imuTimestamps);
+      final Future<List<ExcelDataRow>> dataRowsMovesenseArriveTime = _mapExcelTimestamps('Movesense Arrive Time',history.movesenseArriveTime);
+
+      List<ExcelDataRow> _dataRowIMUAcc = await Future.value(dataRowsIMUAcc);
+      List<ExcelDataRow> _dataRowIMUTimestamp = await Future.value(dataRowsIMUTimestamp);
+      List<ExcelDataRow> _dataRowMovesenseArriveTime = await Future.value(dataRowsMovesenseArriveTime);
+
+      sheet.importData(_dataRowIMUAcc,1,7);
+      sheet.importData(_dataRowIMUTimestamp, 1, 8);
+      sheet.importData(_dataRowMovesenseArriveTime, 1, 9);
+
+    }catch(error){
+      print(error);
+    }
+
+
 
     ///Auto-Fit columns.
     sheet.getRangeByName('A1:B1').autoFitColumns();
@@ -108,6 +126,5 @@ class ExportToExcel{
     String tmp = await exportToExcel(hCardModel);
    return tmp;
   }
-
 
 }

@@ -78,6 +78,10 @@ class _HistoryCardState extends State<HistoryCard> {
         .map((e) => Timestamp.fromJson(e))
         .toList());
 
+    hCardVM.setLastServerTime(hCardVM.getLastServerTime());
+
+    hCardVM.setMarzulloCreationTime(hCardVM.getMarzulloCreationTime());
+
     setState(() => hCardVM.setIsLoading(false));
 
     hCardVM.setupLeftChartData();
