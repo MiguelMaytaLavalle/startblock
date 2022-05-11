@@ -52,7 +52,7 @@ class BLEController extends ChangeNotifier {
   late List<num> timeSyncOffsets = <num>[];
   late num timeSend, timeServer, timeRecieve, syncedTime, RTT, RTT_mean,
       latestMeasure, cristianTimeOffset, offsetMean, marzulloTimeOffset,
-      lastServerTime, marzulloCreationTime;
+      lastServerTime, marzulloCreationTime, startSampleTime, stopSampleTime ;
   int _timeSyncCounter = 0;
 
   late Timer _timeSyncTimer;
@@ -179,6 +179,8 @@ class BLEController extends ChangeNotifier {
     String test = 'Start\n';
     List<int> bytes = utf8.encode(test);
     try {
+      startSampleTime = DateTime.now().millisecondsSinceEpoch;
+      print('Start time: $startSampleTime');
       await writeChar.write(bytes);
     } catch (error) {
       //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
@@ -230,6 +232,7 @@ class BLEController extends ChangeNotifier {
             print("\n");
           });
           isNotStarted = true;
+          stopSampleTime = DateTime.now().millisecondsSinceEpoch;
           notifyListeners();
         }
         break;
@@ -284,15 +287,15 @@ class BLEController extends ChangeNotifier {
   void sendTimeSyncRequest() async
   {
     print('Time to send');
-    String test = "TS\n";
-    List<int> bytes = utf8.encode(test);
-    int currentTime = DateTime.now().millisecondsSinceEpoch;
-    clientSendTime.add(currentTime);
-    try {
-      await writeChar.write(bytes);
-    } catch (error) {
-      //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
-    }
+      String test = "TS\n";
+      List<int> bytes = utf8.encode(test);
+      int currentTime = DateTime.now().millisecondsSinceEpoch;
+      clientSendTime.add(currentTime);
+      try {
+        await writeChar.write(bytes);
+      } catch (error) {
+        //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+      }
   }
   ///Calculates time sync offsets for Cristian's algorithm and Marzullo's algorithm.
   void calculateTimeSync() {
@@ -378,11 +381,13 @@ class BLEController extends ChangeNotifier {
      *
      */
     marzulloCreationTime = DateTime.now().millisecondsSinceEpoch;
+    print('Marzullo Creation Time: ${marzulloCreationTime.toString()}');
 
     /**
      * Saves the last servertime.
      */
     lastServerTime = serverTime.last;
+    print('Last Server Time: ${lastServerTime.toString()}');
 
 
     flushKrille();

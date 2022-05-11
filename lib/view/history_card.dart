@@ -82,6 +82,10 @@ class _HistoryCardState extends State<HistoryCard> {
 
     hCardVM.setMarzulloCreationTime(hCardVM.getMarzulloCreationTime());
 
+    hCardVM.setStartSampleTime(hCardVM.getStartSampleTime());
+
+    hCardVM.setStopSampleTime(hCardVM.getStopSampleTime());
+
     setState(() => hCardVM.setIsLoading(false));
 
     hCardVM.setupLeftChartData();
@@ -178,29 +182,40 @@ class _HistoryCardState extends State<HistoryCard> {
                             ),
                             Wrap(
                               direction: Axis.vertical,
-                              children: <Widget>[
+                              alignment: WrapAlignment.start,
+                              children: [
                                 Material(
-                                    child: Text('Rate of force (RFD): ${hCardVM.getRFDLeft()
-                                    .toStringAsPrecision(2)}'
+                                    child: Text('Left Foot Data',
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(fontWeight: FontWeight.bold,
+                                      color: Colors.blue
+                                      ),
                                     )
                                 ),
                                 Material(
-                                    child: Text('Time to peak (TTP): ${hCardVM.getTimeToPeakForceLeft()}'
+                                    child: Text('Rate of force (RFD): ${hCardVM.getRFDLeft()
+                                        //.toString()}'
+                                      .toStringAsFixed(3)}'
+                                    )
+                                ),
+                                Material(
+                                    child: Text('Time to peak (TTP): ${hCardVM.getTimeToPeakForceLeft()
+                                    .toStringAsFixed(3)}'
                                     )
                                 ),
                                 Material(
                                     child: Text('Average Force: ${hCardVM.getAverageForceLeft()
-                                        .toStringAsFixed(2)}'
+                                        .toStringAsFixed(3)}'
                                     )
                                 ),
                                 Material(
                                     child: Text('Force impulse: ${hCardVM.getForceImpulseLeft()
-                                    .toStringAsPrecision(2)}'
+                                    .toStringAsFixed(3)}'
                                     )
                                 ),
                                 Material(
                                     child: Text('Peak force: ${hCardVM.getPeakForceLeft()
-                                    .toStringAsPrecision(2)}'
+                                    .toStringAsPrecision(10)}'
                                     )
                                 ),
                               ],
@@ -210,20 +225,30 @@ class _HistoryCardState extends State<HistoryCard> {
                               direction: Axis.vertical,
                               children: <Widget>[
                                 Material(
-                                    child: Text(
-                                        'Rate of force (RFD): ${hCardVM.getRFDRight().toStringAsPrecision(2)}')),
+                                    child: Text('Right foot data',
+                                      textAlign: TextAlign.left,
+                                    style: TextStyle(fontWeight: FontWeight.bold,
+                                    color: Colors.red
+                                      ),
+                                    )
+                                ),
                                 Material(
                                     child: Text(
-                                        'Time to peak (TTP): ${hCardVM.getTimeToPeakForceRight()}')),
+                                        'Rate of force (RFD): ${hCardVM.getRFDRight()
+                                            //.toString()}')),
+                                            .toStringAsFixed(3)}')),
                                 Material(
                                     child: Text(
-                                        'Average Force: ${hCardVM.getAverageForceRight().toStringAsFixed(2)}')),
+                                        'Time to peak (TTP): ${hCardVM.getTimeToPeakForceRight().toStringAsFixed(3)}')),
                                 Material(
                                     child: Text(
-                                        'Force impulse: ${hCardVM.getForceImpulseRight().toStringAsPrecision(2)}')),
+                                        'Average Force: ${hCardVM.getAverageForceRight().toStringAsFixed(3)}')),
                                 Material(
                                     child: Text(
-                                        'Peak force: ${hCardVM.getPeakForceRight().toStringAsPrecision(2)}')),
+                                        'Force impulse: ${hCardVM.getForceImpulseRight().toStringAsFixed(3)}')),
+                                Material(
+                                    child: Text(
+                                        'Peak force: ${hCardVM.getPeakForceRight().toStringAsFixed(3)}')),
                               ],
                             ),
                             const SizedBox(height: 60),

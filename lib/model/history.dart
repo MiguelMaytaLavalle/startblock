@@ -24,6 +24,8 @@ class HistoryFields{
   static const String movesenseArriveTime = 'movesenseArriveTime';
   static const String marzulloCreationTime = 'marzulloCreationTime';
   static const String lastServerTime = 'lastServerTime';
+  static const String startSampleTime = 'startSampleTime';
+  static const String stopSampleTime = 'stopSampleTime';
 
 }
 class History{
@@ -39,6 +41,8 @@ class History{
   final String movesenseArriveTime;
   final num? marzulloCreationTime;
   final num? lastServerTime;
+  final num? startSampleTime;
+  final num? stopSampleTime;
 
   History({
     this.id,
@@ -53,6 +57,8 @@ class History{
     required this.movesenseArriveTime,
     required this.marzulloCreationTime,
     required this.lastServerTime,
+    required this.startSampleTime,
+    required this.stopSampleTime,
   });
 
   Map<String, dynamic> toJson() =>{
@@ -68,6 +74,8 @@ class History{
     HistoryFields.movesenseArriveTime: movesenseArriveTime,
     HistoryFields.marzulloCreationTime: marzulloCreationTime,
     HistoryFields.lastServerTime: lastServerTime,
+    HistoryFields.startSampleTime: startSampleTime,
+    HistoryFields.stopSampleTime: stopSampleTime,
 
 
   };
@@ -85,6 +93,8 @@ class History{
     movesenseArriveTime: json[HistoryFields.movesenseArriveTime] as String,
     marzulloCreationTime: json[HistoryFields.marzulloCreationTime] as num?,
     lastServerTime: json[HistoryFields.lastServerTime] as num?,
+    startSampleTime: json[HistoryFields.startSampleTime] as num?,
+    stopSampleTime: json[HistoryFields.stopSampleTime] as num?,
   );
 
   History copy({
@@ -100,6 +110,8 @@ class History{
     String? movesenseArriveTime,
     num? marzulloCreationTime,
     num? lastServerTime,
+    num? startSampleTime,
+    num? stopSampleTime,
   }) =>
       History(
         id: id ?? this.id,
@@ -114,5 +126,7 @@ class History{
         movesenseArriveTime: movesenseArriveTime ?? this.movesenseArriveTime,
         marzulloCreationTime: marzulloCreationTime ?? this.marzulloCreationTime,
         lastServerTime: lastServerTime ?? this.lastServerTime,
+        startSampleTime: startSampleTime ?? this.startSampleTime,
+        stopSampleTime: stopSampleTime ?? this.stopSampleTime,
       );
 }

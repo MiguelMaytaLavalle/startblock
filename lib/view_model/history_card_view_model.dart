@@ -109,6 +109,22 @@ class HistoryCardViewModel{
     hCardModel.lastServerTime = m;
   }
 
+  getStartSampleTime(){
+    return hCardModel.history.startSampleTime;
+  }
+
+  setStartSampleTime(num m){
+    hCardModel.startSampleTime = m;
+  }
+
+  getStopSampleTime(){
+    return hCardModel.history.stopSampleTime;
+  }
+
+  setStopSampleTime(num m){
+    hCardModel.stopSampleTime = m;
+  }
+
   setImuData(List<LiveData> list){
     hCardModel.imuData = list;
   }

@@ -404,4 +404,12 @@ class DataViewViewModel extends ChangeNotifier{
   num getLastServerTime(){
     return bleController.lastServerTime;
   }
+
+  num getStartSampleTime(){
+    return bleController.startSampleTime;
+  }
+
+  num getStopSampleTime(){
+    return bleController.stopSampleTime;
+  }
 }
