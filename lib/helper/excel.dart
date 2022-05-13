@@ -58,25 +58,37 @@ class ExportToExcel{
     final Future<List<ExcelDataRow>> dataRowsLeft = _mapExcelData('Left',history.leftData);
     final Future<List<ExcelDataRow>> dataRowsRight = _mapExcelData('Right',history.rightData);
     final Future<List<ExcelDataRow>> dataRowsTimestamp = _mapExcelTimestamps('Time',history.timestamps);
+    //print("Arrival time: ${history.timestampArrival.length}");
+    //final Future<List<ExcelDataRow>> dataRowsArrivalTimestamp = _mapExcelTimestamps('Arrival Time',history.timestampArrival);
 
 
     /// Transmit the converted data into appropriate ExcelDataRow which will be used for setting up the excel to each column.
     List<ExcelDataRow> _dataRowsLeft = await Future.value(dataRowsLeft);
     List<ExcelDataRow> _dataRowsRight = await Future.value(dataRowsRight);
-    List<ExcelDataRow> _dataRowTimetamps = await Future.value(dataRowsTimestamp);
+    List<ExcelDataRow> _dataRowTimestamps = await Future.value(dataRowsTimestamp);
+    //List<ExcelDataRow> _dataRowsArrivalTimestamp = await Future.value(dataRowsArrivalTimestamp);
 
 
 
     ///Import the lists to a Sheet.
     sheet.importData(_dataRowsLeft, 1, 1);
     sheet.importData(_dataRowsRight, 1, 2);
-    sheet.importData(_dataRowTimetamps, 1, 3);
+    sheet.importData(_dataRowTimestamps, 1, 3);
+    //sheet.importData(_dataRowsArrivalTimestamp, 1, 12);
+
     sheet.getRangeByIndex(1, 4).setText('Marzullo Micro:Bit Offset');
     sheet.getRangeByIndex(2, 4).setText(history.marzullo.toString());
-    sheet.getRangeByIndex(1, 5).setText('Marzullo Micro:Bit Creation Time');
-    sheet.getRangeByIndex(2, 5).setText(history.marzulloCreationTime.toString());
-    sheet.getRangeByIndex(1, 6).setText('Marzullo Micro:Bit Last Server Time');
-    sheet.getRangeByIndex(2, 6).setText(history.lastServerTime.toString());
+
+    sheet.getRangeByIndex(1, 5).setText('Start Sample Time');
+    sheet.getRangeByIndex(2, 5).setText(history.startSampleTime.toString());
+
+    sheet.getRangeByIndex(1, 6).setText('Stop Sample Time');
+    sheet.getRangeByIndex(2, 6).setText(history.stopSampleTime.toString());
+
+    sheet.getRangeByIndex(1, 7).setText('Marzullo Micro:Bit Creation Time');
+    sheet.getRangeByIndex(2, 7).setText(history.marzulloCreationTime.toString());
+    sheet.getRangeByIndex(1, 8).setText('Marzullo Micro:Bit Last Server Time');
+    sheet.getRangeByIndex(2, 8).setText(history.lastServerTime.toString());
 
 
     try{
@@ -88,9 +100,9 @@ class ExportToExcel{
       List<ExcelDataRow> _dataRowIMUTimestamp = await Future.value(dataRowsIMUTimestamp);
       List<ExcelDataRow> _dataRowMovesenseArriveTime = await Future.value(dataRowsMovesenseArriveTime);
 
-      sheet.importData(_dataRowIMUAcc,1,7);
-      sheet.importData(_dataRowIMUTimestamp, 1, 8);
-      sheet.importData(_dataRowMovesenseArriveTime, 1, 9);
+      sheet.importData(_dataRowIMUAcc,1,9);
+      sheet.importData(_dataRowIMUTimestamp, 1, 10);
+      sheet.importData(_dataRowMovesenseArriveTime, 1, 11);
 
     }catch(error){
       print(error);
@@ -99,8 +111,7 @@ class ExportToExcel{
 
 
     ///Auto-Fit columns.
-    sheet.getRangeByName('A1:B1').autoFitColumns();
-    sheet.getRangeByName('D1:E1').autoFitColumns();
+    sheet.getRangeByName('A1:M1').autoFitColumns();
 
     ///Save and launch the excel.
     final List<int> bytes = workbook.saveAsStream();

@@ -45,8 +45,10 @@ CREATE TABLE $tableHistory (
   ${HistoryFields.imuTimestamps} $textTypeNull,
   ${HistoryFields.movesenseArriveTime} $textTypeNull,
   ${HistoryFields.marzulloCreationTime} $realType,
-  ${HistoryFields.lastServerTime} $realType
-  
+  ${HistoryFields.lastServerTime} $realType,
+  ${HistoryFields.startSampleTime} $realType,
+  ${HistoryFields.stopSampleTime} $realType,
+  ${HistoryFields.listTimestampArrivalTime} $textTypeNotNull
   )
 ''');
   }

@@ -108,34 +108,40 @@ class _DataState extends State<DataScreen> {
             ),
             Wrap(
               direction: Axis.vertical,
-              children: <Widget>[
+              alignment: WrapAlignment.start,
+              children: [
                 Material(
-                  //margin:const EdgeInsets.all(10),
+                    child: Text('Left Foot Data',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(fontWeight: FontWeight.bold,
+                          color: Colors.blue
+                      ),
+                    )
+                ),
+                Material(
                     child: Text('Rate of force (RFD): ${sensorPageVM.getRFDLeft()
-                        .toStringAsFixed(2)}'
+                    //.toString()}'
+                        .toStringAsFixed(3)}'
                     )
                 ),
                 Material(
-                  //margin:const EdgeInsets.all(10),
-                    child: Text('Time to peak (TTP): ${sensorPageVM.getTimeToPeakForceLeft()}'
+                    child: Text('Time to peak (TTP): ${sensorPageVM.getTimeToPeakForceLeft()
+                        .toStringAsFixed(3)}'
                     )
                 ),
                 Material(
-                  //margin:const EdgeInsets.all(10),
                     child: Text('Average Force: ${sensorPageVM.getAverageForceLeft()
-                        .toStringAsFixed(2)}'
+                        .toStringAsFixed(3)}'
                     )
                 ),
                 Material(
-                  //margin:const EdgeInsets.all(10),
                     child: Text('Force impulse: ${sensorPageVM.getForceImpulseLeft()
-                        .toStringAsPrecision(2)}'
+                        .toStringAsFixed(3)}'
                     )
                 ),
                 Material(
-                  //margin:const EdgeInsets.all(10),
                     child: Text('Peak force: ${sensorPageVM.getPeakForceLeft()
-                        .toStringAsFixed(2)}'
+                        .toStringAsPrecision(10)}'
                     )
                 ),
               ],
@@ -144,34 +150,30 @@ class _DataState extends State<DataScreen> {
               direction: Axis.vertical,
               children: <Widget>[
                 Material(
-                  //margin:const EdgeInsets.all(10),
-                    child: Text('Rate of force (RFD): ${sensorPageVM.getRFDRight()
-                        .toStringAsFixed(2)}'
+                    child: Text('Right foot data',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(fontWeight: FontWeight.bold,
+                          color: Colors.red
+                      ),
                     )
                 ),
                 Material(
-                  //margin:const EdgeInsets.all(10),
-                    child: Text('Time to peak (TTP): ${sensorPageVM.getTimeToPeakForceRight()}'
-                    )
-                ),
+                    child: Text(
+                        'Rate of force (RFD): ${sensorPageVM.getRFDRight()
+                        //.toString()}')),
+                            .toStringAsFixed(3)}')),
                 Material(
-                  //margin:const EdgeInsets.all(10),
-                    child: Text('Average Force: ${sensorPageVM.getAverageForceRight()
-                        .toStringAsFixed(2)}'
-                    )
-                ),
+                    child: Text(
+                        'Time to peak (TTP): ${sensorPageVM.getTimeToPeakForceRight().toStringAsFixed(3)}')),
                 Material(
-                  //margin:const EdgeInsets.all(10),
-                    child: Text('Force impulse: ${sensorPageVM.getForceImpulseRight()
-                    .toStringAsPrecision(2)}'
-                    )
-                ),
+                    child: Text(
+                        'Average Force: ${sensorPageVM.getAverageForceRight().toStringAsFixed(3)}')),
                 Material(
-                  //margin:const EdgeInsets.all(10),
-                    child: Text('Peak force: ${sensorPageVM.getPeakForceRight()
-                        .toStringAsFixed(2)}'
-                    )
-                ),
+                    child: Text(
+                        'Force impulse: ${sensorPageVM.getForceImpulseRight().toStringAsFixed(3)}')),
+                Material(
+                    child: Text(
+                        'Peak force: ${sensorPageVM.getPeakForceRight().toStringAsFixed(3)}')),
               ],
             ),
 
@@ -237,6 +239,9 @@ class _DataState extends State<DataScreen> {
       List<Timestamp> movesenseArriveTimeList = sensorPageVM.getMovesenseArriveTimestampsToSave();
       num marzulloCreationTime = sensorPageVM.getMarzulloCreationTime();
       num lastServerTime = sensorPageVM.getLastServerTime();
+      num startSampleTime = sensorPageVM.getStartSampleTime();
+      num stopSampleTime = sensorPageVM.getStopSampleTime();
+      List<Timestamp> listTimestampArrivalTime = sensorPageVM.getTimestampArrival();
 
       final history =  History(
         dateTime: DateTime.now(),
@@ -250,6 +255,9 @@ class _DataState extends State<DataScreen> {
         movesenseArriveTime: jsonEncode(movesenseArriveTimeList),
         marzulloCreationTime: marzulloCreationTime,
         lastServerTime: lastServerTime,
+        startSampleTime: startSampleTime,
+        stopSampleTime: stopSampleTime,
+        listTimestampArrivalTime: jsonEncode(listTimestampArrivalTime),
       );
       await HistoryDatabase.instance.create(history);
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Saved Successfully!")));

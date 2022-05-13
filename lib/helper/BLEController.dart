@@ -24,6 +24,7 @@ class BLEController extends ChangeNotifier {
   List<Data> rightFoot = <Data>[];
   late List<Movesense> movesenseData = <Movesense>[];
   List<Timestamp> timestamps = <Timestamp>[];
+  late List<Timestamp> timestampArrivalTime = <Timestamp>[];
 
   FlutterBlue flutterBlue = FlutterBlue.instance;
   FlutterBlue movesenseBlue = FlutterBlue.instance;
@@ -45,6 +46,7 @@ class BLEController extends ChangeNotifier {
   late List<int> serverTime = <int>[];
   late List<int> clientSendTime = <int>[];
   late List<int> clientRecieveTime = <int>[];
+
   late List<num> listSyncedTime = <num>[];
   late List<num> listRTT = <num>[];
   late List<num> tMaxList = <num>[];
@@ -52,7 +54,7 @@ class BLEController extends ChangeNotifier {
   late List<num> timeSyncOffsets = <num>[];
   late num timeSend, timeServer, timeRecieve, syncedTime, RTT, RTT_mean,
       latestMeasure, cristianTimeOffset, offsetMean, marzulloTimeOffset,
-      lastServerTime, marzulloCreationTime;
+      lastServerTime, marzulloCreationTime, startSampleTime, stopSampleTime ;
   int _timeSyncCounter = 0;
 
   late Timer _timeSyncTimer;
@@ -165,6 +167,7 @@ class BLEController extends ChangeNotifier {
     rightFoot.clear();
     timestamps.clear();
     movesenseData.clear();
+    timestampArrivalTime.clear();
   }
 
 
@@ -179,6 +182,8 @@ class BLEController extends ChangeNotifier {
     String test = 'Start\n';
     List<int> bytes = utf8.encode(test);
     try {
+      startSampleTime = DateTime.now().millisecondsSinceEpoch;
+      print('Start time: $startSampleTime');
       await writeChar.write(bytes);
     } catch (error) {
       //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
@@ -195,6 +200,7 @@ class BLEController extends ChangeNotifier {
     switch (tag[0]) {
       case 'RF':
         {
+
           double tmpDoubleR = double.parse(tag[1]);
           print('RF ${tmpDoubleR.toString()}');
           rightFoot.add(Data(0, tmpDoubleR));
@@ -202,6 +208,9 @@ class BLEController extends ChangeNotifier {
         break;
       case 'LF':
         {
+          timestampArrivalTime.add(Timestamp(
+              time: DateTime.now().millisecondsSinceEpoch
+          ));
           double tmpDoubleL = double.parse(tag[1]);
           print('LF ${tmpDoubleL.toString()}');
           leftFoot.add(Data(0, tmpDoubleL));
@@ -230,6 +239,7 @@ class BLEController extends ChangeNotifier {
             print("\n");
           });
           isNotStarted = true;
+          stopSampleTime = DateTime.now().millisecondsSinceEpoch;
           notifyListeners();
         }
         break;
@@ -292,15 +302,15 @@ class BLEController extends ChangeNotifier {
   void sendTimeSyncRequest() async
   {
     print('Time to send');
-    String test = "TS\n";
-    List<int> bytes = utf8.encode(test);
-    int currentTime = DateTime.now().millisecondsSinceEpoch;
-    clientSendTime.add(currentTime);
-    try {
-      await writeChar.write(bytes);
-    } catch (error) {
-      //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
-    }
+      String test = "TS\n";
+      List<int> bytes = utf8.encode(test);
+      int currentTime = DateTime.now().millisecondsSinceEpoch;
+      clientSendTime.add(currentTime);
+      try {
+        await writeChar.write(bytes);
+      } catch (error) {
+        //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+      }
   }
   ///Calculates time sync offsets for Cristian's algorithm and Marzullo's algorithm.
   void calculateTimeSync() {
@@ -359,7 +369,7 @@ class BLEController extends ChangeNotifier {
       tMaxList.add(clientSendTime[i] - serverTime[i]);
       tMinList.add(clientRecieveTime[i] - serverTime [i]);
     }
-    /*
+
     print("----------Marzullo T1 - T2------------");
     for (int i = 0; i < tMaxList.length; i++) {
       print(tMaxList[i]);
@@ -368,7 +378,7 @@ class BLEController extends ChangeNotifier {
     for (int i = 0; i < tMinList.length; i++) {
       print(tMinList[i]);
     }
-     */
+
     num maxVal = tMaxList.reduce((current, next) =>
     current < next
         ? current
@@ -386,11 +396,13 @@ class BLEController extends ChangeNotifier {
      *
      */
     marzulloCreationTime = DateTime.now().millisecondsSinceEpoch;
+    print('Marzullo Creation Time: ${marzulloCreationTime.toString()}');
 
     /**
      * Saves the last servertime.
      */
     lastServerTime = serverTime.last;
+    print('Last Server Time: ${lastServerTime.toString()}');
 
 
     flushKrille();
