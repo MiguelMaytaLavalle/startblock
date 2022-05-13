@@ -141,6 +141,14 @@ class HistoryCardViewModel{
     return hCardModel.imuTimestamps;
   }
 
+  setTimestampArrival(List<Timestamp> list){
+    hCardModel.imuTimestamps = list;
+  }
+
+  getTimestampArrival(){
+    return hCardModel.timestampArrival;
+  }
+
   setMovesenseArriveTime(List<Timestamp> list){
     hCardModel.movesenseArriveTime = list;
   }

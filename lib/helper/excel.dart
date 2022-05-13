@@ -58,19 +58,24 @@ class ExportToExcel{
     final Future<List<ExcelDataRow>> dataRowsLeft = _mapExcelData('Left',history.leftData);
     final Future<List<ExcelDataRow>> dataRowsRight = _mapExcelData('Right',history.rightData);
     final Future<List<ExcelDataRow>> dataRowsTimestamp = _mapExcelTimestamps('Time',history.timestamps);
+    //print("Arrival time: ${history.timestampArrival.length}");
+    //final Future<List<ExcelDataRow>> dataRowsArrivalTimestamp = _mapExcelTimestamps('Arrival Time',history.timestampArrival);
 
 
     /// Transmit the converted data into appropriate ExcelDataRow which will be used for setting up the excel to each column.
     List<ExcelDataRow> _dataRowsLeft = await Future.value(dataRowsLeft);
     List<ExcelDataRow> _dataRowsRight = await Future.value(dataRowsRight);
-    List<ExcelDataRow> _dataRowTimetamps = await Future.value(dataRowsTimestamp);
+    List<ExcelDataRow> _dataRowTimestamps = await Future.value(dataRowsTimestamp);
+    //List<ExcelDataRow> _dataRowsArrivalTimestamp = await Future.value(dataRowsArrivalTimestamp);
 
 
 
     ///Import the lists to a Sheet.
     sheet.importData(_dataRowsLeft, 1, 1);
     sheet.importData(_dataRowsRight, 1, 2);
-    sheet.importData(_dataRowTimetamps, 1, 3);
+    sheet.importData(_dataRowTimestamps, 1, 3);
+    //sheet.importData(_dataRowsArrivalTimestamp, 1, 12);
+
     sheet.getRangeByIndex(1, 4).setText('Marzullo Micro:Bit Offset');
     sheet.getRangeByIndex(2, 4).setText(history.marzullo.toString());
 
@@ -106,8 +111,7 @@ class ExportToExcel{
 
 
     ///Auto-Fit columns.
-    sheet.getRangeByName('A1:B1').autoFitColumns();
-    sheet.getRangeByName('D1:G1').autoFitColumns();
+    sheet.getRangeByName('A1:M1').autoFitColumns();
 
     ///Save and launch the excel.
     final List<int> bytes = workbook.saveAsStream();

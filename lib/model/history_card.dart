@@ -11,10 +11,18 @@ class HistoryCardModel{
   late List<Timestamp> timestamps = <Timestamp>[];
   late List<Timestamp> _imuTimestamps = [];
   late List<Timestamp> _movesenseArriveTime = [];
+  late List<Timestamp> _timestampArrival = <Timestamp>[];
   bool _isLoading = false;
   late num _marzullo;
   late num _marzulloCreationTime;
   late num _lastServerTime;
+
+  List<Timestamp> get timestampArrival => _timestampArrival;
+
+  set timestampArrival(List<Timestamp> value) {
+    _timestampArrival = value;
+  }
+
   late num _startSampleTime;
   late num _stopSampleTime;
 

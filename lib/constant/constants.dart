@@ -26,8 +26,8 @@ class Constants {
   static const ALPHA = 1; //EWMA alpha value
   static const MEAN_NOISE_THRESH = 0; //Threshold value for noise.
   static const MOVESENSE_DEVICE_NAME = 'Movesense 175130000971';
-  static const DATABASE_NAME = 'test17';
-  static const HISTORY_TABLE_NAME = 'test17';
+  static const DATABASE_NAME = 'test21';
+  static const HISTORY_TABLE_NAME = 'test21';
 
 }
 

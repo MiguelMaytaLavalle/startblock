@@ -24,6 +24,7 @@ class BLEController extends ChangeNotifier {
   List<Data> rightFoot = <Data>[];
   late List<Movesense> movesenseData = <Movesense>[];
   List<Timestamp> timestamps = <Timestamp>[];
+  late List<Timestamp> timestampArrivalTime = <Timestamp>[];
 
   FlutterBlue flutterBlue = FlutterBlue.instance;
   FlutterBlue movesenseBlue = FlutterBlue.instance;
@@ -45,6 +46,7 @@ class BLEController extends ChangeNotifier {
   late List<int> serverTime = <int>[];
   late List<int> clientSendTime = <int>[];
   late List<int> clientRecieveTime = <int>[];
+
   late List<num> listSyncedTime = <num>[];
   late List<num> listRTT = <num>[];
   late List<num> tMaxList = <num>[];
@@ -165,6 +167,7 @@ class BLEController extends ChangeNotifier {
     rightFoot.clear();
     timestamps.clear();
     movesenseData.clear();
+    timestampArrivalTime.clear();
   }
 
 
@@ -197,6 +200,7 @@ class BLEController extends ChangeNotifier {
     switch (tag[0]) {
       case 'RF':
         {
+
           double tmpDoubleR = double.parse(tag[1]);
           print('RF ${tmpDoubleR.toString()}');
           rightFoot.add(Data(0, tmpDoubleR));
@@ -204,6 +208,9 @@ class BLEController extends ChangeNotifier {
         break;
       case 'LF':
         {
+          timestampArrivalTime.add(Timestamp(
+              time: DateTime.now().millisecondsSinceEpoch
+          ));
           double tmpDoubleL = double.parse(tag[1]);
           print('LF ${tmpDoubleL.toString()}');
           leftFoot.add(Data(0, tmpDoubleL));
@@ -354,7 +361,7 @@ class BLEController extends ChangeNotifier {
       tMaxList.add(clientSendTime[i] - serverTime[i]);
       tMinList.add(clientRecieveTime[i] - serverTime [i]);
     }
-    /*
+
     print("----------Marzullo T1 - T2------------");
     for (int i = 0; i < tMaxList.length; i++) {
       print(tMaxList[i]);
@@ -363,7 +370,7 @@ class BLEController extends ChangeNotifier {
     for (int i = 0; i < tMinList.length; i++) {
       print(tMinList[i]);
     }
-     */
+
     num maxVal = tMaxList.reduce((current, next) =>
     current < next
         ? current

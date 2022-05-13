@@ -10,7 +10,8 @@ class HistoryFields{
   static final List<String> values = [
     id, dateTime, name, rightData, leftData,timestamps,
     marzullo, imuData, imuTimestamps, movesenseArriveTime,
-    marzulloCreationTime, lastServerTime,
+    marzulloCreationTime, lastServerTime, startSampleTime,
+    stopSampleTime,listTimestampArrivalTime,
   ];
   static const String id = '_id';
   static const String dateTime = 'dateTime';
@@ -26,6 +27,7 @@ class HistoryFields{
   static const String lastServerTime = 'lastServerTime';
   static const String startSampleTime = 'startSampleTime';
   static const String stopSampleTime = 'stopSampleTime';
+  static const String listTimestampArrivalTime = 'listTimestampArrivalTime';
 
 }
 class History{
@@ -43,6 +45,7 @@ class History{
   final num? lastServerTime;
   final num? startSampleTime;
   final num? stopSampleTime;
+  final String listTimestampArrivalTime;
 
   History({
     this.id,
@@ -59,6 +62,7 @@ class History{
     required this.lastServerTime,
     required this.startSampleTime,
     required this.stopSampleTime,
+    required this.listTimestampArrivalTime,
   });
 
   Map<String, dynamic> toJson() =>{
@@ -76,6 +80,7 @@ class History{
     HistoryFields.lastServerTime: lastServerTime,
     HistoryFields.startSampleTime: startSampleTime,
     HistoryFields.stopSampleTime: stopSampleTime,
+    HistoryFields.listTimestampArrivalTime: listTimestampArrivalTime,
 
 
   };
@@ -95,6 +100,7 @@ class History{
     lastServerTime: json[HistoryFields.lastServerTime] as num?,
     startSampleTime: json[HistoryFields.startSampleTime] as num?,
     stopSampleTime: json[HistoryFields.stopSampleTime] as num?,
+    listTimestampArrivalTime: json[HistoryFields.listTimestampArrivalTime] as String,
   );
 
   History copy({
@@ -112,6 +118,7 @@ class History{
     num? lastServerTime,
     num? startSampleTime,
     num? stopSampleTime,
+    String? listTimestampArrivalTime,
   }) =>
       History(
         id: id ?? this.id,
@@ -128,5 +135,6 @@ class History{
         lastServerTime: lastServerTime ?? this.lastServerTime,
         startSampleTime: startSampleTime ?? this.startSampleTime,
         stopSampleTime: stopSampleTime ?? this.stopSampleTime,
+        listTimestampArrivalTime: listTimestampArrivalTime ?? this.listTimestampArrivalTime,
       );
 }

@@ -78,6 +78,14 @@ class _HistoryCardState extends State<HistoryCard> {
         .map((e) => Timestamp.fromJson(e))
         .toList());
 
+/*
+    hCardVM.setTimestampArrival((json.decode(hCardVM.getHistory().listTimestampArrivalTime) as List)
+        .map((e) => Timestamp.fromJson(e))
+        .toList());
+    print('Arrival time length: ${hCardVM.getTimestampArrival().length}');
+    print('Arrival hisotyr time length: ${hCardVM.getHistory().listTimestampArrivalTime.length}');
+*/
+
     hCardVM.setLastServerTime(hCardVM.getLastServerTime());
 
     hCardVM.setMarzulloCreationTime(hCardVM.getMarzulloCreationTime());

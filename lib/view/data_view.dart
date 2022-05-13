@@ -241,6 +241,7 @@ class _DataState extends State<DataScreen> {
       num lastServerTime = sensorPageVM.getLastServerTime();
       num startSampleTime = sensorPageVM.getStartSampleTime();
       num stopSampleTime = sensorPageVM.getStopSampleTime();
+      List<Timestamp> listTimestampArrivalTime = sensorPageVM.getTimestampArrival();
 
       final history =  History(
         dateTime: DateTime.now(),
@@ -256,6 +257,7 @@ class _DataState extends State<DataScreen> {
         lastServerTime: lastServerTime,
         startSampleTime: startSampleTime,
         stopSampleTime: stopSampleTime,
+        listTimestampArrivalTime: jsonEncode(listTimestampArrivalTime),
       );
       await HistoryDatabase.instance.create(history);
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Saved Successfully!")));

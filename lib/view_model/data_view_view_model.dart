@@ -285,19 +285,7 @@ class DataViewViewModel extends ChangeNotifier{
     }
     return tmpRightList;
   }
-  ///Gets time stamps from sample to be saved persistently.
-  List<Timestamp> getTimestampsToSave(){
-    List<Timestamp> tmpList = <Timestamp>[];
-    for(int i = 0; i < bleController.timestamps.length; i++){
-      print("Timestamp: ${bleController.timestamps[i]}");
-      tmpList.add(Timestamp(
-          time: bleController.timestamps[i].time
-      ));
-      print("Index: $i");
-      print("-----------");
-    }
-    return tmpList;
-  }
+
 
   /// Updates the chart if data is added to temp arrays.
   List<SplineSeries<Data, int>> getDataLeft(){
@@ -412,4 +400,34 @@ class DataViewViewModel extends ChangeNotifier{
   num getStopSampleTime(){
     return bleController.stopSampleTime;
   }
+
+  ///Gets time stamps from sample to be saved persistently.
+  List<Timestamp> getTimestampsToSave(){
+    List<Timestamp> tmpList = <Timestamp>[];
+    for(int i = 0; i < bleController.timestamps.length; i++){
+      print("Timestamp: ${bleController.timestamps[i]}");
+      tmpList.add(Timestamp(
+          time: bleController.timestamps[i].time
+      ));
+      print("Index: $i");
+      print("-----------");
+    }
+    return tmpList;
+  }
+
+  ///Gets timestamps from Movesense sample to be saved persistently.
+  List<Timestamp> getTimestampArrival (){
+    List<Timestamp> tmpList = <Timestamp>[];
+    for(int i = 0; i < bleController.timestampArrivalTime.length; i++){
+      print("Timestamp arrival: ${bleController.timestampArrivalTime[i].time}");
+      tmpList.add(Timestamp(
+          time: bleController.timestampArrivalTime[i].time
+      ));
+      print("Index: $i");
+      print("-----------");
+    }
+    return tmpList;
+  }
+
+
 }
