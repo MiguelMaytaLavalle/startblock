@@ -265,10 +265,13 @@ class BLEController extends ChangeNotifier {
         break;
       case 'E':
         {
-          print("Synced Time Test: ${int.parse(tag[1])+marzulloTimeOffset}");
-          print("Time recieved package: ${DateTime
+          num temp = int.parse(tag[1])+marzulloTimeOffset;
+          num stamp = DateTime
               .now()
-              .millisecondsSinceEpoch}");
+              .millisecondsSinceEpoch;
+          print("Synced Time Test: $temp");
+          print("Time recieved package: $stamp");
+          print(stamp-temp);
         }
         break;
       default:
