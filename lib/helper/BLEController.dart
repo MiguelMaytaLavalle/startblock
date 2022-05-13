@@ -253,6 +253,14 @@ class BLEController extends ChangeNotifier {
           notifyListeners();
         }
         break;
+      case 'E':
+        {
+          print("Synced Time Test: ${int.parse(tag[1])+marzulloTimeOffset}");
+          print("Time recieved package: ${DateTime
+              .now()
+              .millisecondsSinceEpoch}");
+        }
+        break;
       default:
         {
           print('No data to read');
@@ -387,7 +395,17 @@ class BLEController extends ChangeNotifier {
 
     flushKrille();
   }
-
+  void getTimeStamp() async
+  {
+    print("Setting Thresh");
+    String test = "E\n";
+    List<int> bytes = utf8.encode(test);
+    try {
+      await writeChar.write(bytes);
+    } catch (error) {
+      print(error);
+    }
+  }
   ///Send method to set threshold value to the micro:bit over BLE
   void sendSetThresh(String val) async
   {
