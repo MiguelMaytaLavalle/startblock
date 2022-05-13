@@ -7,7 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:startblock/constant/constants.dart';
 import 'package:startblock/model/movesense.dart';
-import 'package:startblock/model/sensor.dart';
+import 'package:startblock/model/forceData.dart';
 
 import '../model/timestamp.dart';
 class BLEController extends ChangeNotifier {
@@ -114,7 +114,7 @@ class BLEController extends ChangeNotifier {
           if (c.uuid.toString() == Constants.CHARACTERISTIC_UART_RECIEVE) {
             await c.setNotifyValue(!c.isNotifying);
             streamSubscription = c.value.listen((event) {
-              readDataTest(event);
+              readData(event);
             });
           }
         }
@@ -188,7 +188,7 @@ class BLEController extends ChangeNotifier {
     return utf8.decode(dataFromDevice);
   }
 
-  void readDataTest(List<int> event) {
+  void readData(List<int> event) {
     var currentValue = _dataParser(event);
     var tag = currentValue.split(':');
     switch (tag[0]) {
@@ -219,7 +219,6 @@ class BLEController extends ChangeNotifier {
       case 'D' :
         {
           print('DONE');
-          stopMoveSenseSample();
           _timeStampCounter = 0;
           print(tag[1]);
           movesenseData.forEach((element)

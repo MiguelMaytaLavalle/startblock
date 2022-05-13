@@ -4,7 +4,7 @@ import 'package:startblock/model/history_card.dart';
 import 'package:startblock/model/livedata.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-import '../model/sensor.dart';
+import '../model/forceData.dart';
 import '../model/timestamp.dart';
 import '../constant/constants.dart';
 
