@@ -29,13 +29,14 @@ class _DataState extends State<DataScreen> {
   @override
   void initState() {
     // TODO: implement initState
+    print('Start data view');
     super.initState();
     controller = TextEditingController();
     bleController.addListener(updateDetails);
   }
   void updateDetails(){
-
     if(mounted){
+      print('If mounted');
       setState((){});
     }
   }
@@ -49,20 +50,21 @@ class _DataState extends State<DataScreen> {
         child:Column(
           children: [
             SfCartesianChart(
-              legend: Legend(isVisible: true),
+              legend: Legend(isVisible: false),
               series: sensorPageVM.getDataLeft(),
               primaryXAxis: NumericAxis(
-                isVisible: false,
+                isVisible: true,
                   //Uncomment if X-axis shall be visible and set isVisible = true;
-                  /*
+
                   interactiveTooltip: const InteractiveTooltip(
                     enable: true,
                   ),
-                  majorGridLines: const MajorGridLines(width: 0),
+                  majorGridLines: const MajorGridLines(width: 1),
+                  axisLine: AxisLine(width:1),
                   edgeLabelPlacement: EdgeLabelPlacement.shift,
                   interval: 1000, //1000ms between two timestamps equals a second
                   title: AxisTitle(text: 'Time [S]')
-                   */
+
               ),
 
               primaryYAxis: NumericAxis(
@@ -78,21 +80,21 @@ class _DataState extends State<DataScreen> {
 
 
             SfCartesianChart(
-              legend: Legend(isVisible: true),
+              legend: Legend(isVisible: false),
               series: sensorPageVM.getDataRight(),
-
               primaryXAxis: NumericAxis(
-                isVisible: false,
+                isVisible: true,
                   //Uncomment if X-axis shall be visible and set isVisible = true;
-                  /*
+
                   interactiveTooltip: const InteractiveTooltip(
                     enable: true,
                   ),
-                  majorGridLines: const MajorGridLines(width: 0),
+                  majorGridLines: const MajorGridLines(width: 1),
+                  axisLine: AxisLine(width: 1),
                   edgeLabelPlacement: EdgeLabelPlacement.shift,
                   interval: 1000, //1000ms between two timestamps equals a second
                   title: AxisTitle(text: 'Time [S]')
-                   */
+
               ),
 
               primaryYAxis: NumericAxis(
@@ -101,8 +103,8 @@ class _DataState extends State<DataScreen> {
                   interactiveTooltip: const InteractiveTooltip(
                     enable: true,
                   ),
-                  axisLine: const AxisLine(width: 0),
-                  majorTickLines: const MajorTickLines(size: 0),
+                  axisLine: const AxisLine(width: 1),
+                  majorTickLines: const MajorTickLines(size: 1),
                   title: AxisTitle(text: 'Force [N]')
               ),
             ),
@@ -110,7 +112,7 @@ class _DataState extends State<DataScreen> {
               direction: Axis.vertical,
               alignment: WrapAlignment.start,
               children: [
-                Material(
+                const Material(
                     child: Text('Left Foot Data',
                       textAlign: TextAlign.left,
                       style: TextStyle(fontWeight: FontWeight.bold,
@@ -149,8 +151,8 @@ class _DataState extends State<DataScreen> {
             Wrap(
               direction: Axis.vertical,
               children: <Widget>[
-                Material(
-                    child: Text('Right foot data',
+                const Material(
+                    child: Text('Right Foot Data',
                       textAlign: TextAlign.left,
                       style: TextStyle(fontWeight: FontWeight.bold,
                           color: Colors.red
@@ -259,6 +261,7 @@ class _DataState extends State<DataScreen> {
         stopSampleTime: stopSampleTime,
         listTimestampArrivalTime: jsonEncode(listTimestampArrivalTime),
       );
+
       await HistoryDatabase.instance.create(history);
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Saved Successfully!")));
     }catch(error){

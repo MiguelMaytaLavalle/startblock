@@ -112,7 +112,7 @@ class _RecordingState extends State<RecordingScreen> {
                     Colors.blue),
               ),
             ),
-            Padding(
+/*            Padding(
               padding: const EdgeInsets.all(30),
               child: TextButton(
                 onPressed: bleController.getTimeStamp,
@@ -122,7 +122,7 @@ class _RecordingState extends State<RecordingScreen> {
                     backgroundColor:
                     Colors.blue),
               ),
-            ),
+            ),*/
           ],
         ),
       ),

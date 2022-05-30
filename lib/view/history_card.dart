@@ -78,14 +78,6 @@ class _HistoryCardState extends State<HistoryCard> {
         .map((e) => Timestamp.fromJson(e))
         .toList());
 
-/*
-    hCardVM.setTimestampArrival((json.decode(hCardVM.getHistory().listTimestampArrivalTime) as List)
-        .map((e) => Timestamp.fromJson(e))
-        .toList());
-    print('Arrival time length: ${hCardVM.getTimestampArrival().length}');
-    print('Arrival hisotyr time length: ${hCardVM.getHistory().listTimestampArrivalTime.length}');
-*/
-
     hCardVM.setLastServerTime(hCardVM.getLastServerTime());
 
     hCardVM.setMarzulloCreationTime(hCardVM.getMarzulloCreationTime());
@@ -192,7 +184,7 @@ class _HistoryCardState extends State<HistoryCard> {
                               direction: Axis.vertical,
                               alignment: WrapAlignment.start,
                               children: [
-                                Material(
+                                const Material(
                                     child: Text('Left Foot Data',
                                       textAlign: TextAlign.left,
                                       style: TextStyle(fontWeight: FontWeight.bold,
@@ -232,7 +224,7 @@ class _HistoryCardState extends State<HistoryCard> {
                             Wrap(
                               direction: Axis.vertical,
                               children: <Widget>[
-                                Material(
+                                const Material(
                                     child: Text('Right foot data',
                                       textAlign: TextAlign.left,
                                     style: TextStyle(fontWeight: FontWeight.bold,
@@ -297,10 +289,10 @@ class _HistoryCardState extends State<HistoryCard> {
   Future<String?> openDialog() => showDialog<String>(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Do you want to delete this log?'),
+          title: const Text('Do you want to delete this log?'),
           actions: [
             TextButton(
-              child: Text('No'),
+              child: const Text('No'),
               onPressed: () {
                 Navigator.of(context).pop();
               },

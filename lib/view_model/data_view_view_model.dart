@@ -15,6 +15,7 @@ class DataViewViewModel extends ChangeNotifier{
   late ChartSeriesController _chartSeriesLeftController;
   BLEController bleController = BLEController();
   late List<Movesense> tempMovesenseData;
+  late List<Data> tmp;
 
   double _peakForceLeft = 0;
   double _RFDLeft = 0;
@@ -31,16 +32,18 @@ class DataViewViewModel extends ChangeNotifier{
   double _totalForceRight = 0;
   double _forceImpulseRight = 0;
   int _timeToPeakForceRight = 0;
+
+
   ///Calculates the time to peak based on the array data since the
   ///ratio between sampled data array and time array is 1:1
   int getTimeToPeakForceLeft()
   {
-    _timeToPeakForceLeft = _calcTimeToPeakForce(_EWMAFilter2(bleController.leftFoot));
+    _timeToPeakForceLeft = _calcTimeToPeakForce(_EWMAFilter2(bleController.getLeftFoot()));
     return _timeToPeakForceLeft;
   }
   int getTimeToPeakForceRight()
   {
-    _timeToPeakForceRight =_calcTimeToPeakForce(_EWMAFilter2(bleController.rightFoot));
+    _timeToPeakForceRight =_calcTimeToPeakForce(_EWMAFilter2(bleController.getRightFoot()));
     return _timeToPeakForceRight;
   }
   int _calcTimeToPeakForce(List<Data> data)
@@ -61,12 +64,12 @@ class DataViewViewModel extends ChangeNotifier{
   ///Calculates the highest value in the array, AKA peak force
   double getPeakForceLeft()
   {
-    _peakForceLeft = _calcPeakForce(_EWMAFilter2(bleController.leftFoot));
+    _peakForceLeft = _calcPeakForce(_EWMAFilter2(bleController.getLeftFoot()));
     return _peakForceLeft;
   }
   double getPeakForceRight()
   {
-    _peakForceRight = _calcPeakForce(_EWMAFilter2(bleController.rightFoot));
+    _peakForceRight = _calcPeakForce(_EWMAFilter2(bleController.getRightFoot()));
     return _peakForceRight;
   }
   double _calcPeakForce(List<Data> data)
@@ -84,53 +87,53 @@ class DataViewViewModel extends ChangeNotifier{
   }
   double getForceImpulseLeft()
   {
-    _totalForceLeft = _calcTotalForce(_EWMAFilter2(bleController.leftFoot));
+    _totalForceLeft = _calcTotalForce(_EWMAFilter2(bleController.getLeftFoot()));
     if(_totalForceLeft.isNaN)
       {
         return 0;
       }
     else
       {
-        _forceImpulseLeft = _calcForceImpulse(_EWMAFilter2(bleController.leftFoot), _totalForceLeft);
+        _forceImpulseLeft = _calcForceImpulse(_EWMAFilter2(bleController.getLeftFoot()), _totalForceLeft);
         return _forceImpulseLeft;
       }
   }
   double getForceImpulseRight()
   {
-    _totalForceRight = _calcTotalForce(_EWMAFilter2(bleController.rightFoot));
+    _totalForceRight = _calcTotalForce(_EWMAFilter2(bleController.getRightFoot()));
     if(_totalForceRight.isNaN)
       {
         return 0;
       }
     else
       {
-        _forceImpulseRight = _calcForceImpulse(_EWMAFilter2(bleController.rightFoot), _totalForceRight);
+        _forceImpulseRight = _calcForceImpulse(_EWMAFilter2(bleController.getRightFoot()), _totalForceRight);
         return _forceImpulseRight;
       }
   }
   double getAverageForceLeft()
   {
-    _totalForceLeft = _calcTotalForce(_EWMAFilter2(bleController.leftFoot));
+    _totalForceLeft = _calcTotalForce(_EWMAFilter2(bleController.getLeftFoot()));
     if(_totalForceLeft.isNaN)
       {
         return  0;
       }
     else
       {
-        _avgForceLeft = _calcAverageForce(_EWMAFilter2(bleController.leftFoot), _totalForceLeft);
+        _avgForceLeft = _calcAverageForce(_EWMAFilter2(bleController.getLeftFoot()), _totalForceLeft);
         return _avgForceLeft;
       }
   }
   double getAverageForceRight()
   {
-    _totalForceRight = _calcTotalForce(_EWMAFilter2(bleController.rightFoot));
+    _totalForceRight = _calcTotalForce(_EWMAFilter2(bleController.getRightFoot()));
     if(_totalForceRight.isNaN)
       {
         return 0;
       }
     else
     {
-      _avgForceRight = _calcAverageForce(_EWMAFilter2(bleController.rightFoot), _totalForceRight);
+      _avgForceRight = _calcAverageForce(_EWMAFilter2(bleController.getRightFoot()), _totalForceRight);
       return _avgForceRight;
     }
   }
@@ -168,7 +171,7 @@ class DataViewViewModel extends ChangeNotifier{
           if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
           {
             tempT1 = data[i].getTime();
-            print(tempT1);
+            //print(tempT1);
             break;
           }
         }
@@ -178,7 +181,7 @@ class DataViewViewModel extends ChangeNotifier{
           if(data[i].getForce() >= Constants.MEAN_NOISE_THRESH)
           {
             tempT2 = data[i].getTime();
-            print(tempT2);
+            //print(tempT2);
             break;
           }
         }
@@ -234,12 +237,12 @@ class DataViewViewModel extends ChangeNotifier{
   ///Calculates the slope of the plotted function. Slope value represents Rate of Force Development
   double getRFDLeft()
   {
-    _RFDLeft = _calcRFD(_EWMAFilter2(bleController.leftFoot));
+    _RFDLeft = _calcRFD(_EWMAFilter2(bleController.getLeftFoot()));
     return _RFDLeft;
   }
   double getRFDRight()
   {
-    _RFDRight = _calcRFD(_EWMAFilter2(bleController.rightFoot));
+    _RFDRight = _calcRFD(_EWMAFilter2(bleController.getRightFoot()));
     return _RFDRight;
   }
   double _calcRFD(List<Data> data)
@@ -262,26 +265,26 @@ class DataViewViewModel extends ChangeNotifier{
   ///Gets raw value data to be saved persistently .
   List<LiveData> getLeftDataToSave (){
     List<LiveData> tmpLeftList = <LiveData>[];
-    for(int i = 0; i < bleController.leftFoot.length; i++){
-      print("Left: ${bleController.leftFoot[i]}");
+    for(int i = 0; i < bleController.getLeftFoot().length; i++){
+      //print("Left: ${bleController.getLeftFoot()[i]}");
       tmpLeftList.add(LiveData(
-        force: bleController.leftFoot[i].mForce
+        force: bleController.getLeftFoot()[i].mForce
       ));
-      print("Index: $i");
-      print("-----------");
+      //print("Index: $i");
+      //print("-----------");
     }
     return tmpLeftList;
   }
   ///Gets raw value data to be saved persistently.
   List<LiveData> getRightDataToSave (){
     List<LiveData> tmpRightList = <LiveData>[];
-    for(int i = 0; i < bleController.rightFoot.length; i++){
-      print("Right: ${bleController.rightFoot[i]}");
+    for(int i = 0; i < bleController.getRightFoot().length; i++){
+      //print("Right: ${bleController.getRightFoot()[i]}");
       tmpRightList.add(LiveData(
-          force: bleController.rightFoot[i].mForce
+          force: bleController.getRightFoot()[i].mForce
       ));
-      print("Index: $i");
-      print("-----------");
+      //print("Index: $i");
+      //print("-----------");
     }
     return tmpRightList;
   }
@@ -293,8 +296,8 @@ class DataViewViewModel extends ChangeNotifier{
     return<SplineSeries<Data, int>>[
       SplineSeries<Data, int>(
         color: Colors.blue,
-        //dataSource: tempLeft,
-        dataSource: _EWMAFilter2(bleController.leftFoot),
+        //dataSource: bleController.leftFoot,
+        dataSource: _EWMAFilter2(bleController.getLeftFoot()),
         width: 2,
         name: 'Left foot',
         onRendererCreated: (ChartSeriesController controller) {
@@ -312,7 +315,7 @@ class DataViewViewModel extends ChangeNotifier{
       SplineSeries<Data, int>(
         color: Colors.red,
         //dataSource: tempRight,
-        dataSource: _EWMAFilter2(bleController.rightFoot),
+        dataSource: _EWMAFilter2(bleController.getRightFoot()),
         width: 2,
         name: 'Right foot',
         onRendererCreated: (ChartSeriesController controller) {
@@ -331,12 +334,12 @@ class DataViewViewModel extends ChangeNotifier{
   List<LiveData> getImuDataToSave (){
     List<LiveData> tmpAccList = <LiveData>[];
     for(int i = 0; i < bleController.movesenseData.length; i++){
-      print("Acc: ${bleController.movesenseData[i].mAcc}");
+      //print("Acc: ${bleController.movesenseData[i].mAcc}");
       tmpAccList.add(LiveData(
           force: bleController.movesenseData[i].mAcc
       ));
-      print("Index: $i");
-      print("-----------");
+      //print("Index: $i");
+      //print("-----------");
     }
     return tmpAccList;
   }
@@ -344,12 +347,12 @@ class DataViewViewModel extends ChangeNotifier{
   List<Timestamp> getImuTimestampsToSave (){
     List<Timestamp> tmpTimestampList = <Timestamp>[];
     for(int i = 0; i < bleController.movesenseData.length; i++){
-      print("IMU timestamp: ${bleController.movesenseData[i].timestamp}");
+      //print("IMU timestamp: ${bleController.movesenseData[i].timestamp}");
       tmpTimestampList.add(Timestamp(
           time: bleController.movesenseData[i].timestamp
       ));
-      print("Index: $i");
-      print("-----------");
+      //print("Index: $i");
+      //print("-----------");
     }
     return tmpTimestampList;
   }
@@ -357,12 +360,12 @@ class DataViewViewModel extends ChangeNotifier{
   List<Timestamp> getMovesenseArriveTimestampsToSave (){
     List<Timestamp> tmpTimestampList = <Timestamp>[];
     for(int i = 0; i < bleController.movesenseData.length; i++){
-      print("IMU timestamp: ${bleController.movesenseData[i].mobileTimestamp}");
+      //print("IMU timestamp: ${bleController.movesenseData[i].mobileTimestamp}");
       tmpTimestampList.add(Timestamp(
           time: bleController.movesenseData[i].mobileTimestamp
       ));
-      print("Index: $i");
-      print("-----------");
+      //print("Index: $i");
+      //print("-----------");
     }
     return tmpTimestampList;
   }
@@ -370,6 +373,7 @@ class DataViewViewModel extends ChangeNotifier{
   List<Data> _EWMAFilter2(List<Data> data)
   {
     List<Data> tempList=<Data>[];
+    print('Data length: ${data.length}');
     for(int i = 0; i < data.length-1; i++){
       if(i == 0)
       {
@@ -405,12 +409,12 @@ class DataViewViewModel extends ChangeNotifier{
   List<Timestamp> getTimestampsToSave(){
     List<Timestamp> tmpList = <Timestamp>[];
     for(int i = 0; i < bleController.timestamps.length; i++){
-      print("Timestamp: ${bleController.timestamps[i]}");
+      //print("Timestamp: ${bleController.timestamps[i]}");
       tmpList.add(Timestamp(
           time: bleController.timestamps[i].time
       ));
-      print("Index: $i");
-      print("-----------");
+      //print("Index: $i");
+      //print("-----------");
     }
     return tmpList;
   }
@@ -419,15 +423,17 @@ class DataViewViewModel extends ChangeNotifier{
   List<Timestamp> getTimestampArrival (){
     List<Timestamp> tmpList = <Timestamp>[];
     for(int i = 0; i < bleController.timestampArrivalTime.length; i++){
-      print("Timestamp arrival: ${bleController.timestampArrivalTime[i].time}");
+      //print("Timestamp arrival: ${bleController.timestampArrivalTime[i].time}");
       tmpList.add(Timestamp(
           time: bleController.timestampArrivalTime[i].time
       ));
-      print("Index: $i");
-      print("-----------");
+      //print("Index: $i");
+      //print("-----------");
     }
     return tmpList;
   }
+
+
 
 
 }
