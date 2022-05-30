@@ -25,7 +25,7 @@ class _ConnectionState extends State<ConnectionView> {
   List<Widget> screens=<Widget>[
     RecordingScreen(),
     DataScreen(),
-    SettingScreen(),
+    //SettingScreen(),
   ];
 
   @override
