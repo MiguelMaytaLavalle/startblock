@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 /// A user can also connect to a movesense if the user chooses to.
 /// After connecting to a movesense a user can initiate an episode and record the movesense data.
 ///
+
 class SettingScreen extends StatefulWidget {
   @override
   _SettingState createState() => _SettingState();

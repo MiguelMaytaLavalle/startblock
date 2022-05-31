@@ -25,7 +25,7 @@ class _ConnectionState extends State<ConnectionView> {
   List<Widget> screens=<Widget>[
     RecordingScreen(),
     DataScreen(),
-    SettingScreen(),
+    //SettingScreen(),
   ];
 
   @override
@@ -60,10 +60,10 @@ class _ConnectionState extends State<ConnectionView> {
               icon: Icon(Icons.auto_graph_rounded),
               label: 'View Data',
             ),
-            BottomNavigationBarItem(
+/*            BottomNavigationBarItem(
               icon: Icon(Icons.settings),
               label: 'Settings',
-            ),
+            ),*/
           ],
           currentIndex: _selectedIndex,
           selectedItemColor: Colors.amber[800],

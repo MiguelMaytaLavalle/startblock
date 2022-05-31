@@ -8,7 +8,10 @@ String tableHistory = Constants.HISTORY_TABLE_NAME;
 
 class HistoryFields{
   static final List<String> values = [
-    id, dateTime, name, rightData, leftData,timestamps, marzullo, imuData, imuTimestamps, movesenseArriveTime,
+    id, dateTime, name, rightData, leftData,timestamps,
+    marzullo, imuData, imuTimestamps, movesenseArriveTime,
+    marzulloCreationTime, lastServerTime, startSampleTime,
+    stopSampleTime,listTimestampArrivalTime,
   ];
   static const String id = '_id';
   static const String dateTime = 'dateTime';
@@ -20,6 +23,11 @@ class HistoryFields{
   static const String imuData = 'imuData';
   static const String imuTimestamps = 'imuTimestamps';
   static const String movesenseArriveTime = 'movesenseArriveTime';
+  static const String marzulloCreationTime = 'marzulloCreationTime';
+  static const String lastServerTime = 'lastServerTime';
+  static const String startSampleTime = 'startSampleTime';
+  static const String stopSampleTime = 'stopSampleTime';
+  static const String listTimestampArrivalTime = 'listTimestampArrivalTime';
 
 }
 class History{
@@ -33,6 +41,11 @@ class History{
   final String imuData;
   final String imuTimestamps;
   final String movesenseArriveTime;
+  final num? marzulloCreationTime;
+  final num? lastServerTime;
+  final num? startSampleTime;
+  final num? stopSampleTime;
+  final String listTimestampArrivalTime;
 
   History({
     this.id,
@@ -45,6 +58,11 @@ class History{
     required this.imuData,
     required this.imuTimestamps,
     required this.movesenseArriveTime,
+    required this.marzulloCreationTime,
+    required this.lastServerTime,
+    required this.startSampleTime,
+    required this.stopSampleTime,
+    required this.listTimestampArrivalTime,
   });
 
   Map<String, dynamic> toJson() =>{
@@ -58,6 +76,12 @@ class History{
     HistoryFields.imuData: imuData,
     HistoryFields.imuTimestamps: imuTimestamps,
     HistoryFields.movesenseArriveTime: movesenseArriveTime,
+    HistoryFields.marzulloCreationTime: marzulloCreationTime,
+    HistoryFields.lastServerTime: lastServerTime,
+    HistoryFields.startSampleTime: startSampleTime,
+    HistoryFields.stopSampleTime: stopSampleTime,
+    HistoryFields.listTimestampArrivalTime: listTimestampArrivalTime,
+
 
   };
 
@@ -72,6 +96,11 @@ class History{
     imuData: json[HistoryFields.imuData] as String,
     imuTimestamps: json[HistoryFields.imuTimestamps] as String,
     movesenseArriveTime: json[HistoryFields.movesenseArriveTime] as String,
+    marzulloCreationTime: json[HistoryFields.marzulloCreationTime] as num?,
+    lastServerTime: json[HistoryFields.lastServerTime] as num?,
+    startSampleTime: json[HistoryFields.startSampleTime] as num?,
+    stopSampleTime: json[HistoryFields.stopSampleTime] as num?,
+    listTimestampArrivalTime: json[HistoryFields.listTimestampArrivalTime] as String,
   );
 
   History copy({
@@ -85,6 +114,11 @@ class History{
     String? imuData,
     String? imuTimestamps,
     String? movesenseArriveTime,
+    num? marzulloCreationTime,
+    num? lastServerTime,
+    num? startSampleTime,
+    num? stopSampleTime,
+    String? listTimestampArrivalTime,
   }) =>
       History(
         id: id ?? this.id,
@@ -97,5 +131,10 @@ class History{
         imuData: imuData ?? this.imuData,
         imuTimestamps: imuTimestamps ?? this.imuTimestamps,
         movesenseArriveTime: movesenseArriveTime ?? this.movesenseArriveTime,
+        marzulloCreationTime: marzulloCreationTime ?? this.marzulloCreationTime,
+        lastServerTime: lastServerTime ?? this.lastServerTime,
+        startSampleTime: startSampleTime ?? this.startSampleTime,
+        stopSampleTime: stopSampleTime ?? this.stopSampleTime,
+        listTimestampArrivalTime: listTimestampArrivalTime ?? this.listTimestampArrivalTime,
       );
 }

@@ -93,6 +93,38 @@ class HistoryCardViewModel{
     return hCardModel.history.marzullo;
   }
 
+  getMarzulloCreationTime(){
+    return hCardModel.history.marzulloCreationTime;
+  }
+
+  setMarzulloCreationTime(num m){
+    hCardModel.marzulloCreationTime = m;
+  }
+
+  getLastServerTime(){
+    return hCardModel.history.lastServerTime;
+  }
+
+  setLastServerTime(num m){
+    hCardModel.lastServerTime = m;
+  }
+
+  getStartSampleTime(){
+    return hCardModel.history.startSampleTime;
+  }
+
+  setStartSampleTime(num m){
+    hCardModel.startSampleTime = m;
+  }
+
+  getStopSampleTime(){
+    return hCardModel.history.stopSampleTime;
+  }
+
+  setStopSampleTime(num m){
+    hCardModel.stopSampleTime = m;
+  }
+
   setImuData(List<LiveData> list){
     hCardModel.imuData = list;
   }
@@ -107,6 +139,14 @@ class HistoryCardViewModel{
 
   getImuTimestamps(){
     return hCardModel.imuTimestamps;
+  }
+
+  setTimestampArrival(List<Timestamp> list){
+    hCardModel.imuTimestamps = list;
+  }
+
+  getTimestampArrival(){
+    return hCardModel.timestampArrival;
   }
 
   setMovesenseArriveTime(List<Timestamp> list){

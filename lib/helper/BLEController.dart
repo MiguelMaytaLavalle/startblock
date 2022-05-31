@@ -24,6 +24,7 @@ class BLEController extends ChangeNotifier {
   List<Data> rightFoot = <Data>[];
   late List<Movesense> movesenseData = <Movesense>[];
   List<Timestamp> timestamps = <Timestamp>[];
+  late List<Timestamp> timestampArrivalTime = <Timestamp>[];
 
   FlutterBlue flutterBlue = FlutterBlue.instance;
   FlutterBlue movesenseBlue = FlutterBlue.instance;
@@ -37,6 +38,7 @@ class BLEController extends ChangeNotifier {
 
   bool isNotStarted = false;
   bool isReady = false;
+
   List <int> time = <int>[];
   late BluetoothDevice? targetDevice = null,
       targetMovesenseDevice = null;
@@ -45,13 +47,15 @@ class BLEController extends ChangeNotifier {
   late List<int> serverTime = <int>[];
   late List<int> clientSendTime = <int>[];
   late List<int> clientRecieveTime = <int>[];
+
   late List<num> listSyncedTime = <num>[];
   late List<num> listRTT = <num>[];
   late List<num> tMaxList = <num>[];
   late List<num> tMinList = <num>[];
   late List<num> timeSyncOffsets = <num>[];
   late num timeSend, timeServer, timeRecieve, syncedTime, RTT, RTT_mean,
-      latestMeasure, cristianTimeOffset, offsetMean, marzulloTimeOffset;
+      latestMeasure, cristianTimeOffset, offsetMean, marzulloTimeOffset,
+      lastServerTime, marzulloCreationTime, startSampleTime, stopSampleTime ;
   int _timeSyncCounter = 0;
 
   late Timer _timeSyncTimer;
@@ -59,7 +63,7 @@ class BLEController extends ChangeNotifier {
 
   startScan() async {
     scanSubScription = flutterBlue.scan().listen((scanResult) async {
-      if (scanResult.device.name == Constants.TARGET_DEVICE_NAME_ZIVIT) {
+      if (scanResult.device.name == Constants.TARGET_DEVICE_NAME_TIZEZ) {
         print("Found device");
         targetDevice = scanResult.device;
         await stopScan();
@@ -128,6 +132,8 @@ class BLEController extends ChangeNotifier {
             writeChar = c;
             sendTimeSyncRequest(); //As soon as device is connected to micro:bit - Time Sync immediately
             _timeSyncTimer = Timer.periodic(Duration(minutes: 10), (timer) {
+              // ska hitta metoden för get
+              //getTimeStamp();
               isNotStarted = false;
               notifyListeners();
               sendTimeSyncRequest();
@@ -164,6 +170,7 @@ class BLEController extends ChangeNotifier {
     rightFoot.clear();
     timestamps.clear();
     movesenseData.clear();
+    timestampArrivalTime.clear();
   }
 
 
@@ -178,6 +185,8 @@ class BLEController extends ChangeNotifier {
     String test = 'Start\n';
     List<int> bytes = utf8.encode(test);
     try {
+      startSampleTime = DateTime.now().millisecondsSinceEpoch;
+      //print('Start time: $startSampleTime');
       await writeChar.write(bytes);
     } catch (error) {
       //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
@@ -194,15 +203,19 @@ class BLEController extends ChangeNotifier {
     switch (tag[0]) {
       case 'RF':
         {
+
           double tmpDoubleR = double.parse(tag[1]);
-          print('RF ${tmpDoubleR.toString()}');
+          //print('RF ${tmpDoubleR.toString()}');
           rightFoot.add(Data(0, tmpDoubleR));
         }
         break;
       case 'LF':
         {
+          timestampArrivalTime.add(Timestamp(
+              time: DateTime.now().millisecondsSinceEpoch
+          ));
           double tmpDoubleL = double.parse(tag[1]);
-          print('LF ${tmpDoubleL.toString()}');
+          //print('LF ${tmpDoubleL.toString()}');
           leftFoot.add(Data(0, tmpDoubleL));
         }
         break;
@@ -228,6 +241,7 @@ class BLEController extends ChangeNotifier {
             print("\n");
           });
           isNotStarted = true;
+          stopSampleTime = DateTime.now().millisecondsSinceEpoch;
           notifyListeners();
         }
         break;
@@ -249,6 +263,18 @@ class BLEController extends ChangeNotifier {
           isNotStarted = true;
           stopMoveSenseSample();
           notifyListeners();
+        }
+        break;
+      case 'E':
+        {
+          num temp = ((int.parse(tag[1])*1.001782746) + marzulloTimeOffset);
+          print(int.parse(tag[1]));
+          num stamp = DateTime.now().millisecondsSinceEpoch;
+/*          print('Marzullo offset: ${marzulloTimeOffset}');
+          print("Synced Time Test: $temp");
+          print("Time recieved package: $stamp");
+          print(stamp-temp);*/
+
         }
         break;
       default:
@@ -282,15 +308,15 @@ class BLEController extends ChangeNotifier {
   void sendTimeSyncRequest() async
   {
     print('Time to send');
-    String test = "TS\n";
-    List<int> bytes = utf8.encode(test);
-    int currentTime = DateTime.now().millisecondsSinceEpoch;
-    clientSendTime.add(currentTime);
-    try {
-      await writeChar.write(bytes);
-    } catch (error) {
-      //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
-    }
+      String test = "TS\n";
+      List<int> bytes = utf8.encode(test);
+      int currentTime = DateTime.now().millisecondsSinceEpoch;
+      clientSendTime.add(currentTime);
+      try {
+        await writeChar.write(bytes);
+      } catch (error) {
+        //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+      }
   }
   ///Calculates time sync offsets for Cristian's algorithm and Marzullo's algorithm.
   void calculateTimeSync() {
@@ -298,9 +324,9 @@ class BLEController extends ChangeNotifier {
      * Calculate Cristian's RTT Value
      */
     for (int i = 0; i < Constants.LIST_LEN; i++) {
-      timeSend = clientSendTime[i];
-      timeServer = serverTime[i];
-      timeRecieve = clientRecieveTime[i];
+      timeSend = clientSendTime[i]; // t1
+      timeServer = serverTime[i]; //t2
+      timeRecieve = clientRecieveTime[i]; //t3
       RTT = (timeRecieve - timeSend);
       listRTT.add(RTT);
       syncedTime = (timeServer + (timeRecieve - timeSend) / 2);
@@ -349,7 +375,8 @@ class BLEController extends ChangeNotifier {
       tMaxList.add(clientSendTime[i] - serverTime[i]);
       tMinList.add(clientRecieveTime[i] - serverTime [i]);
     }
-    /*
+/*
+
     print("----------Marzullo T1 - T2------------");
     for (int i = 0; i < tMaxList.length; i++) {
       print(tMaxList[i]);
@@ -358,7 +385,8 @@ class BLEController extends ChangeNotifier {
     for (int i = 0; i < tMinList.length; i++) {
       print(tMinList[i]);
     }
-     */
+*/
+
     num maxVal = tMaxList.reduce((current, next) =>
     current < next
         ? current
@@ -372,27 +400,33 @@ class BLEController extends ChangeNotifier {
     print("Offset marzullo: $timeOffset2");
     marzulloTimeOffset = timeOffset2;
 
-    /**
-     * Test
+    /** Save the time when the marzullo offset was created
+     *
      */
-    print("----------T1------------");
-    for(int i = 0; i < Constants.LIST_LEN; i++)
-      {
-        print(clientSendTime[i]);
-      }
-    print("----------T2------------");
-    for(int i = 0; i < Constants.LIST_LEN; i++)
-    {
-      print(serverTime[i]);
-    }
-    print("----------T3------------");
-    for(int i = 0; i < Constants.LIST_LEN; i++)
-    {
-      print(clientRecieveTime[i]);
-    }
+    marzulloCreationTime = DateTime.now().millisecondsSinceEpoch;
+    print('Marzullo Creation Time: ${marzulloCreationTime.toString()}');
+
+    /**
+     * Saves the last servertime.
+     */
+    lastServerTime = serverTime.last;
+    print('Last Server Time: ${lastServerTime.toString()}');
+
+    getTimeStamp();
+
     flushKrille();
   }
-
+  void getTimeStamp() async
+  {
+    print("Setting Thresh");
+    String test = "E\n";
+    List<int> bytes = utf8.encode(test);
+    try {
+      await writeChar.write(bytes);
+    } catch (error) {
+      print(error);
+    }
+  }
   ///Send method to set threshold value to the micro:bit over BLE
   void sendSetThresh(String val) async
   {
@@ -430,7 +464,7 @@ class BLEController extends ChangeNotifier {
 
   connectToMovesense() async {
     if (targetMovesenseDevice == null) {
-      print('No movesense device');
+      //print('No movesense device');
       return;
     }
     await targetMovesenseDevice?.connect();
@@ -440,21 +474,21 @@ class BLEController extends ChangeNotifier {
 
   discoverMovesenseServices() async {
     if (targetMovesenseDevice == null) {
-      print('No services');
+      //print('No services');
       return;
     }
 
     servicesMovesense = (await targetMovesenseDevice?.discoverServices())!;
-    print('Look after movesense services');
+    //print('Look after movesense services');
     for (var service in servicesMovesense) {
       // do something with service
-      print('Serivce: ${service.uuid.toString()}');
+      //print('Serivce: ${service.uuid.toString()}');
       if (service.uuid.toString() == Constants.MOVESENSE_SERVICE) {
-        print('service send');
+        //print('service send');
         for (var c in service.characteristics) {
-          print('Char send: ${c.uuid.toString()}');
+          //print('Char send: ${c.uuid.toString()}');
           if (c.uuid.toString() == Constants.MOVESENSE_SEND) {
-            print('MOVESENSE SEND: ${c}');
+            //print('MOVESENSE SEND: ${c}');
             testChar = c;
           }
         }
@@ -465,9 +499,9 @@ class BLEController extends ChangeNotifier {
       // do something with service
       if (service.uuid.toString() == Constants.MOVESENSE_SERVICE) {
         for (var c in service.characteristics) {
-          print('Receive char: ${c.uuid.toString()}');
+          //rint('Receive char: ${c.uuid.toString()}');
           if (c.uuid.toString() == Constants.MOVESENSE_DATA) {
-            print('Char: ${c.uuid.toString()}');
+            //print('Char: ${c.uuid.toString()}');
             await c.setNotifyValue(!c.isNotifying);
             streamSubMovesense = c.value.listen((event) {
               readMoveSenseData(event);
@@ -485,8 +519,8 @@ class BLEController extends ChangeNotifier {
     try {
       await testChar.write(bytes);
     } catch (error) {
-      print('Can not send to movesense');
-      print(error.toString());
+      //print('Can not send to movesense');
+      //print(error.toString());
       //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
     }
   }
@@ -512,12 +546,12 @@ class BLEController extends ChangeNotifier {
       56
     ]; //Starting subscription
 
-    print('Time to sample');
+    //print('Time to sample');
     try {
       await testChar.write(bytes);
     } catch (error) {
-      print('Can not send to movesense');
-      print(error.toString());
+      //print('Can not send to movesense');
+      //print(error.toString());
       //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
     }
   }
@@ -554,5 +588,16 @@ class BLEController extends ChangeNotifier {
       movesenseData.add(Movesense(timeStamp, acc, currentTime));
     }
   }
+
+
+  List<Data> getLeftFoot(){
+    return leftFoot;
+  }
+
+  List<Data> getRightFoot(){
+    return rightFoot;
+  }
+
+
 }
 

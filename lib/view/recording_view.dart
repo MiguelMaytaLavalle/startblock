@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:camera/camera.dart';
 import '../helper/BLEController.dart';
 import 'package:gallery_saver/gallery_saver.dart';
 
@@ -18,7 +17,7 @@ class _RecordingState extends State<RecordingScreen> {
 
  bool _isLoading = true;
   bool _isRecording = false;
-  late CameraController _cameraController;
+  //late CameraController _cameraController;
 
   @override
   void initState() {
@@ -32,6 +31,7 @@ class _RecordingState extends State<RecordingScreen> {
       setState((){});
     }
   }
+/*
 
   _initCamera() async {
     final cameras = await availableCameras();
@@ -40,8 +40,9 @@ class _RecordingState extends State<RecordingScreen> {
     await _cameraController.initialize();
     setState(() => _isLoading = false);
   }
+*/
 
-  _recordVideo() async {
+/*  _recordVideo() async {
     if (_isRecording) {
       final file = await _cameraController.stopVideoRecording();
       setState(() => _isRecording = false);
@@ -52,7 +53,7 @@ class _RecordingState extends State<RecordingScreen> {
       await _cameraController.startVideoRecording();
       setState(() => _isRecording = true);
     }
-  }
+  }*/
 
   /// This method will be invoked if a user wants to return back to the menu view by pressing back
   /// It will invoke another method for disconnecting from the micro:bit and movesense if the user chooses to return
@@ -112,6 +113,17 @@ class _RecordingState extends State<RecordingScreen> {
                     Colors.blue),
               ),
             ),
+/*            Padding(
+              padding: const EdgeInsets.all(30),
+              child: TextButton(
+                onPressed: bleController.getTimeStamp,
+                child: const Text('Get Timestamp'),
+                style: TextButton.styleFrom(
+                    primary: Colors.white,
+                    backgroundColor:
+                    Colors.blue),
+              ),
+            ),*/
           ],
         ),
       ),

@@ -78,6 +78,14 @@ class _HistoryCardState extends State<HistoryCard> {
         .map((e) => Timestamp.fromJson(e))
         .toList());
 
+    hCardVM.setLastServerTime(hCardVM.getLastServerTime());
+
+    hCardVM.setMarzulloCreationTime(hCardVM.getMarzulloCreationTime());
+
+    hCardVM.setStartSampleTime(hCardVM.getStartSampleTime());
+
+    hCardVM.setStopSampleTime(hCardVM.getStopSampleTime());
+
     setState(() => hCardVM.setIsLoading(false));
 
     hCardVM.setupLeftChartData();
@@ -174,29 +182,40 @@ class _HistoryCardState extends State<HistoryCard> {
                             ),
                             Wrap(
                               direction: Axis.vertical,
-                              children: <Widget>[
-                                Material(
-                                    child: Text('Rate of force (RFD): ${hCardVM.getRFDLeft()
-                                    .toStringAsPrecision(2)}'
+                              alignment: WrapAlignment.start,
+                              children: [
+                                const Material(
+                                    child: Text('Left Foot Data',
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(fontWeight: FontWeight.bold,
+                                      color: Colors.blue
+                                      ),
                                     )
                                 ),
                                 Material(
-                                    child: Text('Time to peak (TTP): ${hCardVM.getTimeToPeakForceLeft()}'
+                                    child: Text('Rate of force (RFD): ${hCardVM.getRFDLeft()
+                                        //.toString()}'
+                                      .toStringAsFixed(3)}'
+                                    )
+                                ),
+                                Material(
+                                    child: Text('Time to peak (TTP): ${hCardVM.getTimeToPeakForceLeft()
+                                    .toStringAsFixed(3)}'
                                     )
                                 ),
                                 Material(
                                     child: Text('Average Force: ${hCardVM.getAverageForceLeft()
-                                        .toStringAsFixed(2)}'
+                                        .toStringAsFixed(3)}'
                                     )
                                 ),
                                 Material(
                                     child: Text('Force impulse: ${hCardVM.getForceImpulseLeft()
-                                    .toStringAsPrecision(2)}'
+                                    .toStringAsFixed(3)}'
                                     )
                                 ),
                                 Material(
                                     child: Text('Peak force: ${hCardVM.getPeakForceLeft()
-                                    .toStringAsPrecision(2)}'
+                                    .toStringAsPrecision(10)}'
                                     )
                                 ),
                               ],
@@ -205,21 +224,31 @@ class _HistoryCardState extends State<HistoryCard> {
                             Wrap(
                               direction: Axis.vertical,
                               children: <Widget>[
+                                const Material(
+                                    child: Text('Right foot data',
+                                      textAlign: TextAlign.left,
+                                    style: TextStyle(fontWeight: FontWeight.bold,
+                                    color: Colors.red
+                                      ),
+                                    )
+                                ),
                                 Material(
                                     child: Text(
-                                        'Rate of force (RFD): ${hCardVM.getRFDRight().toStringAsPrecision(2)}')),
+                                        'Rate of force (RFD): ${hCardVM.getRFDRight()
+                                            //.toString()}')),
+                                            .toStringAsFixed(3)}')),
                                 Material(
                                     child: Text(
-                                        'Time to peak (TTP): ${hCardVM.getTimeToPeakForceRight()}')),
+                                        'Time to peak (TTP): ${hCardVM.getTimeToPeakForceRight().toStringAsFixed(3)}')),
                                 Material(
                                     child: Text(
-                                        'Average Force: ${hCardVM.getAverageForceRight().toStringAsFixed(2)}')),
+                                        'Average Force: ${hCardVM.getAverageForceRight().toStringAsFixed(3)}')),
                                 Material(
                                     child: Text(
-                                        'Force impulse: ${hCardVM.getForceImpulseRight().toStringAsPrecision(2)}')),
+                                        'Force impulse: ${hCardVM.getForceImpulseRight().toStringAsFixed(3)}')),
                                 Material(
                                     child: Text(
-                                        'Peak force: ${hCardVM.getPeakForceRight().toStringAsPrecision(2)}')),
+                                        'Peak force: ${hCardVM.getPeakForceRight().toStringAsFixed(3)}')),
                               ],
                             ),
                             const SizedBox(height: 60),
@@ -260,10 +289,10 @@ class _HistoryCardState extends State<HistoryCard> {
   Future<String?> openDialog() => showDialog<String>(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Do you want to delete this log?'),
+          title: const Text('Do you want to delete this log?'),
           actions: [
             TextButton(
-              child: Text('No'),
+              child: const Text('No'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
