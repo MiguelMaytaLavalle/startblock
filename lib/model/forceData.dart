@@ -20,6 +20,4 @@ class Data{
   {
     return mForce;
   }
-
-
 }

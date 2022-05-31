@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:startblock/helper/BLEController.dart';
 import 'package:startblock/model/livedata.dart';
-import 'package:startblock/model/sensor.dart';
+import 'package:startblock/model/forceData.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 import '../constant/constants.dart';
