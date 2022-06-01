@@ -1,9 +1,9 @@
-Application for a thesis project at KTH
-The report for this thesis can be found at https://www.diva-portal.org/smash/search.jsf?dswid=-9636
-In the search field, please search the following: Visualisering av tidssynkroniserade kraftdata vid sprintstarter på en mobil enhet
-
+#Application for a thesis project at KTH Royal Institute of Technology
 ## Documents
 Documents used in this project can be found under the directory /documents
+The report for this thesis can be found at https://www.diva-portal.org/smash/search.jsf?dswid=-9636
+In the search field, please search the following: Visualisering av tidssynkroniserade kraftdata vid sprintstarter på en mobil enhet
+The report can also be found under the directory /documents
 ## Getting Started with Flutter
 
 This project is a starting point for a Flutter application.
