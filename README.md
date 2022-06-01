@@ -21,3 +21,5 @@ samples, guidance on mobile development, and a full API reference.
 Code for micro:bit can be found under directory /microbit_code
 Download the file and load it into your micro:bit.
 Make sure that you enable Bluetooth on the micro:bit. See these instructions on how to do it: https://support.microbit.org/support/solutions/articles/19000051025
+
+If you want to edit the source code. Please visit https://makecode.microbit.org and import the file into MakeCode.
