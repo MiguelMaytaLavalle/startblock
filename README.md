@@ -50,6 +50,7 @@ threshold = 200
 
 ## Constants in Flutter application
 Following constants can be manipulated in the file constants/constants.dart:
+
 static const TARGET_DEVICE_NAME_TIZEZ = 'BBC micro:bit [tizez]';
 
 static const LIST_LEN = 100;
