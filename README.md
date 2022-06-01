@@ -4,7 +4,7 @@ In the search field, please search the following: Visualisering av tidssynkronis
 
 ## Documents
 Documents used in this project can be found under the directory /documents
-## Getting Started
+## Getting Started with Flutter
 
 This project is a starting point for a Flutter application.
 
@@ -17,9 +17,11 @@ For help getting started with Flutter, view our
 [online documentation](https://flutter.dev/docs), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
+For installation guidance, please read the Appendix 8 in the thesis report.
 ## Micro:bit code
 Code for micro:bit can be found under directory /microbit_code
 Download the file and load it into your micro:bit.
 Make sure that you enable Bluetooth on the micro:bit. See these instructions on how to do it: https://support.microbit.org/support/solutions/articles/19000051025
 
 If you want to edit the source code. Please visit https://makecode.microbit.org and import the file into MakeCode.
+
