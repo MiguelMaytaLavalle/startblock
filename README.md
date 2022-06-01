@@ -27,7 +27,7 @@ Make sure that you enable Bluetooth on the micro:bit. See these instructions on 
 
 If you want to edit the source code. Please visit https://makecode.microbit.org and import the file into MakeCode.
 
-Following constants kan be changed in the micro:bit code.
+Following constants kan be changed in the micro:bit code:
 k_LF = 1.8379
 m_LF = -901
 k_RF = 2.0824
@@ -40,4 +40,11 @@ frequency = 200
 sampleTotalTime = 3
 threshold = 200
 ## Constants in Flutter application
-Under following constants can be manipukated under constants.dart
+Following constants can be manipulated in the file constants/constants.dart:
+static const TARGET_DEVICE_NAME_TIZEZ = 'BBC micro:bit [tizez]';
+static const LIST_LEN = 100;
+static const ALPHA = 0.1; //EWMA alpha value
+static const MEAN_NOISE_THRESH =200; //Threshold value for noise.
+static const MOVESENSE_DEVICE_NAME = 'Movesense 175130000971';
+static const DATABASE_NAME = 'test21';
+static const HISTORY_TABLE_NAME = 'test21';
