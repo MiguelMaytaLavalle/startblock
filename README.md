@@ -27,3 +27,17 @@ Make sure that you enable Bluetooth on the micro:bit. See these instructions on 
 
 If you want to edit the source code. Please visit https://makecode.microbit.org and import the file into MakeCode.
 
+Following constants kan be changed in the micro:bit code.
+k_LF = 1.8379
+m_LF = -901
+k_RF = 2.0824
+m_RF = -1026
+invers = 1023
+g = 9.82
+pauseTime = 4.741
+frequency = 200
+// sampleTotalTime 3 seconds for 200Hz
+sampleTotalTime = 3
+threshold = 200
+## Constants in Flutter application
+Under following constants can be manipukated under constants.dart
