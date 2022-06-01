@@ -1,1 +1,186 @@
-
+function copySamples () {
+    tmpTimeStamps = timeStamps
+    tmpListLF = list_Left
+    tmpListRF = list_Right
+    list_Left = []
+    list_Right = []
+    timeStamps = []
+}
+function sendData () {
+    basic.showString("B")
+    for (let l = 0; l <= tmpListLF.length - 1; l++) {
+        bluetooth.uartWriteValue("LF", tmpListLF[l])
+    }
+    basic.pause(100)
+    for (let m = 0; m <= tmpListRF.length - 1; m++) {
+        bluetooth.uartWriteValue("RF", tmpListRF[m])
+    }
+    basic.pause(100)
+    for (let n = 0; n <= tmpTimeStamps.length - 1; n++) {
+        bluetooth.uartWriteValue("T", tmpTimeStamps[n])
+    }
+    basic.showIcon(IconNames.Happy)
+}
+bluetooth.onBluetoothConnected(function () {
+    basic.showString("C")
+})
+bluetooth.onBluetoothDisconnected(function () {
+    basic.showString("D")
+    control.reset()
+})
+bluetooth.onUartDataReceived(serial.delimiters(Delimiters.NewLine), function () {
+    data = bluetooth.uartReadUntil(serial.delimiters(Delimiters.NewLine))
+    // Cristian's Algorithm request. TS = TimeSync
+    if (data.compare("TS") == 0) {
+        bluetooth.uartWriteValue("S", input.runningTime())
+    }
+    // Request to start a sample.
+    if (data.compare("Start") == 0) {
+        countDown()
+        copySamples()
+        basic.pause(100)
+        // Indicates app to stop Movesense Accelerometer
+        // subscription
+        bluetooth.uartWriteValue("SM", 0)
+        sendData()
+        bluetooth.uartWriteValue("D", 0)
+        resetTempLists()
+    }
+    if (data.charAt(0) == "T") {
+        threshold = parseInt(data.slice(1))
+    }
+})
+function resetTempLists () {
+    tmpListLF = []
+    tmpListRF = []
+    tmpTimeStamps = []
+}
+function falseStartCheck () {
+    falseStartOccurred = false
+    for (let o = 0; o <= 400; o++) {
+        if (list_Left[o] > threshold && o <= 400 || list_Right[o] > threshold && o <= 400) {
+            falseStartOccurred = true
+            break;
+        }
+    }
+    if (falseStartOccurred) {
+        music.playTone(262, music.beat(BeatFraction.Breve))
+        bluetooth.uartWriteValue("FS", 0)
+        return falseStartOccurred
+    } else {
+        return falseStartOccurred
+    }
+}
+function resetAllLists () {
+    tmpListLF = []
+    tmpListRF = []
+    list_Left = []
+    list_Right = []
+    tmpTimeStamps = []
+    timeStamps = []
+}
+function initCountdown () {
+    music.playTone(262, music.beat(BeatFraction.Quarter))
+    basic.pause(873)
+    for (let index = 0; index < 2; index++) {
+        music.playTone(262, music.beat(BeatFraction.Quarter))
+        initSample()
+    }
+    music.playTone(262, music.beat(BeatFraction.Whole))
+    sampleToLists()
+}
+function countDown () {
+    for (let index2 = 0; index2 <= 2; index2++) {
+        music.playTone(262, music.beat(BeatFraction.Quarter))
+        basic.showNumber(3 - index2)
+    }
+    music.playTone(262, music.beat(BeatFraction.Whole))
+    sampleToLists()
+}
+function initSample () {
+    for (let index = 0; index < frequency; index++) {
+        tmp_RF = invers - pins.analogReadPin(AnalogPin.P1)
+        var_RF = k_RF * tmp_RF + m_RF
+        var_RF = var_RF * g
+        list_Right.push(var_RF)
+        tmp_LF = invers - pins.analogReadPin(AnalogPin.P2)
+        var_LF = k_LF * tmp_LF + m_LF
+        var_LF = var_LF * g
+        list_Left.push(var_LF)
+        timeStamps.push(input.runningTime())
+        basic.pause(pauseTime)
+    }
+}
+function sampleToLists () {
+    for (let index = 0; index < sampleTotalTime; index++) {
+        for (let index = 0; index < frequency; index++) {
+            tmp_RF = invers - pins.analogReadPin(AnalogPin.P1)
+            var_RF = k_RF * tmp_RF + m_RF
+            var_RF = var_RF * g
+            list_Right.push(var_RF)
+            tmp_LF = invers - pins.analogReadPin(AnalogPin.P2)
+            var_LF = k_LF * tmp_LF + m_LF
+            var_LF = var_LF * g
+            list_Left.push(var_LF)
+            timeStamps.push(input.runningTime())
+            basic.pause(pauseTime)
+        }
+    }
+}
+let falseStartOccurred = false
+let timeStamps: number[] = []
+let list_Left: number[] = []
+let list_Right: number[] = []
+let tmpListLF: number[] = []
+let tmpListRF: number[] = []
+let tmpTimeStamps: number[] = []
+let data = ""
+let var_LF: number
+let tmp_LF: number
+let var_RF: number
+let tmp_RF: number
+let sampleTotalTime: number
+let frequency: number
+let pauseTime: number
+let g: number
+let invers: number
+let m_RF: number
+let k_RF: number
+let m_LF: number
+let k_LF: number
+let t2: number
+let t1: number
+let threshold: number
+threshold = 0
+t1 = 0
+t2 = 0
+list_Right = []
+list_Left = []
+tmpListLF = []
+tmpListRF = []
+timeStamps = []
+tmpTimeStamps = []
+music.setVolume(255)
+k_LF = 1.8379
+m_LF = -901
+k_RF = 2.0824
+m_RF = -1026
+invers = 1023
+g = 9.82
+pauseTime = 4.741
+frequency = 200
+// 3 seconds for 200Hz
+sampleTotalTime = 3
+tmp_RF = 0
+var_RF = 0
+tmp_LF = 0
+var_LF = 0
+threshold = 200
+bluetooth.startUartService()
+basic.showLeds(`
+    # . . # #
+    # . . # #
+    # # # . .
+    # . # . .
+    # # # . .
+    `)
