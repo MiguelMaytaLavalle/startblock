@@ -38,12 +38,14 @@ class DataViewViewModel extends ChangeNotifier{
   ///ratio between sampled data array and time array is 1:1
   int getTimeToPeakForceLeft()
   {
-    _timeToPeakForceLeft = _calcTimeToPeakForce(_EWMAFilter2(bleController.getLeftFoot()));
+    //_timeToPeakForceLeft = _calcTimeToPeakForce(_EWMAFilter2(bleController.getLeftFoot()));
+    _timeToPeakForceLeft = _calcTimeToPeakForce(_EWMAFilter2(bleController.leftFoot));
     return _timeToPeakForceLeft;
   }
   int getTimeToPeakForceRight()
   {
-    _timeToPeakForceRight =_calcTimeToPeakForce(_EWMAFilter2(bleController.getRightFoot()));
+    //_timeToPeakForceRight =_calcTimeToPeakForce(_EWMAFilter2(bleController.getRightFoot()));
+    _timeToPeakForceRight =_calcTimeToPeakForce(_EWMAFilter2(bleController.rightFoot));
     return _timeToPeakForceRight;
   }
   int _calcTimeToPeakForce(List<Data> data)
@@ -64,12 +66,14 @@ class DataViewViewModel extends ChangeNotifier{
   ///Calculates the highest value in the array, AKA peak force
   double getPeakForceLeft()
   {
-    _peakForceLeft = _calcPeakForce(_EWMAFilter2(bleController.getLeftFoot()));
+    //_peakForceLeft = _calcPeakForce(_EWMAFilter2(bleController.getLeftFoot()));
+    _peakForceLeft = _calcPeakForce(_EWMAFilter2(bleController.leftFoot));
     return _peakForceLeft;
   }
   double getPeakForceRight()
   {
-    _peakForceRight = _calcPeakForce(_EWMAFilter2(bleController.getRightFoot()));
+    //_peakForceRight = _calcPeakForce(_EWMAFilter2(bleController.getRightFoot()));
+    _peakForceRight = _calcPeakForce(_EWMAFilter2(bleController.rightFoot));
     return _peakForceRight;
   }
   double _calcPeakForce(List<Data> data)
@@ -87,53 +91,61 @@ class DataViewViewModel extends ChangeNotifier{
   }
   double getForceImpulseLeft()
   {
-    _totalForceLeft = _calcTotalForce(_EWMAFilter2(bleController.getLeftFoot()));
+    //_totalForceLeft = _calcTotalForce(_EWMAFilter2(bleController.getLeftFoot()));
+    _totalForceLeft = _calcTotalForce(_EWMAFilter2(bleController.leftFoot));
     if(_totalForceLeft.isNaN)
       {
         return 0;
       }
     else
       {
-        _forceImpulseLeft = _calcForceImpulse(_EWMAFilter2(bleController.getLeftFoot()), _totalForceLeft);
+        //_forceImpulseLeft = _calcForceImpulse(_EWMAFilter2(bleController.getLeftFoot()), _totalForceLeft);
+        _forceImpulseLeft = _calcForceImpulse(_EWMAFilter2(bleController.leftFoot), _totalForceLeft);
         return _forceImpulseLeft;
       }
   }
   double getForceImpulseRight()
   {
-    _totalForceRight = _calcTotalForce(_EWMAFilter2(bleController.getRightFoot()));
+    //_totalForceRight = _calcTotalForce(_EWMAFilter2(bleController.getRightFoot()));
+    _totalForceRight = _calcTotalForce(_EWMAFilter2(bleController.rightFoot));
     if(_totalForceRight.isNaN)
       {
         return 0;
       }
     else
       {
-        _forceImpulseRight = _calcForceImpulse(_EWMAFilter2(bleController.getRightFoot()), _totalForceRight);
+        //_forceImpulseRight = _calcForceImpulse(_EWMAFilter2(bleController.getRightFoot()), _totalForceRight);
+        _forceImpulseRight = _calcForceImpulse(_EWMAFilter2(bleController.rightFoot), _totalForceRight);
         return _forceImpulseRight;
       }
   }
   double getAverageForceLeft()
   {
-    _totalForceLeft = _calcTotalForce(_EWMAFilter2(bleController.getLeftFoot()));
+    //_totalForceLeft = _calcTotalForce(_EWMAFilter2(bleController.getLeftFoot()));
+    _totalForceLeft = _calcTotalForce(_EWMAFilter2(bleController.leftFoot));
     if(_totalForceLeft.isNaN)
       {
         return  0;
       }
     else
       {
-        _avgForceLeft = _calcAverageForce(_EWMAFilter2(bleController.getLeftFoot()), _totalForceLeft);
+        //_avgForceLeft = _calcAverageForce(_EWMAFilter2(bleController.getLeftFoot()), _totalForceLeft);
+        _avgForceLeft = _calcAverageForce(_EWMAFilter2(bleController.leftFoot), _totalForceLeft);
         return _avgForceLeft;
       }
   }
   double getAverageForceRight()
   {
-    _totalForceRight = _calcTotalForce(_EWMAFilter2(bleController.getRightFoot()));
+    //_totalForceRight = _calcTotalForce(_EWMAFilter2(bleController.getRightFoot()));
+    _totalForceRight = _calcTotalForce(_EWMAFilter2(bleController.rightFoot));
     if(_totalForceRight.isNaN)
       {
         return 0;
       }
     else
     {
-      _avgForceRight = _calcAverageForce(_EWMAFilter2(bleController.getRightFoot()), _totalForceRight);
+      //_avgForceRight = _calcAverageForce(_EWMAFilter2(bleController.getRightFoot()), _totalForceRight);
+      _avgForceRight = _calcAverageForce(_EWMAFilter2(bleController.rightFoot), _totalForceRight);
       return _avgForceRight;
     }
   }
@@ -237,12 +249,14 @@ class DataViewViewModel extends ChangeNotifier{
   ///Calculates the slope of the plotted function. Slope value represents Rate of Force Development
   double getRFDLeft()
   {
-    _RFDLeft = _calcRFD(_EWMAFilter2(bleController.getLeftFoot()));
+    //_RFDLeft = _calcRFD(_EWMAFilter2(bleController.getLeftFoot()));
+    _RFDLeft = _calcRFD(_EWMAFilter2(bleController.leftFoot));
     return _RFDLeft;
   }
   double getRFDRight()
   {
-    _RFDRight = _calcRFD(_EWMAFilter2(bleController.getRightFoot()));
+   // _RFDRight = _calcRFD(_EWMAFilter2(bleController.getRightFoot()));
+    _RFDRight = _calcRFD(_EWMAFilter2(bleController.rightFoot));
     return _RFDRight;
   }
   double _calcRFD(List<Data> data)
@@ -265,10 +279,12 @@ class DataViewViewModel extends ChangeNotifier{
   ///Gets raw value data to be saved persistently .
   List<LiveData> getLeftDataToSave (){
     List<LiveData> tmpLeftList = <LiveData>[];
-    for(int i = 0; i < bleController.getLeftFoot().length; i++){
+    //for(int i = 0; i < bleController.getLeftFoot().length; i++){
+    for(int i = 0; i < bleController.leftFoot.length; i++){
       //print("Left: ${bleController.getLeftFoot()[i]}");
       tmpLeftList.add(LiveData(
-        force: bleController.getLeftFoot()[i].mForce
+        //force: bleController.getLeftFoot()[i].mForce
+          force: bleController.leftFoot[i].mForce
       ));
       //print("Index: $i");
       //print("-----------");
@@ -278,10 +294,12 @@ class DataViewViewModel extends ChangeNotifier{
   ///Gets raw value data to be saved persistently.
   List<LiveData> getRightDataToSave (){
     List<LiveData> tmpRightList = <LiveData>[];
-    for(int i = 0; i < bleController.getRightFoot().length; i++){
+    //for(int i = 0; i < bleController.getRightFoot().length; i++){
+    for(int i = 0; i < bleController.rightFoot.length; i++){
       //print("Right: ${bleController.getRightFoot()[i]}");
       tmpRightList.add(LiveData(
-          force: bleController.getRightFoot()[i].mForce
+          //force: bleController.getRightFoot()[i].mForce
+        force: bleController.rightFoot[i].mForce
       ));
       //print("Index: $i");
       //print("-----------");
@@ -297,7 +315,8 @@ class DataViewViewModel extends ChangeNotifier{
       SplineSeries<Data, int>(
         color: Colors.blue,
         //dataSource: bleController.leftFoot,
-        dataSource: _EWMAFilter2(bleController.getLeftFoot()),
+        //dataSource: _EWMAFilter2(bleController.getLeftFoot()),
+        dataSource: _EWMAFilter2(bleController.leftFoot),
         width: 2,
         name: 'Left foot',
         onRendererCreated: (ChartSeriesController controller) {
@@ -315,7 +334,8 @@ class DataViewViewModel extends ChangeNotifier{
       SplineSeries<Data, int>(
         color: Colors.red,
         //dataSource: tempRight,
-        dataSource: _EWMAFilter2(bleController.getRightFoot()),
+        //dataSource: _EWMAFilter2(bleController.getRightFoot()),
+        dataSource: _EWMAFilter2(bleController.rightFoot),
         width: 2,
         name: 'Right foot',
         onRendererCreated: (ChartSeriesController controller) {

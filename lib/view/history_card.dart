@@ -3,12 +3,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:startblock/constant/constants.dart';
 import 'package:startblock/db/database_helper.dart';
 import 'package:startblock/helper/excel.dart';
 import 'package:startblock/model/livedata.dart';
 import 'package:startblock/model/timestamp.dart';
 import 'package:startblock/view_model/history_card_view_model.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:startblock/constant/constants.dart';
 
 class HistoryCard extends StatefulWidget {
   final int historyId;
@@ -141,7 +143,7 @@ class _HistoryCardState extends State<HistoryCard> {
                                   axisLine: AxisLine(width:1),
                                   edgeLabelPlacement: EdgeLabelPlacement.shift,
                                   interval: 1000, //1000ms between two timestamps equals a second
-                                  //title: AxisTitle(text: 'Time [S]')
+                                  title: AxisTitle(text: 'Time [ms]')
 
                               ),
 
@@ -168,7 +170,7 @@ class _HistoryCardState extends State<HistoryCard> {
                                   axisLine: AxisLine(width:1),
                                   edgeLabelPlacement: EdgeLabelPlacement.shift,
                                   interval: 1000, //1000ms between two timestamps equals a second
-                                  //title: AxisTitle(text: 'Time [S]')
+                                  title: AxisTitle(text: 'Time [ms]')
                               ),
 
                               primaryYAxis: NumericAxis(
@@ -195,27 +197,25 @@ class _HistoryCardState extends State<HistoryCard> {
                                 Material(
                                     child: Text('Rate of force (RFD): ${hCardVM.getRFDLeft()
                                         //.toString()}'
-                                      .toStringAsFixed(3)}'
+                                      .toStringAsFixed(Constants.DECIMAL)}'
                                     )
                                 ),
                                 Material(
                                     child: Text('Time to peak (TTP): ${hCardVM.getTimeToPeakForceLeft()
-                                    .toStringAsFixed(3)}'
-                                    )
-                                ),
+                                    .toString()}')),
                                 Material(
                                     child: Text('Average Force: ${hCardVM.getAverageForceLeft()
-                                        .toStringAsFixed(3)}'
+                                        .toStringAsFixed(Constants.DECIMAL)}'
                                     )
                                 ),
-                                Material(
+                                /*Material(
                                     child: Text('Force impulse: ${hCardVM.getForceImpulseLeft()
                                     .toStringAsFixed(3)}'
                                     )
-                                ),
+                                ),*/
                                 Material(
                                     child: Text('Peak force: ${hCardVM.getPeakForceLeft()
-                                    .toStringAsPrecision(10)}'
+                                    .toStringAsFixed(0)}'
                                     )
                                 ),
                               ],
@@ -236,19 +236,21 @@ class _HistoryCardState extends State<HistoryCard> {
                                     child: Text(
                                         'Rate of force (RFD): ${hCardVM.getRFDRight()
                                             //.toString()}')),
-                                            .toStringAsFixed(3)}')),
+                                            .toStringAsFixed(Constants.DECIMAL)}')),
                                 Material(
                                     child: Text(
-                                        'Time to peak (TTP): ${hCardVM.getTimeToPeakForceRight().toStringAsFixed(3)}')),
+                                        'Time to peak (TTP): ${hCardVM.getTimeToPeakForceRight()
+                                            .toString()}')),
                                 Material(
                                     child: Text(
-                                        'Average Force: ${hCardVM.getAverageForceRight().toStringAsFixed(3)}')),
+                                        'Average Force: ${hCardVM.getAverageForceRight()
+                                            .toStringAsFixed(Constants.DECIMAL)}')),
+                                /*Material(
+                                    child: Text(
+                                        'Force impulse: ${hCardVM.getForceImpulseRight().toStringAsFixed(3)}')),*/
                                 Material(
                                     child: Text(
-                                        'Force impulse: ${hCardVM.getForceImpulseRight().toStringAsFixed(3)}')),
-                                Material(
-                                    child: Text(
-                                        'Peak force: ${hCardVM.getPeakForceRight().toStringAsFixed(3)}')),
+                                        'Peak force: ${hCardVM.getPeakForceRight().toStringAsFixed(0)}')),
                               ],
                             ),
                             const SizedBox(height: 60),

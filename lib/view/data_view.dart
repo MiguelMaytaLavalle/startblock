@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:startblock/constant/constants.dart';
 import 'package:startblock/helper/BLEController.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:startblock/view_model/data_view_view_model.dart';
@@ -63,7 +64,7 @@ class _DataState extends State<DataScreen> {
                   axisLine: AxisLine(width:1),
                   edgeLabelPlacement: EdgeLabelPlacement.shift,
                   interval: 1000, //1000ms between two timestamps equals a second
-                  title: AxisTitle(text: 'Time [S]')
+                  title: AxisTitle(text: 'Time [ms]')
 
               ),
 
@@ -93,7 +94,7 @@ class _DataState extends State<DataScreen> {
                   axisLine: AxisLine(width: 1),
                   edgeLabelPlacement: EdgeLabelPlacement.shift,
                   interval: 1000, //1000ms between two timestamps equals a second
-                  title: AxisTitle(text: 'Time [S]')
+                  title: AxisTitle(text: 'Time [ms]')
 
               ),
 
@@ -122,28 +123,19 @@ class _DataState extends State<DataScreen> {
                 ),
                 Material(
                     child: Text('Rate of force (RFD): ${sensorPageVM.getRFDLeft()
-                    //.toString()}'
-                        .toStringAsFixed(3)}'
-                    )
-                ),
+                        .toStringAsFixed(Constants.DECIMAL)}')),
                 Material(
                     child: Text('Time to peak (TTP): ${sensorPageVM.getTimeToPeakForceLeft()
-                        .toStringAsFixed(3)}'
-                    )
-                ),
+                        //.toStringAsFixed(3)}')),
+                        .toString()}')),
                 Material(
                     child: Text('Average Force: ${sensorPageVM.getAverageForceLeft()
-                        .toStringAsFixed(3)}'
-                    )
-                ),
-                Material(
-                    child: Text('Force impulse: ${sensorPageVM.getForceImpulseLeft()
-                        .toStringAsFixed(3)}'
-                    )
-                ),
+                        .toStringAsFixed(Constants.DECIMAL)}')),
+                /*Material(
+                    child: Text('Force impulse: ${sensorPageVM.getForceImpulseLeft().toStringAsFixed(3)}')),*/
                 Material(
                     child: Text('Peak force: ${sensorPageVM.getPeakForceLeft()
-                        .toStringAsPrecision(10)}'
+                        .toStringAsFixed(0)}'
                     )
                 ),
               ],
@@ -160,22 +152,22 @@ class _DataState extends State<DataScreen> {
                     )
                 ),
                 Material(
-                    child: Text(
-                        'Rate of force (RFD): ${sensorPageVM.getRFDRight()
-                        //.toString()}')),
-                            .toStringAsFixed(3)}')),
+                    child: Text('Rate of force (RFD): ${sensorPageVM.getRFDRight()
+                            .toStringAsFixed(Constants.DECIMAL)}')),
                 Material(
                     child: Text(
-                        'Time to peak (TTP): ${sensorPageVM.getTimeToPeakForceRight().toStringAsFixed(3)}')),
+                        'Time to peak (TTP): ${sensorPageVM.getTimeToPeakForceRight()
+                            .toString()}')),
                 Material(
                     child: Text(
-                        'Average Force: ${sensorPageVM.getAverageForceRight().toStringAsFixed(3)}')),
+                        'Average Force: ${sensorPageVM.getAverageForceRight()
+                            .toStringAsFixed(Constants.DECIMAL)}')),
+                /*Material(
+                    child: Text(
+                        'Force impulse: ${sensorPageVM.getForceImpulseRight().toStringAsFixed(3)}')),*/
                 Material(
                     child: Text(
-                        'Force impulse: ${sensorPageVM.getForceImpulseRight().toStringAsFixed(3)}')),
-                Material(
-                    child: Text(
-                        'Peak force: ${sensorPageVM.getPeakForceRight().toStringAsFixed(3)}')),
+                        'Peak force: ${sensorPageVM.getPeakForceRight().toStringAsFixed(0)}')),
               ],
             ),
 
