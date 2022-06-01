@@ -79,7 +79,7 @@ class ExportToExcel{
     sheet.getRangeByIndex(1, 4).setText('Marzullo Micro:Bit Offset');
     sheet.getRangeByIndex(2, 4).setText(history.marzullo.toString());
 
-    sheet.getRangeByIndex(1, 5).setText('Start Sample Time');
+/*    sheet.getRangeByIndex(1, 5).setText('Start Sample Time');
     sheet.getRangeByIndex(2, 5).setText(history.startSampleTime.toString());
 
     sheet.getRangeByIndex(1, 6).setText('Stop Sample Time');
@@ -88,7 +88,7 @@ class ExportToExcel{
     sheet.getRangeByIndex(1, 7).setText('Marzullo Micro:Bit Creation Time');
     sheet.getRangeByIndex(2, 7).setText(history.marzulloCreationTime.toString());
     sheet.getRangeByIndex(1, 8).setText('Marzullo Micro:Bit Last Server Time');
-    sheet.getRangeByIndex(2, 8).setText(history.lastServerTime.toString());
+    sheet.getRangeByIndex(2, 8).setText(history.lastServerTime.toString());*/
 
 
     try{

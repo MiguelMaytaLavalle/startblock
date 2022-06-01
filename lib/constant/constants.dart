@@ -28,6 +28,7 @@ class Constants {
   static const MOVESENSE_DEVICE_NAME = 'Movesense 175130000971';
   static const DATABASE_NAME = 'test21';
   static const HISTORY_TABLE_NAME = 'test21';
+  static const DECIMAL = 1;
 
 }
 
