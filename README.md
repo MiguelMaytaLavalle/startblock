@@ -1,4 +1,3 @@
-#Application for a thesis project at KTH Royal Institute of Technology
 ## Documents
 Documents used in this project can be found under the directory /documents
 The report for this thesis can be found at https://www.diva-portal.org/smash/search.jsf?dswid=-9636
